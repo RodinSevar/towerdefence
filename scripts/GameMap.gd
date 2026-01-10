@@ -7,6 +7,7 @@ extends Node3D
 
 const GRID_SIZE = 32
 const CELL_SIZE = 2.0 # In 3D world units
+const END_POINT = Vector2i(16, 31)
 
 # Game Economy
 var gold = 100
@@ -25,14 +26,16 @@ var hud = null
 # Wave Configuration
 # Each wave: { "count": int, "interval": float, "hp": float, "speed": float, "reward": int, "color": Color, "scale": float }
 var waves = [
-	{ "count": 10, "interval": 1.0, "hp": 50, "speed": 8.0, "reward": 5, "color": Color(1, 0, 0), "scale": 1.0 },       # Wave 1: Red
-	{ "count": 15, "interval": 0.8, "hp": 80, "speed": 10.0, "reward": 6, "color": Color(0, 0.5, 1), "scale": 0.8 },     # Wave 2: Blue (Fast/Small)
-	{ "count": 5, "interval": 1.5, "hp": 300, "speed": 6.0, "reward": 15, "color": Color(0.5, 0, 0.5), "scale": 2.0 },   # Wave 3: Purple (Boss/Big)
+	{ "count": 20, "interval": 0.25, "hp": 40, "speed": 8.0, "reward": 3, "color": Color(1, 0, 0), "scale": 1.0 },       # Wave 1: Pack of 20 Red
+	{ "count": 30, "interval": 0.15, "hp": 60, "speed": 12.0, "reward": 4, "color": Color(0, 0.5, 1), "scale": 0.8 },    # Wave 2: Swarm of 30 Blue
+	{ "count": 5, "interval": 1.0, "hp": 400, "speed": 6.0, "reward": 20, "color": Color(0.5, 0, 0.5), "scale": 2.0 },   # Wave 3: 5 Bosses
 ]
 var current_wave_index = -1
 var enemies_remaining_to_spawn = 0
 var wave_spawn_timer = 0.0
 var is_wave_active = false
+var spawn_counter = 0 # To track position in the spawn grid
+var spawn_zones = [] # List of SpawnLocation objects
 
 # Visual settings
 @export var ground_mesh: MeshInstance3D
@@ -48,8 +51,8 @@ func _ready():
 	setup_grid()
 	setup_map_design() # Add obstacles
 	# Test pathfinding debug
-	print("Grid ready. Testing path from (0,0) to (31,31)...")
-	var path = get_path_route(Vector2i(0,0), Vector2i(31,31))
+	print("Grid ready. Testing path from (0,0) to ", END_POINT, "...")
+	var path = get_path_route(Vector2i(0,0), END_POINT)
 	print("Path found: ", path)
 	
 	start_next_wave()
@@ -114,6 +117,40 @@ func setup_map_design():
 		
 		occupied_cells[pos] = mesh_inst
 
+	# --- SPAWN ZONES (Rectangle 6x4 split in two) ---
+	# Left Zone: x=[13, 15], y=[0, 3] (3x4 = 12 cells)
+	# Right Zone: x=[1---
+	# Define dynamic spawn zones here
+	spawn_zones.clear()
+	# Left Zone: x=[13, 15], y=[0, 3]
+	spawn_zones.append(SpawnLocation.new(Rect2i(13, 0, 3, 4), CELL_SIZE))
+	# Right Zone: x=[16, 18], y=[0, 3]
+	spawn_zones.append(SpawnLocation.new(Rect2i(16, 0, 3, 4), CELL_SIZE))
+
+	for zone in spawn_zones:
+		var cells = zone.get_occupied_cells()
+		for pos in cells:
+			# Visual Marker (Red Floor)
+			var marker = MeshInstance3D.new()
+			var plane = PlaneMesh.new()
+			plane.size = Vector2(CELL_SIZE, CELL_SIZE)
+			marker.mesh = plane
+			
+			var material = StandardMaterial3D.new()
+			material.albedo_color = Color(0.5, 0, 0, 0.5) # Semi-transparent Red
+			material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			marker.material_override = material
+			
+			add_child(marker)
+			marker.position = Vector3(
+				pos.x * CELL_SIZE + CELL_SIZE/2, 
+				0.05, # Slightly above ground to avoid z-fighting
+				pos.y * CELL_SIZE + CELL_SIZE/2
+			)
+			
+			# Mark as occupied so player CANNOT build here
+			occupied_cells[pos] = marker
+
 func start_next_wave():
 	current_wave_index += 1
 	if current_wave_index >= waves.size():
@@ -127,6 +164,11 @@ func start_next_wave():
 	
 	if hud: hud.update_wave(current_wave_index + 1)
 	print("Starting Wave ", current_wave_index + 1)
+	
+	# Instant Spawn (Wintermaul Style)
+	spawn_counter = 0 # Reset grid position for new wave
+	while enemies_remaining_to_spawn > 0:
+		spawn_enemy()
 
 func setup_ui():
 	hud = hud_script.new()
@@ -152,13 +194,7 @@ func restart_game():
 
 func _process(delta):
 	handle_input()
-	
-	if is_wave_active and enemies_remaining_to_spawn > 0:
-		wave_spawn_timer -= delta
-		if wave_spawn_timer <= 0:
-			spawn_enemy()
-			var wave_data = waves[current_wave_index]
-			wave_spawn_timer = wave_data["interval"]
+	# Spawning is now instant in start_next_wave, so no timer logic needed here.
 
 func spawn_enemy():
 	var wave_data = waves[current_wave_index]
@@ -177,12 +213,31 @@ func spawn_enemy():
 	# Apply Visuals
 	enemy.setup_visuals(wave_data["color"], wave_data["scale"])
 	
-	# Start at (0,0)
-	enemy.position = Vector3(1.0, 0.5, 1.0) 
+	# --- SPLIT SPAWN LOGIC ---
+	# AlteDYNAMIC SPAWN LOGIC ---
+	# 1. Round Robin selection of zones
+	var zone_index = spawn_counter % spawn_zones.size()
+	var zone = spawn_zones[zone_index]
 	
-	# Give initial path
-	var path = get_path_route(Vector2i(0,0), Vector2i(31,31))
+	# 2. Calculate local index within that zone
+	var index_in_zone = floor(spawn_counter / spawn_zones.size())
+	
+	# 3. Get World Position
+	enemy.position = zone.get_spawn_pos(index_in_zone)
+	
+	# Increment counter
+	spawn_counter += 1
+	
+	# 4. Pathfinding from spawn point
+	var start_grid_x = floor(enemy.position.x / CELL_SIZE)
+	var start_grid_y = floor(enemy.position.z / CELL_SIZE)
+	
+	# Give initial path to Bottom Center
+	var path = get_path_route(Vector2i(start_grid_x, start_grid_y), END_POINT)
 	enemy.set_path(path)
+	
+	# Wintermaul Style: Idle for a moment before rushing
+	enemy.start_idle(2.0)
 	
 	enemies.append(enemy)
 	
@@ -352,19 +407,20 @@ func update_enemy_paths():
 			var current_grid_x = floor(enemy.position.x / CELL_SIZE)
 			var current_grid_y = floor(enemy.position.z / CELL_SIZE)
 			var start_pos = Vector2i(current_grid_x, current_grid_y)
-			var end_pos = Vector2i(31, 31)
 			
-			var new_path = get_path_route(start_pos, end_pos)
+			var new_path = get_path_route(start_pos, END_POINT)
 			enemy.set_path(new_path)
 
 func is_valid_pos(pos: Vector2i) -> bool:
 	return astar.region.has_point(pos)
 
 func check_path_exists() -> bool:
-	# In Wintermaul, enemies go from Start to End.
-	# Let's assume (0,0) is Start and (31,31) is End for now.
-	var path = astar.get_id_path(Vector2i(0,0), Vector2i(31,31))
-	return not path.is_empty()
+	# Check ALL spawn zones
+	for zone in spawn_zones:
+		var path = astar.get_id_path(zone.get_start_point(), END_POINT)
+		if path.is_empty():
+			return false
+	return true
 
 func get_path_route(start: Vector2i, end: Vector2i) -> Array:
 	return astar.get_point_path(start, end)

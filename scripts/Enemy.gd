@@ -3,10 +3,13 @@ extends Node3D
 var speed = 10.0
 var base_speed = 10.0 # Store original speed
 var current_path = []
-var target_position: Vector3
+var is_active = false # Starts inactive (idling)
+
+# Missing Variables Restored
 var max_health = 100.0
 var current_health = 100.0
 var gold_reward = 5
+var target_position: Vector3
 
 func _ready():
 	# Simple visual for the enemy (Red Sphere)
@@ -21,6 +24,12 @@ func _ready():
 	mesh_inst.material_override = material
 	
 	add_child(mesh_inst)
+
+func start_idle(duration: float):
+	is_active = false
+	await get_tree().create_timer(duration).timeout
+	if is_instance_valid(self):
+		is_active = true
 
 func setup_visuals(color: Color, scale_factor: float):
 	# Update Color
@@ -74,6 +83,9 @@ func set_path(path_points: Array):
 	
 	# Fix: The path includes the starting cell (where we are now).
 	# We should skip it so we don't walk backwards to the center of our current tile.
+	# BUT: If we are idling at spawn with a random offset, we might want to keep the first point 
+	# to ensure we walk to the grid center first. 
+	# For now, we'll keep the pop logic but rely on path finding being from (0,0).
 	if current_path.size() > 1:
 		current_path.pop_front()
 	
@@ -81,6 +93,9 @@ func set_path(path_points: Array):
 		target_position = current_path[0]
 
 func _process(delta):
+	if not is_active:
+		return # Idle waiting for wave to start moving
+		
 	if current_path.is_empty():
 		return
 
