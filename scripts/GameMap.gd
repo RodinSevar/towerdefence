@@ -8,12 +8,17 @@ extends Node3D
 const GRID_SIZE = 32
 const CELL_SIZE = 2.0 # In 3D world units
 
+# Game Economy
+var gold = 100
+const TOWER_COST = 15
+
 # Visual settings
 @export var ground_mesh: MeshInstance3D
 @export var cursor_mesh: MeshInstance3D
 
 var astar = AStarGrid2D.new()
 var enemies = [] # Track active enemies
+var occupied_cells = {} # Dictionary to track built towers { Vector2i: Node3D }
 
 func _ready():
 	setup_visuals()
@@ -93,10 +98,21 @@ func setup_grid():
 	astar.update() # Build the initial grid
 	
 	print("Map initialized with size: ", GRID_SIZE, "x", GRID_SIZE)
+	print("Starting Gold: ", gold)
 
 # Call this when the player builds a tower
 func build_tower(grid_pos: Vector2i) -> bool:
 	if not is_valid_pos(grid_pos):
+		return false
+	
+	# Check affordability
+	if gold < TOWER_COST:
+		print("Not enough gold! Cost: ", TOWER_COST, " Have: ", gold)
+		return false
+	
+	# Fix: Check if we already built here
+	if occupied_cells.has(grid_pos):
+		print("Cell already occupied!")
 		return false
 	
 	# Check if any enemy is currently standing on this tile
@@ -125,7 +141,15 @@ func build_tower(grid_pos: Vector2i) -> bool:
 	# Update all enemies with new path
 	update_enemy_paths()
 	
+	# Pay for the tower
+	gold -= TOWER_COST
+	print("Tower built! Gold remaining: ", gold)
+	
 	return true
+
+func add_gold(amount: int):
+	gold += amount
+	print("Gold added: ", amount, ". Total: ", gold)
 
 func update_enemy_paths():
 	for enemy in enemies:
@@ -192,13 +216,28 @@ func handle_input():
 		cursor_mesh.visible = false
 
 func place_tower_visual(grid_pos: Vector2i):
+	# Create the Tower Logic Node
+	var tower_script = load("res://scripts/Tower.gd")
+	var tower_node = Node3D.new()
+	tower_node.set_script(tower_script)
+	add_child(tower_node)
+	
+	# Track it!
+	occupied_cells[grid_pos] = tower_node
+	
+	# Position the tower
+	tower_node.position = Vector3(
+		grid_pos.x * CELL_SIZE + CELL_SIZE/2, 
+		0.0, 
+		grid_pos.y * CELL_SIZE + CELL_SIZE/2
+	)
+	
+	# Create the Visuals (Box) as a child of the Tower Node
 	var box = BoxMesh.new()
 	box.size = Vector3(CELL_SIZE, 2.0, CELL_SIZE)
 	var mesh_inst = MeshInstance3D.new()
 	mesh_inst.mesh = box
-	add_child(mesh_inst)
-	mesh_inst.position = Vector3(
-		grid_pos.x * CELL_SIZE + CELL_SIZE/2, 
-		1.0, 
-		grid_pos.y * CELL_SIZE + CELL_SIZE/2
-	)
+	# Lift the visual up so it sits on the ground (Height 2.0 / 2 = 1.0)
+	mesh_inst.position.y = 1.0 
+	
+	tower_node.add_child(mesh_inst)

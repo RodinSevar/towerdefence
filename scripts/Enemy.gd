@@ -3,6 +3,9 @@ extends Node3D
 var speed = 10.0
 var current_path = []
 var target_position: Vector3
+var max_health = 100.0
+var current_health = 100.0
+var gold_reward = 5
 
 func _ready():
 	# Simple visual for the enemy (Red Sphere)
@@ -17,6 +20,23 @@ func _ready():
 	mesh_inst.material_override = material
 	
 	add_child(mesh_inst)
+
+func take_damage(amount: float):
+	current_health -= amount
+	# Visual feedback: Flash white or shrink
+	scale *= 0.9 
+	
+	if current_health <= 0:
+		die()
+
+func die():
+	# Reward the player
+	# Assuming the parent is the GameMap/GameWorld node that has the add_gold function
+	var game_map = get_parent()
+	if game_map.has_method("add_gold"):
+		game_map.add_gold(gold_reward)
+		
+	queue_free() # Remove from game
 
 func set_path(path_points: Array):
 	# Path points are already in World Coordinates
