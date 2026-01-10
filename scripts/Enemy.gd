@@ -1,6 +1,7 @@
 extends Node3D
 
 var speed = 10.0
+var base_speed = 10.0 # Store original speed
 var current_path = []
 var target_position: Vector3
 var max_health = 100.0
@@ -31,6 +32,15 @@ func setup_visuals(color: Color, scale_factor: float):
 		
 	# Update Size
 	scale = Vector3(scale_factor, scale_factor, scale_factor)
+
+func apply_slow(factor: float, duration: float):
+	# Factor 0.5 = Half Speed
+	speed = base_speed * factor
+	
+	# Create a timer to reset speed
+	await get_tree().create_timer(duration).timeout
+	if is_instance_valid(self):
+		speed = base_speed
 
 func take_damage(amount: float):
 	current_health -= amount

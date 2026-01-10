@@ -4,6 +4,10 @@ var gold_label: Label
 var lives_label: Label
 var wave_label: Label
 var restart_button: Button
+var tower_label: Label # Shows current selection
+
+# Signals
+signal tower_selected(type_name)
 
 func _ready():
 	setup_ui()
@@ -65,6 +69,30 @@ func setup_ui():
 	restart_button.process_mode = Node.PROCESS_MODE_ALWAYS
 	
 	control.add_child(restart_button)
+	
+	# --- TOWER SELECTION INFO ---
+	tower_label = Label.new()
+	tower_label.text = "Selected: Normal (15g) [Press 1]"
+	tower_label.position = Vector2(20, 600) # Bottom Left
+	control.add_child(tower_label)
+
+func _input(event):
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_1:
+			select_tower("Normal")
+		elif event.keycode == KEY_2:
+			select_tower("Ice")
+		elif event.keycode == KEY_3:
+			select_tower("Sniper")
+
+func select_tower(type: String):
+	emit_signal("tower_selected", type)
+	if type == "Normal":
+		tower_label.text = "Selected: Normal (15g) [Press 1]"
+	elif type == "Ice":
+		tower_label.text = "Selected: Ice (30g) [Press 2]"
+	elif type == "Sniper":
+		tower_label.text = "Selected: Sniper (50g) [Press 3]"
 
 func update_gold(amount: int):
 	gold_label.text = "Gold: " + str(amount)
@@ -75,6 +103,11 @@ func update_lives(amount: int):
 		show_restart_button()
 	else:
 		lives_label.text = "Lives: " + str(amount)
+
+func show_win():
+	lives_label.text = "YOU WIN!"
+	lives_label.label_settings.font_color = Color(0, 1, 0) # Green
+	show_restart_button()
 
 func show_restart_button():
 	restart_button.visible = true

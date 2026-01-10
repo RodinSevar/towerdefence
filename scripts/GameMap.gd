@@ -11,7 +11,12 @@ const CELL_SIZE = 2.0 # In 3D world units
 # Game Economy
 var gold = 100
 var lives = 20
-const TOWER_COST = 15
+var selected_tower_type = "Normal"
+var tower_costs = {
+	"Normal": 15,
+	"Ice": 30,
+	"Sniper": 50
+}
 
 # UI References
 var hud_script = load("res://scripts/HUD.gd")
@@ -71,6 +76,7 @@ func start_next_wave():
 	current_wave_index += 1
 	if current_wave_index >= waves.size():
 		print("ALL WAVES COMPLETED! YOU WIN!")
+		if hud: hud.show_win()
 		return
 		
 	var wave_data = waves[current_wave_index]
@@ -86,10 +92,16 @@ func setup_ui():
 	
 	# Connect Restart Button
 	hud.restart_button.pressed.connect(restart_game)
+	# Connect Tower Selection
+	hud.tower_selected.connect(on_tower_selected)
 	
 	# Initialize HUD values
 	hud.update_gold(gold)
 	hud.update_lives(lives)
+
+func on_tower_selected(type: String):
+	selected_tower_type = type
+	print("Builder switched to: ", type)
 
 func restart_game():
 	print("Restarting...")
@@ -116,6 +128,7 @@ func spawn_enemy():
 	# Configure Stats based on Wave
 	enemy.max_health = wave_data["hp"]
 	enemy.current_health = wave_data["hp"]
+	enemy.base_speed = wave_data["speed"] # Set Base Speed
 	enemy.speed = wave_data["speed"]
 	enemy.gold_reward = wave_data["reward"]
 	
@@ -222,13 +235,15 @@ func handle_input():
 	else:
 		cursor_mesh.visible = false
 
+# Call this when the player builds a tower
 func build_tower(grid_pos: Vector2i) -> bool:
 	if not is_valid_pos(grid_pos):
 		return false
 	
 	# Check affordability
-	if gold < TOWER_COST:
-		print("Not enough gold! Cost: ", TOWER_COST, " Have: ", gold)
+	var cost = tower_costs[selected_tower_type]
+	if gold < cost:
+		print("Not enough gold! Cost: ", cost, " Have: ", gold)
 		return false
 	
 	# Fix: Check if we already built here
@@ -263,7 +278,7 @@ func build_tower(grid_pos: Vector2i) -> bool:
 	update_enemy_paths()
 	
 	# Pay for the tower
-	gold -= TOWER_COST
+	gold -= cost
 	if hud: hud.update_gold(gold)
 	print("Tower built! Gold remaining: ", gold)
 	
@@ -319,6 +334,9 @@ func place_tower_visual(grid_pos: Vector2i):
 	tower_node.set_script(tower_script)
 	add_child(tower_node)
 	
+	# Configure it!
+	tower_node.configure(selected_tower_type)
+	
 	# Track it!
 	occupied_cells[grid_pos] = tower_node
 	
@@ -334,7 +352,20 @@ func place_tower_visual(grid_pos: Vector2i):
 	box.size = Vector3(CELL_SIZE, 2.0, CELL_SIZE)
 	var mesh_inst = MeshInstance3D.new()
 	mesh_inst.mesh = box
+	
+	# Color code the towers
+	var material = StandardMaterial3D.new()
+	if selected_tower_type == "Normal":
+		material.albedo_color = Color(0.5, 0.5, 0.5) # Grey
+	elif selected_tower_type == "Ice":
+		material.albedo_color = Color(0, 1, 1) # Cyan
+	elif selected_tower_type == "Sniper":
+		material.albedo_color = Color(0.2, 0.2, 0.2) # Dark Grey
+		box.size.y = 4.0 # Taller!
+		
+	mesh_inst.material_override = material
+	
 	# Lift the visual up so it sits on the ground (Height 2.0 / 2 = 1.0)
-	mesh_inst.position.y = 1.0 
+	mesh_inst.position.y = box.size.y / 2.0 
 	
 	tower_node.add_child(mesh_inst)

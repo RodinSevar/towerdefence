@@ -1,12 +1,34 @@
 extends Node3D
 
+var tower_type = "Normal"
 var attack_range = 8.0
 var damage = 25.0
 var fire_rate = 0.5 # Seconds between shots
+var slow_factor = 1.0 # 1.0 = No slow
+var slow_duration = 0.0
 var time_since_last_shot = 0.0
 
 # References
 var target_enemy = null
+
+func configure(type: String):
+	tower_type = type
+	if type == "Normal":
+		damage = 25.0
+		attack_range = 8.0
+		fire_rate = 0.5
+		slow_factor = 1.0
+	elif type == "Ice":
+		damage = 5.0
+		attack_range = 6.0
+		fire_rate = 0.2
+		slow_factor = 0.5 # 50% slow
+		slow_duration = 1.0
+	elif type == "Sniper":
+		damage = 100.0
+		attack_range = 15.0
+		fire_rate = 2.0
+		slow_factor = 1.0
 
 func _process(delta):
 	time_since_last_shot += delta
@@ -32,8 +54,6 @@ func _process(delta):
 
 func find_target():
 	# Access the main game map to get the list of enemies
-	# We assume the parent of the tower is the GameWorld (Node3D), which has the 'enemies' array.
-	# Note: In a larger project, use Groups or a Manager.
 	var game_map = get_parent()
 	if not "enemies" in game_map:
 		return
@@ -54,12 +74,19 @@ func shoot():
 	if not is_instance_valid(target_enemy):
 		return
 		
-	# Spawn Projectile
-	var proj_script = load("res://scripts/Projectile.gd")
-	var proj = proj_script.new()
-	
-	# Add to GameMap (parent of tower) so it flies independently
-	get_parent().add_child(proj)
-	
-	# Initialize
-	proj.setup(position, target_enemy, damage)
+	if tower_type == "Ice":
+		# Ice applies slow instantly
+		if target_enemy.has_method("apply_slow"):
+			target_enemy.apply_slow(slow_factor, slow_duration)
+		if target_enemy.has_method("take_damage"):
+			target_enemy.take_damage(damage)
+	else:
+		# Spawn Projectile
+		var proj_script = load("res://scripts/Projectile.gd")
+		var proj = proj_script.new()
+		
+		# Add to GameMap (parent of tower) so it flies independently
+		get_parent().add_child(proj)
+		
+		# Initialize
+		proj.setup(position, target_enemy, damage)
