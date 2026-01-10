@@ -17,6 +17,18 @@ const TOWER_COST = 15
 var hud_script = load("res://scripts/HUD.gd")
 var hud = null
 
+# Wave Configuration
+# Each wave: { "count": int, "interval": float, "hp": float, "speed": float, "reward": int, "color": Color, "scale": float }
+var waves = [
+	{ "count": 10, "interval": 1.0, "hp": 50, "speed": 8.0, "reward": 5, "color": Color(1, 0, 0), "scale": 1.0 },       # Wave 1: Red
+	{ "count": 15, "interval": 0.8, "hp": 80, "speed": 10.0, "reward": 6, "color": Color(0, 0.5, 1), "scale": 0.8 },     # Wave 2: Blue (Fast/Small)
+	{ "count": 5, "interval": 1.5, "hp": 300, "speed": 6.0, "reward": 15, "color": Color(0.5, 0, 0.5), "scale": 2.0 },   # Wave 3: Purple (Boss/Big)
+]
+var current_wave_index = -1
+var enemies_remaining_to_spawn = 0
+var wave_spawn_timer = 0.0
+var is_wave_active = false
+
 # Visual settings
 @export var ground_mesh: MeshInstance3D
 @export var cursor_mesh: MeshInstance3D
@@ -34,25 +46,81 @@ func _ready():
 	var path = get_path_route(Vector2i(0,0), Vector2i(31,31))
 	print("Path found: ", path)
 	
-	# Start spawning enemies just to test
-	var timer = Timer.new()
-	timer.wait_time = 2.0
-	timer.autostart = true
-	timer.timeout.connect(spawn_enemy)
-	add_child(timer)
+	start_next_wave()
+
+func setup_grid():
+	# Configure the AStarGrid2D
+	astar.region = Rect2i(0, 0, GRID_SIZE, GRID_SIZE)
+	astar.cell_size = Vector2(CELL_SIZE, CELL_SIZE)
+	
+	# WC3 Style: Allow diagonals, but NOT if squeezing through two walls.
+	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_ONLY_IF_NO_OBSTACLES
+	# Use Euclidean heuristic for more natural diagonal paths
+	astar.default_compute_heuristic = AStarGrid2D.HEURISTIC_EUCLIDEAN
+	astar.default_estimate_heuristic = AStarGrid2D.HEURISTIC_EUCLIDEAN
+	
+	# Center the path points in the cells
+	astar.offset = Vector2(CELL_SIZE / 2, CELL_SIZE / 2)
+	
+	astar.update() # Build the initial grid
+	
+	print("Map initialized with size: ", GRID_SIZE, "x", GRID_SIZE)
+	print("Starting Gold: ", gold)
+
+func start_next_wave():
+	current_wave_index += 1
+	if current_wave_index >= waves.size():
+		print("ALL WAVES COMPLETED! YOU WIN!")
+		return
+		
+	var wave_data = waves[current_wave_index]
+	enemies_remaining_to_spawn = wave_data["count"]
+	is_wave_active = true
+	
+	if hud: hud.update_wave(current_wave_index + 1)
+	print("Starting Wave ", current_wave_index + 1)
 
 func setup_ui():
 	hud = hud_script.new()
 	add_child(hud)
 	
+	# Connect Restart Button
+	hud.restart_button.pressed.connect(restart_game)
+	
 	# Initialize HUD values
 	hud.update_gold(gold)
 	hud.update_lives(lives)
 
+func restart_game():
+	print("Restarting...")
+	get_tree().paused = false # Unpause!
+	get_tree().reload_current_scene()
+
+func _process(delta):
+	handle_input()
+	
+	if is_wave_active and enemies_remaining_to_spawn > 0:
+		wave_spawn_timer -= delta
+		if wave_spawn_timer <= 0:
+			spawn_enemy()
+			var wave_data = waves[current_wave_index]
+			wave_spawn_timer = wave_data["interval"]
+
 func spawn_enemy():
+	var wave_data = waves[current_wave_index]
+	
 	var enemy_script = load("res://scripts/Enemy.gd")
 	var enemy = enemy_script.new()
 	add_child(enemy)
+	
+	# Configure Stats based on Wave
+	enemy.max_health = wave_data["hp"]
+	enemy.current_health = wave_data["hp"]
+	enemy.speed = wave_data["speed"]
+	enemy.gold_reward = wave_data["reward"]
+	
+	# Apply Visuals
+	enemy.setup_visuals(wave_data["color"], wave_data["scale"])
 	
 	# Start at (0,0)
 	enemy.position = Vector3(1.0, 0.5, 1.0) 
@@ -62,6 +130,28 @@ func spawn_enemy():
 	enemy.set_path(path)
 	
 	enemies.append(enemy)
+	
+	enemies_remaining_to_spawn -= 1
+	
+	if enemies_remaining_to_spawn <= 0:
+		is_wave_active = false
+		print("Wave Spawning Finished. Waiting for clear...")
+
+func enemy_died(enemy):
+	# Check if wave is cleared
+	# We need to wait a frame for the enemy to actually leave the array/tree
+	await get_tree().process_frame
+	
+	var active_count = 0
+	for e in enemies:
+		if is_instance_valid(e) and not e.is_queued_for_deletion():
+			active_count += 1
+			
+	if active_count == 0 and not is_wave_active:
+		print("Wave Cleared!")
+		# Auto start next wave after 3 seconds
+		await get_tree().create_timer(3.0).timeout
+		start_next_wave()
 
 func setup_visuals():
 	# Create a simple plane for the ground
@@ -92,29 +182,46 @@ func setup_visuals():
 		cursor_mesh.mesh = box
 		add_child(cursor_mesh)
 
-func _process(delta):
-	handle_input()
+func handle_input():
+	# Raycast from camera to find grid position
+	var camera = get_viewport().get_camera_3d()
+	if not camera: return
+	
+	var mouse_pos = get_viewport().get_mouse_position()
+	var ray_origin = camera.project_ray_origin(mouse_pos)
+	var ray_direction = camera.project_ray_normal(mouse_pos)
+	
+	# Intersect with the ground plane (Y=0)
+	# Math: O + D * t = P. We want P.y = 0.
+	# O.y + D.y * t = 0  =>  t = -O.y / D.y
+	if ray_direction.y == 0: return # Parallel to ground
+	
+	var t = -ray_origin.y / ray_direction.y
+	if t < 0: return # Behind camera
+	
+	var intersection = ray_origin + ray_direction * t
+	
+	# Convert world position to grid coordinates
+	var grid_x = floor(intersection.x / CELL_SIZE)
+	var grid_y = floor(intersection.z / CELL_SIZE) # 3D Z is 2D Y
+	var grid_pos = Vector2i(grid_x, grid_y)
+	
+	# Move cursor
+	if is_valid_pos(grid_pos):
+		cursor_mesh.visible = true
+		cursor_mesh.position = Vector3(
+			grid_pos.x * CELL_SIZE + CELL_SIZE/2, 
+			0.25, 
+			grid_pos.y * CELL_SIZE + CELL_SIZE/2
+		)
+		
+		# Build on click
+		if Input.is_action_just_pressed("ui_accept") or Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+			if build_tower(grid_pos):
+				place_tower_visual(grid_pos)
+	else:
+		cursor_mesh.visible = false
 
-func setup_grid():
-	# Configure the AStarGrid2D
-	astar.region = Rect2i(0, 0, GRID_SIZE, GRID_SIZE)
-	astar.cell_size = Vector2(CELL_SIZE, CELL_SIZE)
-	
-	# WC3 Style: Allow diagonals, but NOT if squeezing through two walls.
-	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_ONLY_IF_NO_OBSTACLES
-	# Use Euclidean heuristic for more natural diagonal paths
-	astar.default_compute_heuristic = AStarGrid2D.HEURISTIC_EUCLIDEAN
-	astar.default_estimate_heuristic = AStarGrid2D.HEURISTIC_EUCLIDEAN
-	
-	# Center the path points in the cells
-	astar.offset = Vector2(CELL_SIZE / 2, CELL_SIZE / 2)
-	
-	astar.update() # Build the initial grid
-	
-	print("Map initialized with size: ", GRID_SIZE, "x", GRID_SIZE)
-	print("Starting Gold: ", gold)
-
-# Call this when the player builds a tower
 func build_tower(grid_pos: Vector2i) -> bool:
 	if not is_valid_pos(grid_pos):
 		return false
@@ -204,46 +311,6 @@ func check_path_exists() -> bool:
 
 func get_path_route(start: Vector2i, end: Vector2i) -> Array:
 	return astar.get_point_path(start, end)
-
-func handle_input():
-	# Raycast from camera to find grid position
-	var camera = get_viewport().get_camera_3d()
-	if not camera: return
-	
-	var mouse_pos = get_viewport().get_mouse_position()
-	var ray_origin = camera.project_ray_origin(mouse_pos)
-	var ray_direction = camera.project_ray_normal(mouse_pos)
-	
-	# Intersect with the ground plane (Y=0)
-	# Math: O + D * t = P. We want P.y = 0.
-	# O.y + D.y * t = 0  =>  t = -O.y / D.y
-	if ray_direction.y == 0: return # Parallel to ground
-	
-	var t = -ray_origin.y / ray_direction.y
-	if t < 0: return # Behind camera
-	
-	var intersection = ray_origin + ray_direction * t
-	
-	# Convert world position to grid coordinates
-	var grid_x = floor(intersection.x / CELL_SIZE)
-	var grid_y = floor(intersection.z / CELL_SIZE) # 3D Z is 2D Y
-	var grid_pos = Vector2i(grid_x, grid_y)
-	
-	# Move cursor
-	if is_valid_pos(grid_pos):
-		cursor_mesh.visible = true
-		cursor_mesh.position = Vector3(
-			grid_pos.x * CELL_SIZE + CELL_SIZE/2, 
-			0.25, 
-			grid_pos.y * CELL_SIZE + CELL_SIZE/2
-		)
-		
-		# Build on click
-		if Input.is_action_just_pressed("ui_accept") or Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-			if build_tower(grid_pos):
-				place_tower_visual(grid_pos)
-	else:
-		cursor_mesh.visible = false
 
 func place_tower_visual(grid_pos: Vector2i):
 	# Create the Tower Logic Node

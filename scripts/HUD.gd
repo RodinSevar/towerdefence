@@ -3,6 +3,7 @@ extends CanvasLayer
 var gold_label: Label
 var lives_label: Label
 var wave_label: Label
+var restart_button: Button
 
 func _ready():
 	setup_ui()
@@ -49,14 +50,34 @@ func setup_ui():
 	wave_label.label_settings = wave_settings
 	control.add_child(wave_label)
 
+	# --- RESTART BUTTON ---
+	restart_button = Button.new()
+	restart_button.text = "RESTART"
+	restart_button.set_anchors_preset(Control.PRESET_CENTER)
+	restart_button.position = Vector2(0, 50) # Offset slightly down from center
+	restart_button.size = Vector2(200, 60)
+	restart_button.visible = false # Hidden initially
+	
+	# Enable mouse for button even if control ignores it
+	restart_button.mouse_filter = Control.MOUSE_FILTER_STOP
+	
+	# CRITICAL FIX: Allow this button to work when the game is paused!
+	restart_button.process_mode = Node.PROCESS_MODE_ALWAYS
+	
+	control.add_child(restart_button)
+
 func update_gold(amount: int):
 	gold_label.text = "Gold: " + str(amount)
 
 func update_lives(amount: int):
 	if amount <= 0:
 		lives_label.text = "GAME OVER"
+		show_restart_button()
 	else:
 		lives_label.text = "Lives: " + str(amount)
+
+func show_restart_button():
+	restart_button.visible = true
 
 func update_wave(wave_num: int):
 	wave_label.text = "Wave: " + str(wave_num)

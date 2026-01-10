@@ -21,20 +21,36 @@ func _ready():
 	
 	add_child(mesh_inst)
 
+func setup_visuals(color: Color, scale_factor: float):
+	# Update Color
+	var mesh = get_child(0) # We know the mesh is the first child we added
+	if mesh and mesh is MeshInstance3D:
+		var material = StandardMaterial3D.new()
+		material.albedo_color = color
+		mesh.material_override = material
+		
+	# Update Size
+	scale = Vector3(scale_factor, scale_factor, scale_factor)
+
 func take_damage(amount: float):
 	current_health -= amount
 	# Visual feedback: Flash white or shrink
 	scale *= 0.9 
 	
 	if current_health <= 0:
-		die()
+		die(true)
 
-func die():
-	# Reward the player
-	# Assuming the parent is the GameMap/GameWorld node that has the add_gold function
+func die(killed_by_player: bool = false):
 	var game_map = get_parent()
-	if game_map.has_method("add_gold"):
-		game_map.add_gold(gold_reward)
+	
+	if killed_by_player:
+		# Reward the player
+		if game_map.has_method("add_gold"):
+			game_map.add_gold(gold_reward)
+	
+	# Notify map logic (for waves)
+	if game_map.has_method("enemy_died"):
+		game_map.enemy_died(self)
 		
 	queue_free() # Remove from game
 
@@ -75,4 +91,4 @@ func _process(delta):
 			if game_map.has_method("lose_life"):
 				game_map.lose_life()
 			
-			queue_free() # Destroy enemy
+			die(false) # Died by leaking (no gold)
