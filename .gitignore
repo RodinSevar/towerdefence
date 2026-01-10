@@ -1,0 +1,15 @@
+# Godot 4+ specific ignores
+.godot/
+.tmp/
+
+# Export builds
+export/
+
+# Imported translations (automatically generated)
+*.translation
+
+# Mono/C# builds
+.mono/
+.vscode/
+*.sln
+*.csproj
