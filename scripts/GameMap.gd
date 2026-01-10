@@ -5,9 +5,9 @@ extends Node3D
 # 0 = Empty (Walkable)
 # 1 = Wall/Tower (Blocked)
 
-const GRID_SIZE = 32
-const CELL_SIZE = 2.0 # In 3D world units
-const END_POINT = Vector2i(16, 31)
+const GRID_SIZE = 256
+const CELL_SIZE = 1.0 # In 3D world units (Smaller cells for higher res)
+const END_POINT = Vector2i(128, 250)
 
 # Game Economy
 var gold = 100
@@ -50,12 +50,25 @@ func _ready():
 	setup_visuals()
 	setup_grid()
 	setup_map_design() # Add obstacles
+	setup_camera() # New: Auto-position camera
 	# Test pathfinding debug
 	print("Grid ready. Testing path from (0,0) to ", END_POINT, "...")
 	var path = get_path_route(Vector2i(0,0), END_POINT)
 	print("Path found: ", path)
 	
 	start_next_wave()
+
+func setup_camera():
+	var camera = get_viewport().get_camera_3d()
+	if camera:
+		# Center of 256x256 map is 128, 128
+		# Position high up and pulled back
+		camera.position = Vector3(128, 200, 240)
+		camera.rotation_degrees = Vector3(-55, 0, 0)
+		
+		# Optional: If you want Orthographic (2D style)
+		# camera.projection = Camera3D.PROJECTION_ORTHOGONAL
+		# camera.size = 260
 
 func setup_grid():
 	# Configure the AStarGrid2D
@@ -77,29 +90,41 @@ func setup_grid():
 	print("Starting Gold: ", gold)
 
 func setup_map_design():
-	# Define simple obstacles (Rocks/Pillars)
-	var obstacles = []
-	
-	# Create 4 Corner Pillars (2x2 blocks)
-	var corners = [Vector2i(8, 8), Vector2i(22, 8), Vector2i(8, 22), Vector2i(22, 22)]
-	for c in corners:
-		obstacles.append(c)
-		obstacles.append(c + Vector2i(1, 0))
-		obstacles.append(c + Vector2i(0, 1))
-		obstacles.append(c + Vector2i(1, 1))
+	# Load map data from JSON
+	var file_path = "res://assets/map_data.json"
+	if not FileAccess.file_exists(file_path):
+		print("Error: Map data not found at ", file_path)
+		return
 		
-	# Create a Central Blockade
-	for i in range(12, 20):
-		obstacles.append(Vector2i(i, 16)) # Horizontal line in middle
+	var file = FileAccess.open(file_path, FileAccess.READ)
+	var content = file.get_as_text()
+	var data = JSON.parse_string(content)
 	
-	for pos in obstacles:
-		# 1. Block Pathfinding
-		astar.set_point_solid(pos, true)
+	if not data:
+		print("Error parsing map JSON")
+		return
 		
-		# 2. Mark as occupied so we can't build there
-		# We store the mesh as the value, consistent with towers
+	print("Loading Map: ", data["grid_width"], "x", data["grid_height"])
+	
+	var obstacles = data["obstacles"] # List of {x,y,w,h}
+	
+	for rect in obstacles:
+		var x = rect["x"]
+		var y = rect["y"]
+		var w = rect["w"]
+		var h = rect["h"]
+		
+		# 1. Update Grid
+		# Loop through all cells in this rect
+		for i in range(x, x + w):
+			for j in range(y, y + h):
+				var pos = Vector2i(i, j)
+				astar.set_point_solid(pos, true)
+				occupied_cells[pos] = true 
+		
+		# 2. Visuals: Create ONE big block for the whole rect (Optimization)
 		var box = BoxMesh.new()
-		box.size = Vector3(CELL_SIZE, 3.0, CELL_SIZE) # Tall rocks
+		box.size = Vector3(w * CELL_SIZE, 3.0, h * CELL_SIZE)
 		
 		var mesh_inst = MeshInstance3D.new()
 		mesh_inst.mesh = box
@@ -109,23 +134,30 @@ func setup_map_design():
 		mesh_inst.material_override = material
 		
 		add_child(mesh_inst)
-		mesh_inst.position = Vector3(
-			pos.x * CELL_SIZE + CELL_SIZE/2, 
-			1.5, # Half of height 3.0
-			pos.y * CELL_SIZE + CELL_SIZE/2
-		)
 		
-		occupied_cells[pos] = mesh_inst
+		# Center position
+		var center_x = x + w / 2.0
+		var center_y = y + h / 2.0
+		
+		mesh_inst.position = Vector3(
+			center_x * CELL_SIZE, 
+			1.5, 
+			center_y * CELL_SIZE
+		)
 
-	# --- SPAWN ZONES (Rectangle 6x4 split in two) ---
-	# Left Zone: x=[13, 15], y=[0, 3] (3x4 = 12 cells)
-	# Right Zone: x=[1---
-	# Define dynamic spawn zones here
+	# --- SPAWN ZONES ---
+	# Define dynamic spawn zones from JSON
 	spawn_zones.clear()
-	# Left Zone: x=[13, 15], y=[0, 3]
-	spawn_zones.append(SpawnLocation.new(Rect2i(13, 0, 3, 4), CELL_SIZE))
-	# Right Zone: x=[16, 18], y=[0, 3]
-	spawn_zones.append(SpawnLocation.new(Rect2i(16, 0, 3, 4), CELL_SIZE))
+	
+	if data.has("spawns"):
+		for s_rect in data["spawns"]:
+			var zone_rect = Rect2i(s_rect["x"], s_rect["y"], s_rect["w"], s_rect["h"])
+			spawn_zones.append(SpawnLocation.new(zone_rect, CELL_SIZE))
+	
+	# Fallback if no spawns in JSON
+	if spawn_zones.is_empty():
+		print("Warning: No spawn zones in JSON. Using defaults.")
+		spawn_zones.append(SpawnLocation.new(Rect2i(110, 5, 10, 10), CELL_SIZE))
 
 	for zone in spawn_zones:
 		var cells = zone.get_occupied_cells()
@@ -281,7 +313,8 @@ func setup_visuals():
 	# Create a cursor to show where we are building
 	if not cursor_mesh:
 		var box = BoxMesh.new()
-		box.size = Vector3(CELL_SIZE, 0.5, CELL_SIZE)
+		# 2x2 Size
+		box.size = Vector3(CELL_SIZE * 2.0, 0.5, CELL_SIZE * 2.0)
 		
 		var material = StandardMaterial3D.new()
 		material.albedo_color = Color(0, 1, 0, 0.5) # Semi-transparent Green
@@ -302,8 +335,6 @@ func handle_input():
 	var ray_direction = camera.project_ray_normal(mouse_pos)
 	
 	# Intersect with the ground plane (Y=0)
-	# Math: O + D * t = P. We want P.y = 0.
-	# O.y + D.y * t = 0  =>  t = -O.y / D.y
 	if ray_direction.y == 0: return # Parallel to ground
 	
 	var t = -ray_origin.y / ray_direction.y
@@ -313,16 +344,17 @@ func handle_input():
 	
 	# Convert world position to grid coordinates
 	var grid_x = floor(intersection.x / CELL_SIZE)
-	var grid_y = floor(intersection.z / CELL_SIZE) # 3D Z is 2D Y
+	var grid_y = floor(intersection.z / CELL_SIZE) 
 	var grid_pos = Vector2i(grid_x, grid_y)
 	
-	# Move cursor
-	if is_valid_pos(grid_pos):
+	# Move cursor (Centered on 2x2 block)
+	# Top-Left is grid_pos. Center is grid_pos + 1.0 (in world units if cell=1.0)
+	if can_build_at(grid_pos):
 		cursor_mesh.visible = true
 		cursor_mesh.position = Vector3(
-			grid_pos.x * CELL_SIZE + CELL_SIZE/2, 
+			(grid_pos.x * CELL_SIZE) + CELL_SIZE, # Center of 2x2
 			0.25, 
-			grid_pos.y * CELL_SIZE + CELL_SIZE/2
+			(grid_pos.y * CELL_SIZE) + CELL_SIZE
 		)
 		
 		# Build on click
@@ -334,7 +366,9 @@ func handle_input():
 
 # Call this when the player builds a tower
 func build_tower(grid_pos: Vector2i) -> bool:
-	if not is_valid_pos(grid_pos):
+	# Check 2x2 validity (Occupied? Enemy in way? Out of bounds?)
+	if not can_build_at(grid_pos):
+		print("Cannot build here (Blocked or Enemy inside)")
 		return false
 	
 	# Check affordability
@@ -343,30 +377,14 @@ func build_tower(grid_pos: Vector2i) -> bool:
 		print("Not enough gold! Cost: ", cost, " Have: ", gold)
 		return false
 	
-	# Fix: Check if we already built here
-	if occupied_cells.has(grid_pos):
-		print("Cell already occupied!")
-		return false
-	
-	# Check if any enemy is currently standing on this tile
-	for enemy in enemies:
-		if is_instance_valid(enemy):
-			var enemy_grid_pos = Vector2i(
-				floor(enemy.position.x / CELL_SIZE), 
-				floor(enemy.position.z / CELL_SIZE)
-			)
-			if enemy_grid_pos == grid_pos:
-				print("Cannot build: Enemy in the way!")
-				return false
-		
-	# Check if this blocks the path (Wintermaul rule: Cannot block completely)
-	# For now, we just set it solid to test
-	astar.set_point_solid(grid_pos, true)
+	# Temporarily block the 2x2 area to test pathing
+	# We don't have the visual node yet, so pass null for occupied_cells value
+	set_area_solid(grid_pos, true, null)
 	
 	# Verify if enemies still have a path
 	if not check_path_exists():
 		print("Cannot build here! Blocks path.")
-		astar.set_point_solid(grid_pos, false) # Revert
+		set_area_solid(grid_pos, false) # Revert
 		return false
 		
 	print("Tower built at: ", grid_pos)
@@ -414,6 +432,41 @@ func update_enemy_paths():
 func is_valid_pos(pos: Vector2i) -> bool:
 	return astar.region.has_point(pos)
 
+# Helper to check 2x2 area
+func can_build_at(pos: Vector2i) -> bool:
+	# Check all 4 cells: (x,y), (x+1,y), (x,y+1), (x+1,y+1)
+	var offsets = [Vector2i(0,0), Vector2i(1,0), Vector2i(0,1), Vector2i(1,1)]
+	
+	for offset in offsets:
+		var p = pos + offset
+		# Check bounds
+		if not astar.region.has_point(p):
+			return false
+		# Check if already occupied (building on top of another tower/rock)
+		if occupied_cells.has(p):
+			return false
+		# Check if an enemy is inside this specific cell
+		for enemy in enemies:
+			if is_instance_valid(enemy):
+				var enemy_grid_pos = Vector2i(
+					floor(enemy.position.x / CELL_SIZE), 
+					floor(enemy.position.z / CELL_SIZE)
+				)
+				if enemy_grid_pos == p:
+					return false
+	return true
+
+# Helper to mark 2x2 area solid/occupied
+func set_area_solid(pos: Vector2i, is_solid: bool, visual_node: Node3D = null):
+	var offsets = [Vector2i(0,0), Vector2i(1,0), Vector2i(0,1), Vector2i(1,1)]
+	for offset in offsets:
+		var p = pos + offset
+		astar.set_point_solid(p, is_solid)
+		if is_solid:
+			occupied_cells[p] = visual_node # Mark all 4 cells as occupied by this tower
+		else:
+			occupied_cells.erase(p)
+
 func check_path_exists() -> bool:
 	# Check ALL spawn zones
 	for zone in spawn_zones:
@@ -435,19 +488,19 @@ func place_tower_visual(grid_pos: Vector2i):
 	# Configure it!
 	tower_node.configure(selected_tower_type)
 	
-	# Track it!
-	occupied_cells[grid_pos] = tower_node
+	# Mark 2x2 area as occupied
+	set_area_solid(grid_pos, true, tower_node)
 	
-	# Position the tower
+	# Position the tower (Center of 2x2 area)
 	tower_node.position = Vector3(
-		grid_pos.x * CELL_SIZE + CELL_SIZE/2, 
+		(grid_pos.x * CELL_SIZE) + CELL_SIZE, 
 		0.0, 
-		grid_pos.y * CELL_SIZE + CELL_SIZE/2
+		(grid_pos.y * CELL_SIZE) + CELL_SIZE
 	)
 	
 	# Create the Visuals (Box) as a child of the Tower Node
 	var box = BoxMesh.new()
-	box.size = Vector3(CELL_SIZE, 2.0, CELL_SIZE)
+	box.size = Vector3(CELL_SIZE * 2.0, 2.0, CELL_SIZE * 2.0)
 	var mesh_inst = MeshInstance3D.new()
 	mesh_inst.mesh = box
 	

@@ -8,6 +8,9 @@ export/
 # Imported translations (automatically generated)
 *.translation
 
+#logs
+logs/
+
 # Mono/C# builds
 .mono/
 .vscode/
