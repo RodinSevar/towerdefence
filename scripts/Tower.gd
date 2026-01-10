@@ -51,7 +51,15 @@ func find_target():
 	target_enemy = best_target
 
 func shoot():
-	if target_enemy.has_method("take_damage"):
-		target_enemy.take_damage(damage)
-		# Add a simple visual beam or effect here later
-		print("Pew! Hit enemy for ", damage)
+	if not is_instance_valid(target_enemy):
+		return
+		
+	# Spawn Projectile
+	var proj_script = load("res://scripts/Projectile.gd")
+	var proj = proj_script.new()
+	
+	# Add to GameMap (parent of tower) so it flies independently
+	get_parent().add_child(proj)
+	
+	# Initialize
+	proj.setup(position, target_enemy, damage)

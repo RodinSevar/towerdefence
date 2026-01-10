@@ -10,7 +10,12 @@ const CELL_SIZE = 2.0 # In 3D world units
 
 # Game Economy
 var gold = 100
+var lives = 20
 const TOWER_COST = 15
+
+# UI References
+var hud_script = load("res://scripts/HUD.gd")
+var hud = null
 
 # Visual settings
 @export var ground_mesh: MeshInstance3D
@@ -21,6 +26,7 @@ var enemies = [] # Track active enemies
 var occupied_cells = {} # Dictionary to track built towers { Vector2i: Node3D }
 
 func _ready():
+	setup_ui()
 	setup_visuals()
 	setup_grid()
 	# Test pathfinding debug
@@ -34,6 +40,14 @@ func _ready():
 	timer.autostart = true
 	timer.timeout.connect(spawn_enemy)
 	add_child(timer)
+
+func setup_ui():
+	hud = hud_script.new()
+	add_child(hud)
+	
+	# Initialize HUD values
+	hud.update_gold(gold)
+	hud.update_lives(lives)
 
 func spawn_enemy():
 	var enemy_script = load("res://scripts/Enemy.gd")
@@ -143,13 +157,29 @@ func build_tower(grid_pos: Vector2i) -> bool:
 	
 	# Pay for the tower
 	gold -= TOWER_COST
+	if hud: hud.update_gold(gold)
 	print("Tower built! Gold remaining: ", gold)
 	
 	return true
 
 func add_gold(amount: int):
 	gold += amount
+	if hud: hud.update_gold(gold)
 	print("Gold added: ", amount, ". Total: ", gold)
+
+func lose_life():
+	lives -= 1
+	if hud: hud.update_lives(lives)
+	print("Life lost! Remaining: ", lives)
+	
+	if lives <= 0:
+		game_over()
+
+func game_over():
+	print("GAME OVER")
+	# For now, just pause or restart
+	get_tree().paused = true
+	if hud: hud.update_lives(0)
 
 func update_enemy_paths():
 	for enemy in enemies:

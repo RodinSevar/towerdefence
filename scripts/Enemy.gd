@@ -71,4 +71,8 @@ func _process(delta):
 			target_position = current_path[0]
 		else:
 			# Reached the end!
+			var game_map = get_parent()
+			if game_map.has_method("lose_life"):
+				game_map.lose_life()
+			
 			queue_free() # Destroy enemy
