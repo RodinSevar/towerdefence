@@ -46,6 +46,7 @@ func _ready():
 	setup_ui()
 	setup_visuals()
 	setup_grid()
+	setup_map_design() # Add obstacles
 	# Test pathfinding debug
 	print("Grid ready. Testing path from (0,0) to (31,31)...")
 	var path = get_path_route(Vector2i(0,0), Vector2i(31,31))
@@ -71,6 +72,47 @@ func setup_grid():
 	
 	print("Map initialized with size: ", GRID_SIZE, "x", GRID_SIZE)
 	print("Starting Gold: ", gold)
+
+func setup_map_design():
+	# Define simple obstacles (Rocks/Pillars)
+	var obstacles = []
+	
+	# Create 4 Corner Pillars (2x2 blocks)
+	var corners = [Vector2i(8, 8), Vector2i(22, 8), Vector2i(8, 22), Vector2i(22, 22)]
+	for c in corners:
+		obstacles.append(c)
+		obstacles.append(c + Vector2i(1, 0))
+		obstacles.append(c + Vector2i(0, 1))
+		obstacles.append(c + Vector2i(1, 1))
+		
+	# Create a Central Blockade
+	for i in range(12, 20):
+		obstacles.append(Vector2i(i, 16)) # Horizontal line in middle
+	
+	for pos in obstacles:
+		# 1. Block Pathfinding
+		astar.set_point_solid(pos, true)
+		
+		# 2. Mark as occupied so we can't build there
+		# We store the mesh as the value, consistent with towers
+		var box = BoxMesh.new()
+		box.size = Vector3(CELL_SIZE, 3.0, CELL_SIZE) # Tall rocks
+		
+		var mesh_inst = MeshInstance3D.new()
+		mesh_inst.mesh = box
+		
+		var material = StandardMaterial3D.new()
+		material.albedo_color = Color(0.3, 0.25, 0.2) # Dark Brown Rock
+		mesh_inst.material_override = material
+		
+		add_child(mesh_inst)
+		mesh_inst.position = Vector3(
+			pos.x * CELL_SIZE + CELL_SIZE/2, 
+			1.5, # Half of height 3.0
+			pos.y * CELL_SIZE + CELL_SIZE/2
+		)
+		
+		occupied_cells[pos] = mesh_inst
 
 func start_next_wave():
 	current_wave_index += 1
