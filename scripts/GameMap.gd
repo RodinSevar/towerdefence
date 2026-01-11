@@ -444,6 +444,7 @@ func can_build_at(pos: Vector2i) -> bool:
 			return false
 		# Check if already occupied (building on top of another tower/rock)
 		if occupied_cells.has(p):
+			print("Build blocked at ", p, ". Occupied: ", occupied_cells[p])
 			return false
 		# Check if an enemy is inside this specific cell
 		for enemy in enemies:

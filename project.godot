@@ -16,10 +16,6 @@ config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 
 [debug]
+
 file_logging/enable_file_logging=true
 file_logging/log_path="res://logs/godot.log"
-
-[display]
-
-window/size/viewport_width=1152
-window/size/viewport_height=648
