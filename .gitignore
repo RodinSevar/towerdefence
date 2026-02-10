@@ -1,0 +1,32 @@
+# Unity generated files
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+UserSettings/
+
+# Visual Studio cache/options
+.vs/
+.vscode/
+*.csproj
+*.sln
+*.sln.DotSettings
+
+# Rider cache/options
+.idea/
+*.sln.iml
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Build output
+*.pdb
+*.mdb
+
+# Lock files
+Packages/packages-lock.json
