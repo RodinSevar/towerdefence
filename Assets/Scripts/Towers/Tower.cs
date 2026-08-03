@@ -31,6 +31,9 @@ public class Tower : MonoBehaviour, ISelectable
     private float fireTimer = 0f;
     private Transform firePoint;
     private GameObject selectionRing;
+    
+    private LineRenderer laserLine;
+    private float laserDisplayTimer = 0f;
 
     private void Start()
     {
@@ -62,12 +65,39 @@ public class Tower : MonoBehaviour, ISelectable
         Destroy(selectionRing.GetComponent<Collider>());
         selectionRing.GetComponent<Renderer>().material.color = Color.green;
         selectionRing.SetActive(false);
+        
+        // Setup laser line renderer
+        if (towerType == TowerType.Laser)
+        {
+            laserLine = gameObject.AddComponent<LineRenderer>();
+            laserLine.startWidth = 0.1f;
+            laserLine.endWidth = 0.1f;
+            laserLine.material = new Material(Shader.Find("Sprites/Default"));
+            laserLine.startColor = Color.yellow;
+            laserLine.endColor = Color.red;
+            laserLine.enabled = false;
+        }
     }
 
     private void Update()
     {
         if (GameManager.Instance == null || stats == null) return;
         if (GameManager.Instance.IsGameOver()) return;
+
+        if (laserLine != null && laserLine.enabled)
+        {
+            laserDisplayTimer -= Time.deltaTime;
+            if (laserDisplayTimer <= 0)
+            {
+                laserLine.enabled = false;
+            }
+            else if (targetEnemy != null)
+            {
+                // Update laser position if still firing
+                laserLine.SetPosition(0, firePoint.position);
+                laserLine.SetPosition(1, targetEnemy.transform.position + Vector3.up * 0.4f);
+            }
+        }
 
         FindTarget();
 
@@ -124,10 +154,45 @@ public class Tower : MonoBehaviour, ISelectable
     {
         if (targetEnemy == null) return;
 
-        targetEnemy.TakeDamage(stats.damage);
-
-        // Visual feedback
-        Debug.DrawLine(firePoint.position, targetEnemy.GetComponent<Collider>().bounds.center, Color.yellow, 0.1f);
+        if (towerType == TowerType.Laser)
+        {
+            // Laser is instant damage
+            targetEnemy.TakeDamage(stats.damage);
+            
+            if (laserLine != null)
+            {
+                laserLine.enabled = true;
+                laserLine.SetPosition(0, firePoint.position);
+                laserLine.SetPosition(1, targetEnemy.transform.position + Vector3.up * 0.4f);
+                laserDisplayTimer = 0.1f; // Display laser for 0.1 seconds
+            }
+        }
+        else
+        {
+            // Gun and Ice fire physical projectiles
+            GameObject projObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            projObj.transform.position = firePoint.position;
+            
+            // Remove collider so it doesn't block rays
+            Destroy(projObj.GetComponent<Collider>());
+            
+            if (towerType == TowerType.Gun)
+            {
+                projObj.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+                projObj.GetComponent<Renderer>().material.color = Color.yellow;
+                
+                Projectile proj = projObj.AddComponent<Projectile>();
+                proj.Initialize(targetEnemy, 15f, stats.damage); // Fast speed
+            }
+            else if (towerType == TowerType.Ice)
+            {
+                projObj.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
+                projObj.GetComponent<Renderer>().material.color = Color.cyan;
+                
+                Projectile proj = projObj.AddComponent<Projectile>();
+                proj.Initialize(targetEnemy, 8f, stats.damage); // Slower speed
+            }
+        }
     }
 
     private void OnDrawGizmosSelected()
