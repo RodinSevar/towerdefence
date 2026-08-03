@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Enemy : MonoBehaviour
 {
@@ -24,13 +25,15 @@ public class Enemy : MonoBehaviour
     private EnemyType currentType = EnemyType.Basic;
     private EnemyStats stats;
     private float currentHealth;
-    private int currentWaypointIndex = 0;
-    private float distanceToNextWaypoint = 0f;
     private bool isAlive = true;
+
+    // Pathfinding state
+    private int targetWaypointIndex = 1; // 0 is usually spawn, so head to 1
+    private List<Vector3> currentPath;
+    private int currentPathNodeIndex = 0;
 
     private void OnEnable()
     {
-        // Initialize stats to Basic if not already set
         if (stats == null)
         {
             stats = basicStats;
@@ -40,65 +43,78 @@ public class Enemy : MonoBehaviour
     private void Start()
     {
         currentHealth = stats.health;
-        UpdateDistanceToNextWaypoint();
+        
+        if (PathManager.Instance != null)
+        {
+            PathManager.Instance.OnMazeChanged += RecalculatePath;
+            RecalculatePath();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (PathManager.Instance != null)
+        {
+            PathManager.Instance.OnMazeChanged -= RecalculatePath;
+        }
+    }
+
+    private void RecalculatePath()
+    {
+        if (PathManager.Instance == null || targetWaypointIndex >= PathManager.Instance.GetWaypointCount()) return;
+
+        Vector3 targetPos = PathManager.Instance.GetWaypoint(targetWaypointIndex);
+        currentPath = PathManager.Instance.FindPath(transform.position, targetPos);
+        currentPathNodeIndex = 0;
+
+        if (currentPath == null || currentPath.Count == 0)
+        {
+            Debug.LogWarning("Enemy could not find path!");
+        }
     }
 
     private void Update()
     {
         if (!isAlive) return;
-
         MoveAlongPath();
     }
 
     private void MoveAlongPath()
     {
-        if (PathManager.Instance == null)
-        {
-            Debug.LogWarning("PathManager not initialized yet!");
-            return;
-        }
+        if (PathManager.Instance == null) return;
 
-        if (currentWaypointIndex >= PathManager.Instance.GetWaypointCount())
+        // Reached final waypoint
+        if (targetWaypointIndex >= PathManager.Instance.GetWaypointCount())
         {
             ReachedEnd();
             return;
         }
 
-        Vector3 targetWaypoint = PathManager.Instance.GetWaypoint(currentWaypointIndex);
-        Vector3 direction = (targetWaypoint - transform.position).normalized;
-
-        // Move towards waypoint
-        transform.position += direction * stats.speed * Time.deltaTime;
-
-        // Rotate to face direction
-        if (direction != Vector3.zero)
+        if (currentPath == null || currentPathNodeIndex >= currentPath.Count)
         {
-            transform.rotation = Quaternion.LookRotation(direction);
-        }
-
-        // Check if reached waypoint
-        float distanceToWaypoint = Vector3.Distance(transform.position, targetWaypoint);
-        if (distanceToWaypoint < 0.5f)
-        {
-            currentWaypointIndex++;
-            if (PathManager.Instance != null && currentWaypointIndex < PathManager.Instance.GetWaypointCount())
+            // Reached current major waypoint, target the next one
+            targetWaypointIndex++;
+            if (targetWaypointIndex < PathManager.Instance.GetWaypointCount())
             {
-                UpdateDistanceToNextWaypoint();
+                RecalculatePath();
             }
-        }
-        
-
-    }
-
-    private void UpdateDistanceToNextWaypoint()
-    {
-        if (PathManager.Instance == null)
             return;
+        }
 
-        if (currentWaypointIndex < PathManager.Instance.GetWaypointCount())
+        Vector3 targetNode = currentPath[currentPathNodeIndex];
+        Vector3 moveDir = (targetNode - transform.position).normalized;
+        
+        transform.position += moveDir * stats.speed * Time.deltaTime;
+        
+        if (moveDir != Vector3.zero)
         {
-            Vector3 nextWaypoint = PathManager.Instance.GetWaypoint(currentWaypointIndex);
-            distanceToNextWaypoint = Vector3.Distance(transform.position, nextWaypoint);
+            transform.rotation = Quaternion.LookRotation(moveDir);
+        }
+
+        float distanceToNode = Vector3.Distance(transform.position, targetNode);
+        if (distanceToNode < 0.1f) // reached path node
+        {
+            currentPathNodeIndex++;
         }
     }
 
@@ -151,5 +167,5 @@ public class Enemy : MonoBehaviour
     public float GetHealth() => currentHealth;
     public float GetMaxHealth() => stats.health;
     public EnemyType GetEnemyType() => currentType;
-    public float GetProgress() => PathManager.Instance != null ? (float)currentWaypointIndex / PathManager.Instance.GetWaypointCount() : 0f;
+    public float GetProgress() => PathManager.Instance != null ? (float)targetWaypointIndex / PathManager.Instance.GetWaypointCount() : 0f;
 }

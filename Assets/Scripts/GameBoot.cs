@@ -56,8 +56,8 @@ public class GameBoot : MonoBehaviour
                 cameraObj = camera.gameObject;
             }
 
-            cameraObj.transform.position = new Vector3(0, 25, 0);
-            cameraObj.transform.rotation = Quaternion.Euler(85, 0, 0);
+            cameraObj.transform.position = new Vector3(0, 100, -30);
+            cameraObj.transform.rotation = Quaternion.Euler(70, 0, 0);
             
             // Set camera clipping planes
             camera.nearClipPlane = 0.1f;
@@ -71,42 +71,16 @@ public class GameBoot : MonoBehaviour
         // Create ground if not exists
         if (GameObject.FindWithTag("Ground") == null)
         {
-            GameObject groundObj = new GameObject("Ground");
+            GameObject groundObj = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            groundObj.name = "Ground";
             groundObj.tag = "Ground";
             
-            // Create a simple plane mesh
-            Mesh groundMesh = new Mesh();
-            Vector3[] vertices = new Vector3[4]
-            {
-                new Vector3(-20, 0, -20),
-                new Vector3(20, 0, -20),
-                new Vector3(-20, 0, 20),
-                new Vector3(20, 0, 20)
-            };
-            
-            int[] triangles = new int[6] { 0, 2, 1, 1, 2, 3 };
-            Vector2[] uv = new Vector2[4]
-            {
-                new Vector2(0, 0),
-                new Vector2(1, 0),
-                new Vector2(0, 1),
-                new Vector2(1, 1)
-            };
-            
-            groundMesh.vertices = vertices;
-            groundMesh.triangles = triangles;
-            groundMesh.uv = uv;
-            groundMesh.RecalculateNormals();
-            
-            MeshFilter meshFilter = groundObj.AddComponent<MeshFilter>();
-            meshFilter.mesh = groundMesh;
-            
-            MeshCollider collider = groundObj.AddComponent<MeshCollider>();
-            collider.sharedMesh = groundMesh;
-            
-            MeshRenderer renderer = groundObj.AddComponent<MeshRenderer>();
-            renderer.material = new Material(Shader.Find("Standard"));
-            renderer.material.color = new Color(0.2f, 0.8f, 0.2f);
+            // A default Unity plane is 10x10 units. To make it 196x196, scale by 19.6.
+            groundObj.transform.localScale = new Vector3(19.6f, 1f, 19.6f);
+            groundObj.transform.position = Vector3.zero;
+
+            MeshRenderer renderer = groundObj.GetComponent<MeshRenderer>();
+            renderer.material.color = new Color(0.2f, 0.8f, 0.2f); // Set to green
         }
 
         // Create spawn point if not exists
@@ -130,6 +104,13 @@ public class GameBoot : MonoBehaviour
 
     private void SetupManagers()
     {
+        
+        // Create GridManager if not exists
+        if (FindAnyObjectByType<GridManager>() == null)
+        {
+            GameObject gridObj = new GameObject("GridManager");
+            gridObj.AddComponent<GridManager>();
+        }
         
         // Create GameManager if not exists
         if (FindAnyObjectByType<GameManager>() == null)

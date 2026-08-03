@@ -18,13 +18,13 @@ public class Tower : MonoBehaviour
     private TowerType towerType = TowerType.Gun;
 
     [SerializeField]
-    private TowerStats gunStats = new TowerStats() { cost = 100, range = 10f, fireRate = 1f, damage = 10f, displayName = "Gun Tower" };
+    private TowerStats gunStats = new TowerStats() { cost = 10, range = 10f, fireRate = 1f, damage = 10f, displayName = "Gun Tower" };
 
     [SerializeField]
-    private TowerStats laserStats = new TowerStats() { cost = 150, range = 12f, fireRate = 2f, damage = 15f, displayName = "Laser Tower" };
+    private TowerStats laserStats = new TowerStats() { cost = 15, range = 12f, fireRate = 2f, damage = 15f, displayName = "Laser Tower" };
 
     [SerializeField]
-    private TowerStats iceStats = new TowerStats() { cost = 120, range = 8f, fireRate = 0.5f, damage = 5f, displayName = "Ice Tower" };
+    private TowerStats iceStats = new TowerStats() { cost = 12, range = 8f, fireRate = 0.5f, damage = 5f, displayName = "Ice Tower" };
 
     private TowerStats stats;
     private Enemy targetEnemy = null;
@@ -49,6 +49,11 @@ public class Tower : MonoBehaviour
                       Color.cyan;
         visual.GetComponent<Renderer>().material.color = color;
 
+        // Add collider for mouse picking (if needed in future) or purely visual boundary
+        SphereCollider sphereCollider = gameObject.AddComponent<SphereCollider>();
+        sphereCollider.radius = 1f;  // Fixed radius for detection
+        sphereCollider.isTrigger = true;
+
         // Create fire point
         firePoint = new GameObject("FirePoint").transform;
         firePoint.SetParent(transform);
@@ -57,6 +62,7 @@ public class Tower : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.Instance == null || stats == null) return;
         if (GameManager.Instance.IsGameOver()) return;
 
         FindTarget();

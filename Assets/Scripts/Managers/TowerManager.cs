@@ -58,20 +58,52 @@ public class TowerManager : MonoBehaviour
 
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
         
-        
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
             // Check if we hit the ground plane
             if (hit.collider.CompareTag("Ground"))
             {
+                // Snap to grid
+                Vector3 snappedPos = GridManager.Instance.SnapToGrid(hit.point);
+                
+                // Check if building is allowed at this position
+                if (!GridManager.Instance.CanBuildAt(snappedPos))
+                {
+                    return; // Can't build here
+                }
+                
                 int cost = selectedTowerPrefab.GetComponent<Tower>().GetCost();
+                if (GameManager.Instance.GetCurrentGold() < cost)
+                {
+                    return; // Not enough gold
+                }
+                
+                // Temporarily occupy to validate maze
+                Vector2Int cell = GridManager.Instance.WorldToGridCell(snappedPos);
+                GridManager.Instance.OccupyCell(cell);
+                
+                if (!PathManager.Instance.ValidateFullMaze())
+                {
+                    // Revert and deny placement
+                    GridManager.Instance.FreeCell(cell);
+                    Debug.Log("Tower placement blocked: Prevents path completion.");
+                    return;
+                }
                 
                 if (GameManager.Instance.TrySpendGold(cost))
                 {
-                    Tower newTower = Instantiate(selectedTowerPrefab, hit.point, Quaternion.identity);
-                    newTower.gameObject.SetActive(true);  // Activate the tower
+                    Tower newTower = Instantiate(selectedTowerPrefab, snappedPos, Quaternion.identity);
+                    newTower.gameObject.SetActive(true);
+                    
                     RegisterTower(newTower);
                     CancelPlacement();
+                    
+                    // Notify enemies that the maze has changed
+                    PathManager.Instance.NotifyMazeChanged();
+                }
+                else
+                {
+                    GridManager.Instance.FreeCell(cell);
                 }
             }
         }
