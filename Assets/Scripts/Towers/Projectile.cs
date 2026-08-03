@@ -5,13 +5,15 @@ public class Projectile : MonoBehaviour
     private Enemy target;
     private float speed;
     private float damage;
+    private StatusEffect payloadEffect;
     private bool initialized = false;
 
-    public void Initialize(Enemy targetEnemy, float travelSpeed, float hitDamage)
+    public void Initialize(Enemy targetEnemy, float travelSpeed, float hitDamage, StatusEffect effect = null)
     {
         target = targetEnemy;
         speed = travelSpeed;
         damage = hitDamage;
+        payloadEffect = effect;
         initialized = true;
     }
 
@@ -47,6 +49,11 @@ public class Projectile : MonoBehaviour
         if (target != null)
         {
             target.TakeDamage(damage);
+            
+            if (payloadEffect != null)
+            {
+                target.ApplyStatusEffect(payloadEffect);
+            }
         }
         
         // Add impact particle effect here later if desired

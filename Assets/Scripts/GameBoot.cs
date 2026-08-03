@@ -263,6 +263,9 @@ public class GameBoot : MonoBehaviour
         minimapRect.offsetMax = new Vector2(100, 0); // 100x100 square
         
         minimapObj.AddComponent<MinimapInteraction>();
+        minimapObj.AddComponent<MinimapCameraView>();
+        minimapObj.AddComponent<RectMask2D>();
+        
         if (MinimapManager.Instance != null)
         {
             MinimapManager.Instance.Initialize(minimapRect);

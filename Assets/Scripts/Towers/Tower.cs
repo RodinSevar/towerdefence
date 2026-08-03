@@ -104,12 +104,13 @@ public class Tower : MonoBehaviour, ISelectable
             }
         }
 
+        fireTimer += Time.deltaTime;
+
         FindTarget();
 
         if (targetEnemy != null)
         {
             AimAtTarget();
-            fireTimer += Time.deltaTime;
 
             if (fireTimer >= 1f / stats.fireRate)
             {
@@ -195,7 +196,8 @@ public class Tower : MonoBehaviour, ISelectable
                 projObj.GetComponent<Renderer>().material.color = Color.cyan;
                 
                 Projectile proj = projObj.AddComponent<Projectile>();
-                proj.Initialize(targetEnemy, 8f, stats.damage); // Slower speed
+                StatusEffect slowEffect = new StatusEffect(StatusEffectType.Slow, 2f, 0.5f); // 50% slow for 2 seconds
+                proj.Initialize(targetEnemy, 24f, stats.damage, slowEffect); // 3x faster speed
             }
         }
     }

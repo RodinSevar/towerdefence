@@ -33,6 +33,10 @@ public class Enemy : MonoBehaviour, ISelectable
     private int currentPathNodeIndex = 0;
     
     private GameObject selectionRing;
+    private Renderer visualRenderer;
+    private Color baseColor;
+
+    private List<StatusEffect> activeEffects = new List<StatusEffect>();
 
     private void OnEnable()
     {
@@ -54,6 +58,17 @@ public class Enemy : MonoBehaviour, ISelectable
         selectionRing.GetComponent<Renderer>().material.color = Color.green;
         Destroy(selectionRing.GetComponent<Collider>());
         selectionRing.SetActive(false);
+        
+        // Find the visual primitive (the cube) to change its color later
+        Transform visualTransform = transform.Find("EnemyVisual");
+        if (visualTransform != null)
+        {
+            visualRenderer = visualTransform.GetComponent<Renderer>();
+            if (visualRenderer != null)
+            {
+                baseColor = visualRenderer.material.color;
+            }
+        }
         
         if (PathManager.Instance != null)
         {
@@ -92,7 +107,68 @@ public class Enemy : MonoBehaviour, ISelectable
     private void Update()
     {
         if (!isAlive) return;
+        ProcessStatusEffects();
         MoveAlongPath();
+    }
+
+    public void ApplyStatusEffect(StatusEffect newEffect)
+    {
+        // Check if we already have this effect type
+        foreach (var effect in activeEffects)
+        {
+            if (effect.type == newEffect.type)
+            {
+                // Refresh duration if it's longer
+                if (newEffect.duration > effect.duration)
+                {
+                    effect.duration = newEffect.duration;
+                }
+                // Override strength if it's stronger
+                if (newEffect.strength > effect.strength)
+                {
+                    effect.strength = newEffect.strength;
+                }
+                return;
+            }
+        }
+
+        // Add new effect if it doesn't exist
+        activeEffects.Add(new StatusEffect(newEffect.type, newEffect.duration, newEffect.strength));
+    }
+
+    private void ProcessStatusEffects()
+    {
+        bool hasSlow = false;
+
+        for (int i = activeEffects.Count - 1; i >= 0; i--)
+        {
+            StatusEffect effect = activeEffects[i];
+            effect.duration -= Time.deltaTime;
+
+            if (effect.type == StatusEffectType.Slow)
+            {
+                hasSlow = true;
+            }
+
+            if (effect.duration <= 0)
+            {
+                activeEffects.RemoveAt(i);
+            }
+        }
+
+        // Visual feedback
+        if (visualRenderer != null)
+        {
+            if (hasSlow)
+            {
+                // Tint cyan if slowed
+                visualRenderer.material.color = Color.Lerp(baseColor, Color.cyan, 0.7f);
+            }
+            else
+            {
+                visualRenderer.material.color = baseColor;
+            }
+        }
     }
 
     private void MoveAlongPath()
@@ -120,7 +196,21 @@ public class Enemy : MonoBehaviour, ISelectable
         Vector3 targetNode = currentPath[currentPathNodeIndex];
         Vector3 moveDir = (targetNode - transform.position).normalized;
         
-        transform.position += moveDir * stats.speed * Time.deltaTime;
+        float currentSpeed = stats.speed;
+        
+        // Apply slow effects
+        float maxSlow = 0f;
+        foreach (var effect in activeEffects)
+        {
+            if (effect.type == StatusEffectType.Slow && effect.strength > maxSlow)
+            {
+                maxSlow = effect.strength;
+            }
+        }
+        
+        currentSpeed *= (1f - maxSlow);
+        
+        transform.position += moveDir * currentSpeed * Time.deltaTime;
         
         if (moveDir != Vector3.zero)
         {
