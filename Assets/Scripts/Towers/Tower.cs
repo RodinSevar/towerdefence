@@ -39,6 +39,11 @@ public class Tower : MonoBehaviour, ISelectable
     {
         SetTowerType(towerType);
         TowerManager.Instance.RegisterTower(this);
+        
+        if (MinimapManager.Instance != null)
+        {
+            MinimapManager.Instance.RegisterUnit(transform, false);
+        }
 
         // Create visual
         GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -271,6 +276,11 @@ public class Tower : MonoBehaviour, ISelectable
         if (TowerManager.Instance != null)
         {
             TowerManager.Instance.UnregisterTower(this);
+        }
+        
+        if (MinimapManager.Instance != null)
+        {
+            MinimapManager.Instance.UnregisterUnit(transform);
         }
 
         // Instantly notify A* system that the maze has opened up

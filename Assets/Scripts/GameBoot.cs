@@ -152,6 +152,13 @@ public class GameBoot : MonoBehaviour
             GameObject piObj = new GameObject("PlayerInteraction");
             piObj.AddComponent<PlayerInteraction>();
         }
+
+        // Create MinimapManager if not exists
+        if (FindAnyObjectByType<MinimapManager>() == null)
+        {
+            GameObject mmObj = new GameObject("MinimapManager");
+            mmObj.AddComponent<MinimapManager>();
+        }
     }
 
     private void SetupUI()
@@ -254,6 +261,12 @@ public class GameBoot : MonoBehaviour
         minimapRect.anchorMax = new Vector2(0, 1);
         minimapRect.offsetMin = new Vector2(0, 0);
         minimapRect.offsetMax = new Vector2(100, 0); // 100x100 square
+        
+        minimapObj.AddComponent<MinimapInteraction>();
+        if (MinimapManager.Instance != null)
+        {
+            MinimapManager.Instance.Initialize(minimapRect);
+        }
 
         // Right Section: Action Grid (Tower Selection UI)
         GameObject actionGridObj = new GameObject("ActionGridBox");

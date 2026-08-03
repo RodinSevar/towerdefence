@@ -60,6 +60,11 @@ public class Enemy : MonoBehaviour, ISelectable
             PathManager.Instance.OnMazeChanged += RecalculatePath;
             RecalculatePath();
         }
+        
+        if (MinimapManager.Instance != null)
+        {
+            MinimapManager.Instance.RegisterUnit(transform, true);
+        }
     }
 
     private void OnDestroy()
@@ -154,6 +159,12 @@ public class Enemy : MonoBehaviour, ISelectable
         isAlive = false;
         GameManager.Instance.AddGold(stats.goldReward);
         GameManager.Instance.UnregisterEnemy(this);
+        
+        if (MinimapManager.Instance != null)
+        {
+            MinimapManager.Instance.UnregisterUnit(transform);
+        }
+        
         Destroy(gameObject);
     }
 
