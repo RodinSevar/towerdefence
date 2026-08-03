@@ -7,6 +7,7 @@ public class CameraController : MonoBehaviour
     public float panSpeed = 30f;
     public float edgeScrollThickness = 20f;
     public bool useEdgeScrolling = true;
+    public float dragPanSpeed = 0.1f;
 
     [Header("Zoom Settings")]
     public float scrollSpeed = 5000f;
@@ -54,11 +55,26 @@ public class CameraController : MonoBehaviour
             }
         }
 
-        // Edge Scrolling (Mouse - New Input System)
-        if (useEdgeScrolling)
+        // Mouse Panning (New Input System)
+        Mouse mouse = Mouse.current;
+        if (mouse != null)
         {
-            Mouse mouse = Mouse.current;
-            if (mouse != null)
+            // Middle-Click Drag Panning
+            if (mouse.middleButton.isPressed)
+            {
+                // mouse.delta is pixels moved this frame
+                Vector2 delta = mouse.delta.ReadValue();
+                
+                // Scale movement by current height so it feels consistent at any zoom level
+                float heightMultiplier = transform.position.y / 50f;
+                
+                // User specifically requested: "moving up should move the camera up"
+                // delta.y is positive when mouse moves up, delta.x is positive when mouse moves right
+                pos.x += delta.x * dragPanSpeed * heightMultiplier;
+                pos.z += delta.y * dragPanSpeed * heightMultiplier;
+            }
+            // Edge Scrolling
+            else if (useEdgeScrolling)
             {
                 Vector2 mousePos = mouse.position.ReadValue();
                 

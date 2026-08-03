@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour, ISelectable
 {
     public enum EnemyType { Basic, Strong, Fast }
 
@@ -31,6 +31,8 @@ public class Enemy : MonoBehaviour
     private int targetWaypointIndex = 1; // 0 is usually spawn, so head to 1
     private List<Vector3> currentPath;
     private int currentPathNodeIndex = 0;
+    
+    private GameObject selectionRing;
 
     private void OnEnable()
     {
@@ -43,6 +45,15 @@ public class Enemy : MonoBehaviour
     private void Start()
     {
         currentHealth = stats.health;
+        
+        // Create selection ring visual (a slightly larger, flat cylinder at the base)
+        selectionRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        selectionRing.transform.SetParent(transform);
+        selectionRing.transform.localScale = new Vector3(1.2f, 0.05f, 1.2f);
+        selectionRing.transform.localPosition = new Vector3(0, 0.05f, 0);
+        selectionRing.GetComponent<Renderer>().material.color = Color.green;
+        Destroy(selectionRing.GetComponent<Collider>());
+        selectionRing.SetActive(false);
         
         if (PathManager.Instance != null)
         {
@@ -168,4 +179,36 @@ public class Enemy : MonoBehaviour
     public float GetMaxHealth() => stats.health;
     public EnemyType GetEnemyType() => currentType;
     public float GetProgress() => PathManager.Instance != null ? (float)targetWaypointIndex / PathManager.Instance.GetWaypointCount() : 0f;
+
+    // ISelectable implementation
+    public string GetDisplayName()
+    {
+        switch (currentType)
+        {
+            case EnemyType.Strong: return "Strong Creep";
+            case EnemyType.Fast: return "Fast Creep";
+            default: return "Basic Creep";
+        }
+    }
+
+    public string GetStatsText()
+    {
+        return $"Health: {Mathf.CeilToInt(currentHealth)} / {Mathf.CeilToInt(stats.health)}\n" +
+               $"Speed: {stats.speed}\n" +
+               $"Reward: {stats.goldReward}G";
+    }
+
+    public bool IsSellable() => false;
+    
+    public int GetRefundAmount() => 0;
+    
+    public void Sell() { } // Cannot sell creeps
+
+    public void SetSelected(bool isSelected)
+    {
+        if (selectionRing != null)
+        {
+            selectionRing.SetActive(isSelected);
+        }
+    }
 }

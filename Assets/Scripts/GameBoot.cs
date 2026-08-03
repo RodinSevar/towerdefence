@@ -347,7 +347,7 @@ public class GameBoot : MonoBehaviour
         sellBtnTextRect.offsetMin = Vector2.zero;
         sellBtnTextRect.offsetMax = Vector2.zero;
 
-        SelectedTowerUI stComponent = selectedTowerUIObj.AddComponent<SelectedTowerUI>();
+        SelectionUI stComponent = selectedTowerUIObj.AddComponent<SelectionUI>();
         var nameField = stComponent.GetType().GetField("nameText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         var statsField = stComponent.GetType().GetField("statsText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         var btnField = stComponent.GetType().GetField("sellButton", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Tower : MonoBehaviour
+public class Tower : MonoBehaviour, ISelectable
 {
     public enum TowerType { Gun, Laser, Ice }
 
@@ -58,7 +58,7 @@ public class Tower : MonoBehaviour
         selectionRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         selectionRing.transform.SetParent(transform);
         selectionRing.transform.localScale = new Vector3(1.2f, 0.05f, 1.2f);
-        selectionRing.transform.localPosition = new Vector3(0, -0.4f, 0);
+        selectionRing.transform.localPosition = new Vector3(0, 0.05f, 0);
         Destroy(selectionRing.GetComponent<Collider>());
         selectionRing.GetComponent<Renderer>().material.color = Color.green;
         selectionRing.SetActive(false);
@@ -170,6 +170,23 @@ public class Tower : MonoBehaviour
     }
 
     public void SellTower()
+    {
+        Sell();
+    }
+
+    // ISelectable implementation
+    public string GetStatsText()
+    {
+        return $"Damage: {GetDamage()}\n" +
+               $"Range: {GetRange()}\n" +
+               $"Speed: {GetFireRate()}s";
+    }
+
+    public bool IsSellable() => true;
+    
+    public int GetRefundAmount() => GetCost() / 2;
+
+    public void Sell()
     {
         // Refund 50%
         int refund = GetCost() / 2;

@@ -6,10 +6,10 @@ public class PlayerInteraction : MonoBehaviour
 {
     public static PlayerInteraction Instance { get; private set; }
     
-    private Tower selectedTower;
+    private ISelectable selectedUnit;
     
-    public System.Action<Tower> OnTowerSelected;
-    public System.Action OnTowerDeselected;
+    public System.Action<ISelectable> OnUnitSelected;
+    public System.Action OnUnitDeselected;
 
     private void Awake()
     {
@@ -33,62 +33,62 @@ public class PlayerInteraction : MonoBehaviour
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
                 return;
 
-            TrySelectTower();
+            TrySelectUnit();
         }
         
         // Deselect on right click or escape
         if (Mouse.current.rightButton.wasPressedThisFrame || Keyboard.current.escapeKey.wasPressedThisFrame)
         {
-            DeselectTower();
+            DeselectUnit();
         }
     }
 
-    private void TrySelectTower()
+    private void TrySelectUnit()
     {
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
         
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            Tower tower = hit.collider.GetComponentInParent<Tower>();
+            ISelectable unit = hit.collider.GetComponentInParent<ISelectable>();
             
-            if (tower != null)
+            if (unit != null)
             {
-                SelectTower(tower);
+                SelectUnit(unit);
             }
             else
             {
                 // Clicked on something else (like the ground)
-                DeselectTower();
+                DeselectUnit();
             }
         }
     }
 
-    public void SelectTower(Tower tower)
+    public void SelectUnit(ISelectable unit)
     {
-        if (selectedTower != null)
+        if (selectedUnit != null)
         {
-            selectedTower.SetSelected(false);
+            selectedUnit.SetSelected(false);
         }
         
-        selectedTower = tower;
-        selectedTower.SetSelected(true);
+        selectedUnit = unit;
+        selectedUnit.SetSelected(true);
         
-        OnTowerSelected?.Invoke(selectedTower);
+        OnUnitSelected?.Invoke(selectedUnit);
     }
 
-    public void DeselectTower()
+    public void DeselectUnit()
     {
-        if (selectedTower != null)
+        if (selectedUnit != null)
         {
-            selectedTower.SetSelected(false);
-            selectedTower = null;
-            
-            OnTowerDeselected?.Invoke();
+            selectedUnit.SetSelected(false);
         }
+        
+        selectedUnit = null;
+        OnUnitDeselected?.Invoke();
     }
 
-    public Tower GetSelectedTower()
+    public ISelectable GetSelectedUnit()
     {
-        return selectedTower;
+        return selectedUnit;
     }
 }
