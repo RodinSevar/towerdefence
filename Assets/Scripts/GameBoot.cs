@@ -363,17 +363,47 @@ public class GameBoot : MonoBehaviour
         sellBtnTextRect.offsetMin = Vector2.zero;
         sellBtnTextRect.offsetMax = Vector2.zero;
 
+        // Upgrade Button
+        GameObject upgBtnObj = new GameObject("UpgradeButton");
+        upgBtnObj.transform.SetParent(selectedTowerUIObj.transform, false);
+        Button upgBtn = upgBtnObj.AddComponent<Button>();
+        Image upgBtnImg = upgBtnObj.AddComponent<Image>();
+        upgBtnImg.color = new Color(0.2f, 0.6f, 0.2f, 1f); // Green
+        RectTransform upgBtnRect = upgBtnObj.GetComponent<RectTransform>();
+        upgBtnRect.anchorMin = new Vector2(1, 0);
+        upgBtnRect.anchorMax = new Vector2(1, 0);
+        upgBtnRect.offsetMin = new Vector2(-300, 10);
+        upgBtnRect.offsetMax = new Vector2(-160, 40);
+
+        // Upgrade Button Text
+        GameObject upgBtnTextObj = new GameObject("Text");
+        upgBtnTextObj.transform.SetParent(upgBtnObj.transform, false);
+        TextMeshProUGUI upgBtnText = upgBtnTextObj.AddComponent<TextMeshProUGUI>();
+        upgBtnText.text = "Upgrade";
+        upgBtnText.fontSize = 16;
+        upgBtnText.color = Color.white;
+        upgBtnText.alignment = TextAlignmentOptions.Center;
+        RectTransform upgBtnTextRect = upgBtnTextObj.GetComponent<RectTransform>();
+        upgBtnTextRect.anchorMin = Vector2.zero;
+        upgBtnTextRect.anchorMax = Vector2.one;
+        upgBtnTextRect.offsetMin = Vector2.zero;
+        upgBtnTextRect.offsetMax = Vector2.zero;
+
         SelectionUI stComponent = selectedTowerUIObj.AddComponent<SelectionUI>();
         var nameField = stComponent.GetType().GetField("nameText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         var statsField = stComponent.GetType().GetField("statsText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         var btnField = stComponent.GetType().GetField("sellButton", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         var btnTextField = stComponent.GetType().GetField("sellButtonText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var upgBtnField = stComponent.GetType().GetField("upgradeButton", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var upgBtnTextField = stComponent.GetType().GetField("upgradeButtonText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         var panelField = stComponent.GetType().GetField("panelObject", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
         if (nameField != null) nameField.SetValue(stComponent, stName);
         if (statsField != null) statsField.SetValue(stComponent, stStats);
         if (btnField != null) btnField.SetValue(stComponent, sellBtn);
         if (btnTextField != null) btnTextField.SetValue(stComponent, sellBtnText);
+        if (upgBtnField != null) upgBtnField.SetValue(stComponent, upgBtn);
+        if (upgBtnTextField != null) upgBtnTextField.SetValue(stComponent, upgBtnText);
         if (panelField != null) panelField.SetValue(stComponent, selectedTowerUIObj);
 
         // ---------------- GAME OVER PANEL ----------------

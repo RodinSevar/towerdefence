@@ -8,6 +8,8 @@ public class SelectionUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI statsText;
     [SerializeField] private Button sellButton;
     [SerializeField] private TextMeshProUGUI sellButtonText;
+    [SerializeField] private Button upgradeButton;
+    [SerializeField] private TextMeshProUGUI upgradeButtonText;
     [SerializeField] private GameObject panelObject;
 
     private ISelectable currentUnit;
@@ -24,6 +26,11 @@ public class SelectionUI : MonoBehaviour
         if (sellButton != null)
         {
             sellButton.onClick.AddListener(OnSellClicked);
+        }
+        
+        if (upgradeButton != null)
+        {
+            upgradeButton.onClick.AddListener(OnUpgradeClicked);
         }
 
         // Start hidden
@@ -60,6 +67,11 @@ public class SelectionUI : MonoBehaviour
                     sellButton.gameObject.SetActive(false);
                 }
                 
+                if (upgradeButton != null)
+                {
+                    upgradeButton.gameObject.SetActive(false);
+                }
+                
                 // Clear the reference so we stop checking
                 currentUnit = null;
             }
@@ -70,6 +82,13 @@ public class SelectionUI : MonoBehaviour
                 if (statsText != null)
                 {
                     statsText.text = lastKnownStats;
+                }
+                
+                // Update upgrade button interactability dynamically (in case gold changes)
+                if (upgradeButton != null && currentUnit.CanUpgrade())
+                {
+                    bool canAfford = GameManager.Instance.GetGold() >= currentUnit.GetUpgradeCost();
+                    upgradeButton.interactable = canAfford;
                 }
             }
         }
@@ -100,6 +119,18 @@ public class SelectionUI : MonoBehaviour
             sellButton.gameObject.SetActive(unit.IsSellable());
         }
 
+        if (upgradeButton != null)
+        {
+            bool canUpgrade = unit.CanUpgrade();
+            upgradeButton.gameObject.SetActive(canUpgrade);
+            if (canUpgrade && upgradeButtonText != null)
+            {
+                int cost = unit.GetUpgradeCost();
+                upgradeButtonText.text = $"Upgrade (-{cost}G)";
+                upgradeButton.interactable = GameManager.Instance.GetGold() >= cost;
+            }
+        }
+
         if (panelObject != null)
         {
             panelObject.SetActive(true);
@@ -120,7 +151,22 @@ public class SelectionUI : MonoBehaviour
         if (currentUnit != null && currentUnit.IsSellable())
         {
             currentUnit.Sell();
-            PlayerInteraction.Instance.DeselectUnit();
+            HandleUnitDeselected();
+        }
+    }
+
+    private void OnUpgradeClicked()
+    {
+        if (currentUnit != null && currentUnit.CanUpgrade())
+        {
+            int cost = currentUnit.GetUpgradeCost();
+            if (GameManager.Instance.TrySpendGold(cost))
+            {
+                currentUnit.Upgrade();
+                
+                // Refresh UI immediately
+                HandleUnitSelected(currentUnit);
+            }
         }
     }
 }

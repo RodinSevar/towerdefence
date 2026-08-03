@@ -57,6 +57,8 @@ public class GameManager : MonoBehaviour
         currentGold += amount;
         OnGoldChanged?.Invoke(currentGold);
     }
+    
+    public int GetGold() => currentGold;
 
     public bool TrySpendGold(int amount)
     {

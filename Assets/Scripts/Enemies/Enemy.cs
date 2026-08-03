@@ -312,4 +312,9 @@ public class Enemy : MonoBehaviour, ISelectable
             selectionRing.SetActive(isSelected);
         }
     }
+    
+    // Upgrade System (Enemies don't upgrade)
+    public bool CanUpgrade() => false;
+    public int GetUpgradeCost() => 0;
+    public void Upgrade() { }
 }

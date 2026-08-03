@@ -5,32 +5,62 @@ public class Tower : MonoBehaviour, ISelectable
     public enum TowerType { Gun, Laser, Ice }
 
     [System.Serializable]
-    public class TowerStats
+    public class TowerLevel
     {
         public int cost = 100;
         public float range = 10f;
         public float fireRate = 1f;
         public float damage = 10f;
         public string displayName = "Gun Tower";
+        
+        [Header("Visuals")]
+        public Color visualColor = Color.blue;
+        public float visualScale = 0.8f;
+        
+        [Header("Projectile")]
+        public float projectileSpeed = 15f;
+        public Color projectileColor = Color.yellow;
+        public float projectileScale = 0.2f;
+        
+        [Header("Status Effect")]
+        public bool hasStatusEffect = false;
+        public StatusEffectType effectType;
+        public float effectDuration;
+        public float effectStrength;
     }
 
     [SerializeField]
     private TowerType towerType = TowerType.Gun;
 
+    // Hardcoded default arrays for now so they work without Inspector setup
     [SerializeField]
-    private TowerStats gunStats = new TowerStats() { cost = 10, range = 10f, fireRate = 1f, damage = 10f, displayName = "Gun Tower" };
+    private TowerLevel[] gunLevels = new TowerLevel[] {
+        new TowerLevel() { cost = 10, range = 10f, fireRate = 1f, damage = 10f, displayName = "Gun Tower Lvl 1", visualColor = Color.blue, visualScale = 0.8f, projectileSpeed = 15f, projectileColor = Color.yellow, projectileScale = 0.2f },
+        new TowerLevel() { cost = 20, range = 12f, fireRate = 1.5f, damage = 25f, displayName = "Gun Tower Lvl 2", visualColor = new Color(0, 0, 0.7f), visualScale = 1.0f, projectileSpeed = 20f, projectileColor = new Color(1f, 0.5f, 0f), projectileScale = 0.3f }
+    };
 
     [SerializeField]
-    private TowerStats laserStats = new TowerStats() { cost = 15, range = 12f, fireRate = 2f, damage = 15f, displayName = "Laser Tower" };
+    private TowerLevel[] laserLevels = new TowerLevel[] {
+        new TowerLevel() { cost = 15, range = 12f, fireRate = 2f, damage = 15f, displayName = "Laser Tower Lvl 1", visualColor = Color.yellow, visualScale = 0.8f },
+        new TowerLevel() { cost = 30, range = 15f, fireRate = 3f, damage = 35f, displayName = "Laser Tower Lvl 2", visualColor = new Color(0.8f, 0.8f, 0f), visualScale = 1.0f }
+    };
 
     [SerializeField]
-    private TowerStats iceStats = new TowerStats() { cost = 12, range = 8f, fireRate = 0.5f, damage = 5f, displayName = "Ice Tower" };
+    private TowerLevel[] iceLevels = new TowerLevel[] {
+        new TowerLevel() { cost = 12, range = 8f, fireRate = 0.5f, damage = 5f, displayName = "Ice Tower Lvl 1", visualColor = Color.cyan, visualScale = 0.8f, projectileSpeed = 24f, projectileColor = Color.cyan, projectileScale = 0.4f, hasStatusEffect = true, effectType = StatusEffectType.Slow, effectDuration = 2f, effectStrength = 0.5f },
+        new TowerLevel() { cost = 25, range = 10f, fireRate = 1f, damage = 15f, displayName = "Ice Tower Lvl 2", visualColor = new Color(0, 0.7f, 0.7f), visualScale = 1.0f, projectileSpeed = 30f, projectileColor = Color.cyan, projectileScale = 0.5f, hasStatusEffect = true, effectType = StatusEffectType.Slow, effectDuration = 3f, effectStrength = 0.7f }
+    };
 
-    private TowerStats stats;
+    private TowerLevel[] currentUpgradePath;
+    private int currentLevelIndex = 0;
+    
+    private TowerLevel currentLevel;
+    
     private Enemy targetEnemy = null;
     private float fireTimer = 0f;
     private Transform firePoint;
     private GameObject selectionRing;
+    private GameObject visual;
     
     private LineRenderer laserLine;
     private float laserDisplayTimer = 0f;
@@ -46,16 +76,9 @@ public class Tower : MonoBehaviour, ISelectable
         }
 
         // Create visual
-        GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        visual = GameObject.CreatePrimitive(PrimitiveType.Cube);
         visual.transform.SetParent(transform);
-        visual.transform.localScale = Vector3.one * 0.8f;
-        visual.transform.localPosition = Vector3.zero;
-        
-        // Set color based on type
-        Color color = towerType == Tower.TowerType.Gun ? Color.blue : 
-                      towerType == Tower.TowerType.Laser ? Color.yellow : 
-                      Color.cyan;
-        visual.GetComponent<Renderer>().material.color = color;
+        ApplyCurrentLevelVisuals();
 
         // Removed the giant SphereCollider that was bleeding into adjacent cells and blocking ground clicks
         firePoint = new GameObject("FirePoint").transform;
@@ -86,7 +109,7 @@ public class Tower : MonoBehaviour, ISelectable
 
     private void Update()
     {
-        if (GameManager.Instance == null || stats == null) return;
+        if (GameManager.Instance == null || currentLevel == null) return;
         if (GameManager.Instance.IsGameOver()) return;
 
         if (laserLine != null && laserLine.enabled)
@@ -112,7 +135,7 @@ public class Tower : MonoBehaviour, ISelectable
         {
             AimAtTarget();
 
-            if (fireTimer >= 1f / stats.fireRate)
+            if (fireTimer >= 1f / currentLevel.fireRate)
             {
                 FireAtTarget();
                 fireTimer = 0f;
@@ -123,16 +146,16 @@ public class Tower : MonoBehaviour, ISelectable
     private void FindTarget()
     {
         // Check if current target is still valid
-        if (targetEnemy != null && Vector3.Distance(transform.position, targetEnemy.transform.position) <= stats.range)
+        if (targetEnemy != null && Vector3.Distance(transform.position, targetEnemy.transform.position) <= currentLevel.range)
         {
             return;
         }
 
         // Find nearest enemy in range
         targetEnemy = null;
-        float closestDistance = stats.range;
+        float closestDistance = currentLevel.range;
 
-        Collider[] colliders = Physics.OverlapSphere(transform.position, stats.range);
+        Collider[] colliders = Physics.OverlapSphere(transform.position, currentLevel.range);
         foreach (Collider col in colliders)
         {
             Enemy enemy = col.GetComponent<Enemy>();
@@ -163,7 +186,7 @@ public class Tower : MonoBehaviour, ISelectable
         if (towerType == TowerType.Laser)
         {
             // Laser is instant damage
-            targetEnemy.TakeDamage(stats.damage);
+            targetEnemy.TakeDamage(currentLevel.damage);
             
             if (laserLine != null)
             {
@@ -182,56 +205,72 @@ public class Tower : MonoBehaviour, ISelectable
             // Remove collider so it doesn't block rays
             Destroy(projObj.GetComponent<Collider>());
             
-            if (towerType == TowerType.Gun)
+            projObj.transform.localScale = Vector3.one * currentLevel.projectileScale;
+            projObj.GetComponent<Renderer>().material.color = currentLevel.projectileColor;
+            
+            Projectile proj = projObj.AddComponent<Projectile>();
+            
+            StatusEffect payload = null;
+            if (currentLevel.hasStatusEffect)
             {
-                projObj.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
-                projObj.GetComponent<Renderer>().material.color = Color.yellow;
-                
-                Projectile proj = projObj.AddComponent<Projectile>();
-                proj.Initialize(targetEnemy, 15f, stats.damage); // Fast speed
+                payload = new StatusEffect(currentLevel.effectType, currentLevel.effectDuration, currentLevel.effectStrength);
             }
-            else if (towerType == TowerType.Ice)
-            {
-                projObj.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
-                projObj.GetComponent<Renderer>().material.color = Color.cyan;
-                
-                Projectile proj = projObj.AddComponent<Projectile>();
-                StatusEffect slowEffect = new StatusEffect(StatusEffectType.Slow, 2f, 0.5f); // 50% slow for 2 seconds
-                proj.Initialize(targetEnemy, 24f, stats.damage, slowEffect); // 3x faster speed
-            }
+            
+            proj.Initialize(targetEnemy, currentLevel.projectileSpeed, currentLevel.damage, payload);
         }
     }
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, GetComponent<Tower>() != null ? GetComponent<Tower>().stats.range : 10f);
+        if (currentLevel != null)
+        {
+            Gizmos.DrawWireSphere(transform.position, currentLevel.range);
+        }
     }
 
     public void SetTowerType(TowerType type)
     {
         towerType = type;
-
-        switch (type)
+        currentLevelIndex = 0;
+        
+        switch (towerType)
         {
             case TowerType.Gun:
-                stats = gunStats;
+                currentUpgradePath = gunLevels;
                 break;
             case TowerType.Laser:
-                stats = laserStats;
+                currentUpgradePath = laserLevels;
                 break;
             case TowerType.Ice:
-                stats = iceStats;
+                currentUpgradePath = iceLevels;
                 break;
+        }
+        
+        if (currentUpgradePath != null && currentUpgradePath.Length > 0)
+        {
+            currentLevel = currentUpgradePath[0];
         }
     }
 
-    public int GetCost() => stats != null ? stats.cost : 0;
-    public float GetDamage() => stats != null ? stats.damage : 0f;
-    public float GetRange() => stats != null ? stats.range : 0f;
-    public float GetFireRate() => stats != null ? stats.fireRate : 0f;
+    private void ApplyCurrentLevelVisuals()
+    {
+        if (visual == null || currentLevel == null) return;
+        
+        visual.transform.localScale = Vector3.one * currentLevel.visualScale;
+        visual.transform.localPosition = Vector3.zero;
+        visual.GetComponent<Renderer>().material.color = currentLevel.visualColor;
+    }
+
+    public int GetCost() => currentLevel != null ? currentLevel.cost : 0;
+    public float GetDamage() => currentLevel != null ? currentLevel.damage : 0f;
+    public float GetRange() => currentLevel != null ? currentLevel.range : 0f;
+    public float GetFireRate() => currentLevel != null ? currentLevel.fireRate : 0f;
     public TowerType GetTowerType() => towerType;
-    public string GetDisplayName() => stats != null ? stats.displayName : "Tower";
+    public string GetDisplayName()
+    {
+        return currentLevel != null ? currentLevel.displayName : "Unknown Tower";
+    }
 
     public void SetSelected(bool selected)
     {
@@ -246,17 +285,51 @@ public class Tower : MonoBehaviour, ISelectable
         Sell();
     }
 
-    // ISelectable implementation
     public string GetStatsText()
     {
-        return $"Damage: {GetDamage()}\n" +
-               $"Range: {GetRange()}\n" +
-               $"Speed: {GetFireRate()}s";
+        if (currentLevel == null) return "";
+        return $"Damage: {currentLevel.damage}\nRange: {currentLevel.range}\nFire Rate: {currentLevel.fireRate}/s";
     }
 
-    public bool IsSellable() => true;
+    public bool IsSellable()
+    {
+        return true; // All towers can be sold
+    }
     
-    public int GetRefundAmount() => GetCost() / 2;
+    public int GetRefundAmount()
+    {
+        // Refund sum of all levels bought so far (or half of it)
+        int totalCost = 0;
+        for (int i = 0; i <= currentLevelIndex; i++)
+        {
+            totalCost += currentUpgradePath[i].cost;
+        }
+        return totalCost / 2;
+    }
+
+    public bool CanUpgrade()
+    {
+        return currentUpgradePath != null && currentLevelIndex < currentUpgradePath.Length - 1;
+    }
+
+    public int GetUpgradeCost()
+    {
+        if (CanUpgrade())
+        {
+            return currentUpgradePath[currentLevelIndex + 1].cost;
+        }
+        return 0;
+    }
+
+    public void Upgrade()
+    {
+        if (CanUpgrade())
+        {
+            currentLevelIndex++;
+            currentLevel = currentUpgradePath[currentLevelIndex];
+            ApplyCurrentLevelVisuals();
+        }
+    }
 
     public void Sell()
     {

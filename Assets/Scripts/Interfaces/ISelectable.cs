@@ -8,4 +8,9 @@ public interface ISelectable
     int GetRefundAmount();
     void Sell();
     void SetSelected(bool isSelected);
+    
+    // Upgrade System
+    bool CanUpgrade();
+    int GetUpgradeCost();
+    void Upgrade();
 }
