@@ -146,6 +146,12 @@ public class GameBoot : MonoBehaviour
             tmObj.AddComponent<TowerManager>();
         }
 
+        // Create PlayerInteraction if not exists
+        if (FindAnyObjectByType<PlayerInteraction>() == null)
+        {
+            GameObject piObj = new GameObject("PlayerInteraction");
+            piObj.AddComponent<PlayerInteraction>();
+        }
     }
 
     private void SetupUI()
@@ -183,52 +189,178 @@ public class GameBoot : MonoBehaviour
 
         HUD hudComponent = hudObj.AddComponent<HUD>();
 
-        // Create Gold Text
+        // ---------------- TOP HUD (Resources & Wave) ----------------
+        // Gold Text
         GameObject goldTextObj = new GameObject("GoldText");
         goldTextObj.transform.SetParent(hudObj.transform, false);
         TextMeshProUGUI goldText = goldTextObj.AddComponent<TextMeshProUGUI>();
         goldText.text = "Gold: 500";
-        goldText.fontSize = 36;
+        goldText.fontSize = 18; // Shrunk down
         RectTransform goldRect = goldTextObj.GetComponent<RectTransform>();
         goldRect.anchorMin = new Vector2(0, 1);
         goldRect.anchorMax = new Vector2(0, 1);
-        goldRect.offsetMin = new Vector2(10, -50);
+        goldRect.offsetMin = new Vector2(10, -25); // Taking up a quarter of previous vertical space
         goldRect.offsetMax = new Vector2(200, 0);
 
-        // Create Lives Text
+        // Lives Text
         GameObject livesTextObj = new GameObject("LivesText");
         livesTextObj.transform.SetParent(hudObj.transform, false);
         TextMeshProUGUI livesText = livesTextObj.AddComponent<TextMeshProUGUI>();
         livesText.text = "Lives: 20";
-        livesText.fontSize = 36;
+        livesText.fontSize = 18;
         RectTransform livesRect = livesTextObj.GetComponent<RectTransform>();
         livesRect.anchorMin = new Vector2(0.5f, 1);
         livesRect.anchorMax = new Vector2(0.5f, 1);
-        livesRect.offsetMin = new Vector2(-100, -50);
+        livesRect.offsetMin = new Vector2(-100, -25);
         livesRect.offsetMax = new Vector2(100, 0);
 
-        // Create Wave Text
+        // Wave Text
         GameObject waveTextObj = new GameObject("WaveText");
         waveTextObj.transform.SetParent(hudObj.transform, false);
         TextMeshProUGUI waveText = waveTextObj.AddComponent<TextMeshProUGUI>();
         waveText.text = "Wave: 0 / 5";
-        waveText.fontSize = 36;
+        waveText.fontSize = 18;
         RectTransform waveRect = waveTextObj.GetComponent<RectTransform>();
         waveRect.anchorMin = new Vector2(1, 1);
         waveRect.anchorMax = new Vector2(1, 1);
-        waveRect.offsetMin = new Vector2(-250, -50);
-        waveRect.offsetMax = new Vector2(0, 0);
+        waveRect.offsetMin = new Vector2(-250, -25);
+        waveRect.offsetMax = new Vector2(-10, 0);
 
-        // Use reflection to set private fields (alternative to serialized fields)
         var goldField = hudComponent.GetType().GetField("goldText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         var livesField = hudComponent.GetType().GetField("livesText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         var waveField = hudComponent.GetType().GetField("waveText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
         if (goldField != null) goldField.SetValue(hudComponent, goldText);
         if (livesField != null) livesField.SetValue(hudComponent, livesText);
         if (waveField != null) waveField.SetValue(hudComponent, waveText);
 
-        // Create Game Over Panel
+        // ---------------- BOTTOM BAR (Warcraft 3 Style) ----------------
+        GameObject bottomBarObj = new GameObject("BottomBar");
+        bottomBarObj.transform.SetParent(canvas.transform, false);
+        Image bottomBarBg = bottomBarObj.AddComponent<Image>();
+        bottomBarBg.color = new Color(0.1f, 0.1f, 0.1f, 1f); // Dark background
+        RectTransform bottomBarRect = bottomBarObj.GetComponent<RectTransform>();
+        bottomBarRect.anchorMin = new Vector2(0, 0);
+        bottomBarRect.anchorMax = new Vector2(1, 0);
+        bottomBarRect.offsetMin = new Vector2(0, 0);
+        bottomBarRect.offsetMax = new Vector2(0, 100); // 100px tall
+
+        // Left Section: Minimap
+        GameObject minimapObj = new GameObject("MinimapBox");
+        minimapObj.transform.SetParent(bottomBarObj.transform, false);
+        Image minimapBg = minimapObj.AddComponent<Image>();
+        minimapBg.color = new Color(0.05f, 0.05f, 0.05f, 1f);
+        RectTransform minimapRect = minimapObj.GetComponent<RectTransform>();
+        minimapRect.anchorMin = new Vector2(0, 0);
+        minimapRect.anchorMax = new Vector2(0, 1);
+        minimapRect.offsetMin = new Vector2(0, 0);
+        minimapRect.offsetMax = new Vector2(100, 0); // 100x100 square
+
+        // Right Section: Action Grid (Tower Selection UI)
+        GameObject actionGridObj = new GameObject("ActionGridBox");
+        actionGridObj.transform.SetParent(bottomBarObj.transform, false);
+        Image actionGridBg = actionGridObj.AddComponent<Image>();
+        actionGridBg.color = new Color(0.15f, 0.15f, 0.15f, 1f);
+        RectTransform actionGridRect = actionGridObj.GetComponent<RectTransform>();
+        actionGridRect.anchorMin = new Vector2(1, 0);
+        actionGridRect.anchorMax = new Vector2(1, 1);
+        actionGridRect.offsetMin = new Vector2(-250, 0); // 250px wide for grid
+        actionGridRect.offsetMax = new Vector2(0, 0);
+
+        GridLayoutGroup actionLayout = actionGridObj.AddComponent<GridLayoutGroup>();
+        actionLayout.cellSize = new Vector2(40, 40); // 40x40 squares
+        actionLayout.spacing = new Vector2(10, 10);
+        actionLayout.padding = new RectOffset(10, 10, 10, 10);
+        
+        TowerSelectionUI towerSelectionUI = actionGridObj.AddComponent<TowerSelectionUI>();
+        var containerField = towerSelectionUI.GetType().GetField("towersContainer", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        if (containerField != null) containerField.SetValue(towerSelectionUI, actionGridObj.transform);
+
+        // Center Section: Unit Info (Selected Tower UI)
+        GameObject centerSectionObj = new GameObject("CenterSectionBox");
+        centerSectionObj.transform.SetParent(bottomBarObj.transform, false);
+        Image centerBg = centerSectionObj.AddComponent<Image>();
+        centerBg.color = new Color(0.12f, 0.12f, 0.12f, 1f);
+        RectTransform centerRect = centerSectionObj.GetComponent<RectTransform>();
+        centerRect.anchorMin = new Vector2(0, 0);
+        centerRect.anchorMax = new Vector2(1, 1);
+        centerRect.offsetMin = new Vector2(100, 0);   // After Minimap
+        centerRect.offsetMax = new Vector2(-250, 0);  // Before Action Grid
+
+        // Selected Tower UI Content (Turns off when nothing selected)
+        GameObject selectedTowerUIObj = new GameObject("SelectedTowerUI");
+        selectedTowerUIObj.transform.SetParent(centerSectionObj.transform, false);
+        RectTransform stRect = selectedTowerUIObj.AddComponent<RectTransform>();
+        stRect.anchorMin = Vector2.zero;
+        stRect.anchorMax = Vector2.one;
+        stRect.offsetMin = Vector2.zero;
+        stRect.offsetMax = Vector2.zero;
+
+        // Name text
+        GameObject nameTextObj = new GameObject("NameText");
+        nameTextObj.transform.SetParent(selectedTowerUIObj.transform, false);
+        TextMeshProUGUI stName = nameTextObj.AddComponent<TextMeshProUGUI>();
+        stName.text = "Tower Name";
+        stName.fontSize = 18;
+        stName.alignment = TextAlignmentOptions.Top;
+        RectTransform nameRect = nameTextObj.GetComponent<RectTransform>();
+        nameRect.anchorMin = new Vector2(0, 1);
+        nameRect.anchorMax = new Vector2(1, 1);
+        nameRect.offsetMin = new Vector2(20, -30);
+        nameRect.offsetMax = new Vector2(-20, -5);
+
+        // Stats text
+        GameObject statsTextObj = new GameObject("StatsText");
+        statsTextObj.transform.SetParent(selectedTowerUIObj.transform, false);
+        TextMeshProUGUI stStats = statsTextObj.AddComponent<TextMeshProUGUI>();
+        stStats.text = "Damage: 0\nRange: 0\nSpeed: 0";
+        stStats.fontSize = 14;
+        stStats.alignment = TextAlignmentOptions.TopLeft;
+        RectTransform statsRect = statsTextObj.GetComponent<RectTransform>();
+        statsRect.anchorMin = new Vector2(0, 0);
+        statsRect.anchorMax = new Vector2(1, 1);
+        statsRect.offsetMin = new Vector2(20, 10);
+        statsRect.offsetMax = new Vector2(-20, -30);
+
+        // Sell Button
+        GameObject sellBtnObj = new GameObject("SellButton");
+        sellBtnObj.transform.SetParent(selectedTowerUIObj.transform, false);
+        Button sellBtn = sellBtnObj.AddComponent<Button>();
+        Image sellBtnImg = sellBtnObj.AddComponent<Image>();
+        sellBtnImg.color = new Color(0.8f, 0.2f, 0.2f, 1f);
+        RectTransform sellBtnRect = sellBtnObj.GetComponent<RectTransform>();
+        sellBtnRect.anchorMin = new Vector2(1, 0);
+        sellBtnRect.anchorMax = new Vector2(1, 0);
+        sellBtnRect.offsetMin = new Vector2(-150, 10);
+        sellBtnRect.offsetMax = new Vector2(-20, 40);
+
+        // Sell Button Text
+        GameObject sellBtnTextObj = new GameObject("Text");
+        sellBtnTextObj.transform.SetParent(sellBtnObj.transform, false);
+        TextMeshProUGUI sellBtnText = sellBtnTextObj.AddComponent<TextMeshProUGUI>();
+        sellBtnText.text = "Sell";
+        sellBtnText.fontSize = 16;
+        sellBtnText.color = Color.white;
+        sellBtnText.alignment = TextAlignmentOptions.Center;
+        RectTransform sellBtnTextRect = sellBtnTextObj.GetComponent<RectTransform>();
+        sellBtnTextRect.anchorMin = Vector2.zero;
+        sellBtnTextRect.anchorMax = Vector2.one;
+        sellBtnTextRect.offsetMin = Vector2.zero;
+        sellBtnTextRect.offsetMax = Vector2.zero;
+
+        SelectedTowerUI stComponent = selectedTowerUIObj.AddComponent<SelectedTowerUI>();
+        var nameField = stComponent.GetType().GetField("nameText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var statsField = stComponent.GetType().GetField("statsText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var btnField = stComponent.GetType().GetField("sellButton", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var btnTextField = stComponent.GetType().GetField("sellButtonText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var panelField = stComponent.GetType().GetField("panelObject", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        if (nameField != null) nameField.SetValue(stComponent, stName);
+        if (statsField != null) statsField.SetValue(stComponent, stStats);
+        if (btnField != null) btnField.SetValue(stComponent, sellBtn);
+        if (btnTextField != null) btnTextField.SetValue(stComponent, sellBtnText);
+        if (panelField != null) panelField.SetValue(stComponent, selectedTowerUIObj);
+
+        // ---------------- GAME OVER PANEL ----------------
         GameObject gameOverPanelObj = new GameObject("GameOverPanel");
         gameOverPanelObj.transform.SetParent(hudObj.transform, false);
         Image panelImage = gameOverPanelObj.AddComponent<Image>();
@@ -240,7 +372,7 @@ public class GameBoot : MonoBehaviour
         panelRect.offsetMax = Vector2.zero;
         gameOverPanelObj.SetActive(false);
 
-        // Create Game Over Text
+        // Game Over Text
         GameObject gameOverTextObj = new GameObject("GameOverText");
         gameOverTextObj.transform.SetParent(gameOverPanelObj.transform, false);
         TextMeshProUGUI gameOverText = gameOverTextObj.AddComponent<TextMeshProUGUI>();
@@ -258,26 +390,6 @@ public class GameBoot : MonoBehaviour
 
         if (gameOverPanelField != null) gameOverPanelField.SetValue(hudComponent, gameOverPanelObj);
         if (gameOverTextField != null) gameOverTextField.SetValue(hudComponent, gameOverText);
-
-        // Create Tower Selection UI
-        GameObject towerUIObj = new GameObject("TowerSelectionUI");
-        towerUIObj.transform.SetParent(canvas.transform, false);
-        RectTransform towerUIRect = towerUIObj.AddComponent<RectTransform>();
-        towerUIRect.anchorMin = new Vector2(1, 0);
-        towerUIRect.anchorMax = new Vector2(1, 1);
-        towerUIRect.offsetMin = new Vector2(-160, 10);
-        towerUIRect.offsetMax = new Vector2(-10, -10);
-
-        VerticalLayoutGroup layoutGroup = towerUIObj.AddComponent<VerticalLayoutGroup>();
-        layoutGroup.childForceExpandHeight = false;
-        layoutGroup.childForceExpandWidth = false;
-        layoutGroup.spacing = 5;
-        layoutGroup.padding = new RectOffset(5, 5, 5, 5);
-
-        TowerSelectionUI towerSelectionUI = towerUIObj.AddComponent<TowerSelectionUI>();
-
-        var containerField = towerSelectionUI.GetType().GetField("towersContainer", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        if (containerField != null) containerField.SetValue(towerSelectionUI, towerUIObj.transform);
     }
 
     private void CreateTagIfNotExists(string tag)

@@ -29,20 +29,47 @@ public class PathManager : MonoBehaviour
         {
             CreateDefaultPath();
         }
+        
+        CreateWaypointVisuals();
     }
 
     private void CreateDefaultPath()
     {
+        // Spawns enemies on the far left, and they walk to the far right.
         waypoints = new Vector3[]
         {
-            new Vector3(-18, 0.5f, 0),
-            new Vector3(-12, 0.5f, 0),
-            new Vector3(-6, 0.5f, 0),
-            new Vector3(0, 0.5f, 0),
-            new Vector3(6, 0.5f, 0),
-            new Vector3(12, 0.5f, 0),
-            new Vector3(18, 0.5f, 0)
+            new Vector3(-90, 0.5f, 0),
+            new Vector3(90, 0.5f, 0)
         };
+    }
+
+    private void CreateWaypointVisuals()
+    {
+        for (int i = 0; i < waypoints.Length; i++)
+        {
+            GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            marker.name = $"Waypoint_{i}";
+            marker.transform.position = waypoints[i];
+            marker.transform.localScale = new Vector3(2f, 0.1f, 2f); // Flat disc
+            
+            // Remove collider so it doesn't block rays or physics
+            Destroy(marker.GetComponent<Collider>());
+            
+            // Set color based on type
+            Material mat = marker.GetComponent<Renderer>().material;
+            if (i == 0)
+                mat.color = Color.blue; // Spawn (Green might blend with ground)
+            else if (i == waypoints.Length - 1)
+                mat.color = Color.red; // Finish
+            else
+                mat.color = Color.yellow; // Intermediate
+        }
+    }
+
+    public Vector3 GetSpawnPoint()
+    {
+        if (waypoints != null && waypoints.Length > 0) return waypoints[0];
+        return new Vector3(-90, 0.5f, 0);
     }
 
     private void OnDrawGizmos()
@@ -121,7 +148,8 @@ public class PathManager : MonoBehaviour
         gScore[startNode] = 0;
         fScore[startNode] = GetDistance(startNode, targetNode);
 
-        int maxIterations = 5000;
+        // Increased max iterations to safely cover the entire 196x196 map (38,000+ cells)
+        int maxIterations = 50000;
         int iterations = 0;
 
         while (openSet.Count > 0)

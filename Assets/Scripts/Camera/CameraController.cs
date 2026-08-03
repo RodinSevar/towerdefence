@@ -99,18 +99,46 @@ public class CameraController : MonoBehaviour
                 // Normalize scroll value so trackpads (small values) and mice (120) both zoom at a usable speed
                 float normalizedScroll = Mathf.Clamp(scroll, -1f, 1f);
                 
-                Vector3 pos = transform.position;
+                // Desired change in Height (Y)
+                float zoomY = normalizedScroll * scrollSpeed * Time.deltaTime;
                 
-                // Move camera down/up along the Y axis
-                pos.y -= normalizedScroll * scrollSpeed * Time.deltaTime;
+                // Cast a ray from the cursor to the ground plane to find what world point we are looking at
+                Ray ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
+                Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
                 
-                // Move camera slightly forward/backward as it zooms
-                pos.z += normalizedScroll * scrollSpeed * 0.5f * Time.deltaTime;
-                
-                // Clamp Zoom Level
-                pos.y = Mathf.Clamp(pos.y, minY, maxY);
+                if (groundPlane.Raycast(ray, out float enter))
+                {
+                    Vector3 hitPoint = ray.GetPoint(enter);
+                    
+                    // We want to move along the line from the camera to the hitPoint.
+                    // The ratio of our desired Y change to our total current Y height tells us exactly how far to move.
+                    float currentY = transform.position.y;
+                    
+                    // Calculate proposed Y and clamp it
+                    float proposedY = currentY - zoomY;
+                    proposedY = Mathf.Clamp(proposedY, minY, maxY);
+                    
+                    // Recalculate the actual Y change after clamping
+                    float actualZoomY = currentY - proposedY;
+                    
+                    // If we are already at the zoom limit, actualZoomY is 0, so we don't move
+                    if (Mathf.Abs(actualZoomY) > 0.001f)
+                    {
+                        float ratio = actualZoomY / currentY;
+                        
+                        // Vector from camera to hit point
+                        Vector3 toHit = hitPoint - transform.position;
+                        
+                        // Move the camera by that ratio
+                        Vector3 proposedPos = transform.position + (toHit * ratio);
+                        
+                        // Clamp to map boundaries so zooming at edges doesn't push you out of bounds
+                        proposedPos.x = Mathf.Clamp(proposedPos.x, panLimitX.x, panLimitX.y);
+                        proposedPos.z = Mathf.Clamp(proposedPos.z, panLimitZ.x, panLimitZ.y);
 
-                transform.position = pos;
+                        transform.position = proposedPos;
+                    }
+                }
             }
         }
     }

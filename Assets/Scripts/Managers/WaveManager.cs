@@ -32,17 +32,6 @@ public class WaveManager : MonoBehaviour
 
     private void Start()
     {
-        spawnPoint = GameObject.FindWithTag("SpawnPoint")?.transform;
-        if (spawnPoint == null)
-        {
-            Debug.LogWarning("SpawnPoint not found! Creating one at origin.");
-            GameObject spawn = new GameObject("SpawnPoint");
-            spawn.tag = "SpawnPoint";
-            spawnPoint = spawn.transform;
-        }
-        
-
-
         // Default waves if none configured
         if (waves == null || waves.Length == 0)
         {
@@ -102,9 +91,8 @@ public class WaveManager : MonoBehaviour
         Enemy enemy = enemyObj.AddComponent<Enemy>();
         enemy.SetEnemyType(type);
         
-        enemyObj.transform.position = spawnPoint.position;
+        enemyObj.transform.position = PathManager.Instance != null ? PathManager.Instance.GetSpawnPoint() : new Vector3(-90, 0.5f, 0);
 
-        
         // Add collider for targeting
         BoxCollider enemyCollider = enemyObj.AddComponent<BoxCollider>();
         enemyCollider.size = new Vector3(0.8f, 0.8f, 0.8f);

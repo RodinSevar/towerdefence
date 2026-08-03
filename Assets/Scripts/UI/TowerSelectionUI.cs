@@ -69,8 +69,10 @@ public class TowerSelectionUI : MonoBehaviour
             GameObject buttonTextObj = new GameObject("Text");
             buttonTextObj.transform.SetParent(buttonObj.transform);
             TextMeshProUGUI buttonText = buttonTextObj.AddComponent<TextMeshProUGUI>();
-            buttonText.text = $"{tower.GetDisplayName()}\n${tower.GetCost()}";
-            buttonText.fontSize = 18;
+            // Remove the word "Tower" so it fits in the small square buttons
+            string shortName = tower.GetDisplayName().Replace(" Tower", "");
+            buttonText.text = $"{shortName}\n${tower.GetCost()}";
+            buttonText.fontSize = 12; // Shrunk to fit 40x40 square
             buttonText.alignment = TextAlignmentOptions.Center;
             buttonText.color = Color.white;
 

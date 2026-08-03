@@ -30,6 +30,7 @@ public class Tower : MonoBehaviour
     private Enemy targetEnemy = null;
     private float fireTimer = 0f;
     private Transform firePoint;
+    private GameObject selectionRing;
 
     private void Start()
     {
@@ -41,7 +42,6 @@ public class Tower : MonoBehaviour
         visual.transform.SetParent(transform);
         visual.transform.localScale = Vector3.one * 0.8f;
         visual.transform.localPosition = Vector3.zero;
-        Destroy(visual.GetComponent<Collider>());
         
         // Set color based on type
         Color color = towerType == Tower.TowerType.Gun ? Color.blue : 
@@ -49,15 +49,19 @@ public class Tower : MonoBehaviour
                       Color.cyan;
         visual.GetComponent<Renderer>().material.color = color;
 
-        // Add collider for mouse picking (if needed in future) or purely visual boundary
-        SphereCollider sphereCollider = gameObject.AddComponent<SphereCollider>();
-        sphereCollider.radius = 1f;  // Fixed radius for detection
-        sphereCollider.isTrigger = true;
-
-        // Create fire point
+        // Removed the giant SphereCollider that was bleeding into adjacent cells and blocking ground clicks
         firePoint = new GameObject("FirePoint").transform;
         firePoint.SetParent(transform);
         firePoint.localPosition = Vector3.up * 0.5f;
+
+        // Create selection ring visual (a slightly larger, flat cylinder at the base)
+        selectionRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        selectionRing.transform.SetParent(transform);
+        selectionRing.transform.localScale = new Vector3(1.2f, 0.05f, 1.2f);
+        selectionRing.transform.localPosition = new Vector3(0, -0.4f, 0);
+        Destroy(selectionRing.GetComponent<Collider>());
+        selectionRing.GetComponent<Renderer>().material.color = Color.green;
+        selectionRing.SetActive(false);
     }
 
     private void Update()
@@ -150,7 +154,49 @@ public class Tower : MonoBehaviour
         }
     }
 
-    public int GetCost() => stats.cost;
+    public int GetCost() => stats != null ? stats.cost : 0;
+    public float GetDamage() => stats != null ? stats.damage : 0f;
+    public float GetRange() => stats != null ? stats.range : 0f;
+    public float GetFireRate() => stats != null ? stats.fireRate : 0f;
     public TowerType GetTowerType() => towerType;
-    public string GetDisplayName() => stats.displayName;
+    public string GetDisplayName() => stats != null ? stats.displayName : "Tower";
+
+    public void SetSelected(bool selected)
+    {
+        if (selectionRing != null)
+        {
+            selectionRing.SetActive(selected);
+        }
+    }
+
+    public void SellTower()
+    {
+        // Refund 50%
+        int refund = GetCost() / 2;
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.AddGold(refund);
+        }
+
+        // Free up the grid cell
+        if (GridManager.Instance != null)
+        {
+            Vector2Int cell = GridManager.Instance.WorldToGridCell(transform.position);
+            GridManager.Instance.FreeCell(cell);
+        }
+
+        // Unregister from the manager
+        if (TowerManager.Instance != null)
+        {
+            TowerManager.Instance.UnregisterTower(this);
+        }
+
+        // Instantly notify A* system that the maze has opened up
+        if (PathManager.Instance != null)
+        {
+            PathManager.Instance.NotifyMazeChanged();
+        }
+
+        Destroy(gameObject);
+    }
 }

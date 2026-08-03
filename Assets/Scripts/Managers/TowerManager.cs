@@ -26,6 +26,13 @@ public class TowerManager : MonoBehaviour
     {
         if (isPlacingTower && Mouse.current.leftButton.wasPressedThisFrame)
         {
+            // Ignore clicks over UI
+            if (UnityEngine.EventSystems.EventSystem.current != null && 
+                UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+            {
+                return;
+            }
+
             TryPlaceTower();
         }
 
