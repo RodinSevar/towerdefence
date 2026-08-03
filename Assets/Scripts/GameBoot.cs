@@ -62,6 +62,12 @@ public class GameBoot : MonoBehaviour
             // Set camera clipping planes
             camera.nearClipPlane = 0.1f;
             camera.farClipPlane = 1000f;
+
+            // Add camera controller
+            if (cameraObj.GetComponent<CameraController>() == null)
+            {
+                cameraObj.AddComponent<CameraController>();
+            }
         }
         catch (System.Exception e)
         {
@@ -80,7 +86,7 @@ public class GameBoot : MonoBehaviour
             groundObj.transform.position = Vector3.zero;
 
             MeshRenderer renderer = groundObj.GetComponent<MeshRenderer>();
-            renderer.material.color = new Color(0.2f, 0.8f, 0.2f); // Set to green
+            renderer.material.color = new Color(0.1f, 0.25f, 0.1f); // Set to dark green
         }
 
         // Create spawn point if not exists
