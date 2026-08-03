@@ -426,16 +426,44 @@ public class GameBoot : MonoBehaviour
         gameOverText.fontSize = 72;
         gameOverText.alignment = TextAlignmentOptions.Center;
         RectTransform gameOverRect = gameOverTextObj.GetComponent<RectTransform>();
-        gameOverRect.anchorMin = Vector2.zero;
-        gameOverRect.anchorMax = Vector2.one;
-        gameOverRect.offsetMin = Vector2.zero;
-        gameOverRect.offsetMax = Vector2.zero;
+        gameOverRect.anchorMin = new Vector2(0, 0.5f);
+        gameOverRect.anchorMax = new Vector2(1, 0.5f);
+        gameOverRect.offsetMin = new Vector2(0, 50);
+        gameOverRect.offsetMax = new Vector2(0, 150);
+
+        // Restart Button
+        GameObject restartBtnObj = new GameObject("RestartButton");
+        restartBtnObj.transform.SetParent(gameOverPanelObj.transform, false);
+        Button restartBtn = restartBtnObj.AddComponent<Button>();
+        Image restartBtnImg = restartBtnObj.AddComponent<Image>();
+        restartBtnImg.color = new Color(0.2f, 0.6f, 0.2f, 1f); // Green
+        RectTransform restartBtnRect = restartBtnObj.GetComponent<RectTransform>();
+        restartBtnRect.anchorMin = new Vector2(0.5f, 0.5f);
+        restartBtnRect.anchorMax = new Vector2(0.5f, 0.5f);
+        restartBtnRect.offsetMin = new Vector2(-100, -50);
+        restartBtnRect.offsetMax = new Vector2(100, 0);
+
+        // Restart Button Text
+        GameObject restartBtnTextObj = new GameObject("Text");
+        restartBtnTextObj.transform.SetParent(restartBtnObj.transform, false);
+        TextMeshProUGUI restartBtnText = restartBtnTextObj.AddComponent<TextMeshProUGUI>();
+        restartBtnText.text = "Restart Game";
+        restartBtnText.fontSize = 24;
+        restartBtnText.color = Color.white;
+        restartBtnText.alignment = TextAlignmentOptions.Center;
+        RectTransform restartBtnTextRect = restartBtnTextObj.GetComponent<RectTransform>();
+        restartBtnTextRect.anchorMin = Vector2.zero;
+        restartBtnTextRect.anchorMax = Vector2.one;
+        restartBtnTextRect.offsetMin = Vector2.zero;
+        restartBtnTextRect.offsetMax = Vector2.zero;
 
         var gameOverPanelField = hudComponent.GetType().GetField("gameOverPanel", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         var gameOverTextField = hudComponent.GetType().GetField("gameOverText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var restartBtnField = hudComponent.GetType().GetField("restartButton", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
         if (gameOverPanelField != null) gameOverPanelField.SetValue(hudComponent, gameOverPanelObj);
         if (gameOverTextField != null) gameOverTextField.SetValue(hudComponent, gameOverText);
+        if (restartBtnField != null) restartBtnField.SetValue(hudComponent, restartBtn);
     }
 
     private void CreateTagIfNotExists(string tag)

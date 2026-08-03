@@ -17,6 +17,9 @@ public class HUD : MonoBehaviour
 
     [SerializeField]
     private GameObject gameOverPanel;
+    
+    [SerializeField]
+    private UnityEngine.UI.Button restartButton;
 
     private void Start()
     {
@@ -30,6 +33,11 @@ public class HUD : MonoBehaviour
         // Initial updates
         UpdateGoldDisplay(GameManager.Instance.GetCurrentGold());
         UpdateLivesDisplay(GameManager.Instance.GetCurrentLives());
+        
+        if (restartButton != null)
+        {
+            restartButton.onClick.AddListener(RestartGame);
+        }
     }
 
     private void UpdateGoldDisplay(int gold)
@@ -66,6 +74,12 @@ public class HUD : MonoBehaviour
 
         if (gameOverText != null)
             gameOverText.text = "YOU WIN!";
+    }
+    
+    private void RestartGame()
+    {
+        Time.timeScale = 1;
+        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
     }
 
     private void OnDestroy()
