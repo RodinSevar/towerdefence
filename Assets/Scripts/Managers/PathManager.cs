@@ -5,12 +5,6 @@ public class PathManager : MonoBehaviour
 {
     public static PathManager Instance { get; private set; }
 
-    [SerializeField]
-    private Vector3[] waypoints;
-
-    [SerializeField]
-    private bool drawDebugPath = true;
-
     public System.Action OnMazeChanged;
 
     private void Awake()
@@ -25,217 +19,129 @@ public class PathManager : MonoBehaviour
 
     private void Start()
     {
-        if (waypoints == null || waypoints.Length == 0)
-        {
-            CreateDefaultPath();
-        }
-        
-        CreateWaypointVisuals();
     }
 
-    private void CreateDefaultPath()
+    public class FlowField
     {
-        // Spawns enemies on the far left, and they walk to the far right.
-        waypoints = new Vector3[]
-        {
-            new Vector3(-90, 0.5f, 0),
-            new Vector3(90, 0.5f, 0)
-        };
+        public Vector2Int target;
+        public float[,] distanceGrid = new float[200, 200];
+        public Vector2[,] vectorGrid = new Vector2[200, 200];
     }
 
-    private void CreateWaypointVisuals()
-    {
-        for (int i = 0; i < waypoints.Length; i++)
-        {
-            GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            marker.name = $"Waypoint_{i}";
-            marker.transform.position = waypoints[i];
-            marker.transform.localScale = new Vector3(2f, 0.1f, 2f); // Flat disc
-            
-            // Remove collider so it doesn't block rays or physics
-            Destroy(marker.GetComponent<Collider>());
-            
-            // Set color based on type
-            Material mat = marker.GetComponent<Renderer>().material;
-            if (i == 0)
-                mat.color = Color.blue; // Spawn (Green might blend with ground)
-            else if (i == waypoints.Length - 1)
-                mat.color = Color.red; // Finish
-            else
-                mat.color = Color.yellow; // Intermediate
-        }
-    }
-
-    public Vector3 GetSpawnPoint()
-    {
-        if (waypoints != null && waypoints.Length > 0) return waypoints[0];
-        return new Vector3(-90, 0.5f, 0);
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (!drawDebugPath || waypoints == null || waypoints.Length == 0) return;
-
-        Gizmos.color = Color.cyan;
-        for (int i = 0; i < waypoints.Length; i++)
-        {
-            Gizmos.DrawSphere(waypoints[i], 0.3f);
-            if (i < waypoints.Length - 1)
-            {
-                Gizmos.DrawLine(waypoints[i], waypoints[i + 1]);
-            }
-        }
-    }
-
-    public Vector3 GetWaypoint(int index)
-    {
-        if (index >= 0 && index < waypoints.Length)
-            return waypoints[index];
-        return waypoints[waypoints.Length - 1];
-    }
-
-    public int GetWaypointCount() => waypoints.Length;
+    private Dictionary<Vector2Int, FlowField> flowFieldCache = new Dictionary<Vector2Int, FlowField>();
+    private MinHeap openSet = new MinHeap(40000);
 
     public void NotifyMazeChanged()
     {
+        flowFieldCache.Clear();
         OnMazeChanged?.Invoke();
     }
 
     public bool ValidateFullMaze()
     {
-        if (waypoints == null || waypoints.Length < 2) return true;
-        for (int i = 0; i < waypoints.Length - 1; i++)
+        if (WaveManager.Instance == null) return true;
+        
+        foreach (var spawner in WaveManager.Instance.activeSpawners)
         {
-            var path = FindPath(waypoints[i], waypoints[i+1]);
-            if (path == null || path.Count == 0) return false;
+            if (spawner.waypoints == null || spawner.waypoints.Length < 2) continue;
+            for (int i = 0; i < spawner.waypoints.Length - 1; i++)
+            {
+                Vector2Int startNode = GridManager.Instance.WorldToGridCell(spawner.waypoints[i]);
+                Vector2Int targetNode = GridManager.Instance.WorldToGridCell(spawner.waypoints[i+1]);
+                
+                FlowField ff = GetFlowField(targetNode);
+                if (ff == null || ff.distanceGrid[startNode.x + 100, startNode.y + 100] == float.MaxValue)
+                {
+                    return false;
+                }
+            }
         }
         return true;
     }
 
-    public List<Vector3> FindPath(Vector3 startPos, Vector3 targetPos)
+    public Vector2 GetFlowDirection(Vector3 currentPos, Vector3 targetPos)
     {
-        Vector2Int startNode = GridManager.Instance.WorldToGridCell(startPos);
-        Vector2Int targetNode = GridManager.Instance.WorldToGridCell(targetPos);
+        Vector2Int currentCell = GridManager.Instance.WorldToGridCell(currentPos);
+        Vector2Int targetCell = GridManager.Instance.WorldToGridCell(targetPos);
 
-        List<Vector2Int> path = FindPathGrid(startNode, targetNode);
-        if (path == null) return null;
+        // If in the exact destination cell, steer directly towards the transform vector
+        // to prevent getting stuck oscillating over the center.
+        if (currentCell == targetCell)
+        {
+            Vector3 dir = (targetPos - currentPos).normalized;
+            return new Vector2(dir.x, dir.z);
+        }
 
-        List<Vector3> worldPath = new List<Vector3>();
-        float cellSize = GridManager.Instance.GetCellSize();
-        foreach (var node in path)
+        FlowField ff = GetFlowField(targetCell);
+        if (ff == null) return Vector2.zero;
+
+        int cx = currentCell.x + 100;
+        int cy = currentCell.y + 100;
+        if (cx >= 0 && cx < 200 && cy >= 0 && cy < 200)
         {
-            worldPath.Add(GridManager.Instance.GetWorldPosition(node));
+            return ff.vectorGrid[cx, cy];
         }
-        
-        if (worldPath.Count > 0 && Vector3.Distance(worldPath[worldPath.Count - 1], targetPos) > 0.01f)
-        {
-            worldPath.Add(targetPos);
-        }
-        
-        return worldPath;
+
+        return Vector2.zero;
     }
 
-    private int searchID = 0;
-    private float[,] gScoreGrid = new float[200, 200];
-    private float[,] fScoreGrid = new float[200, 200];
-    private int[,] parentXGrid = new int[200, 200];
-    private int[,] parentYGrid = new int[200, 200];
-    private int[,] nodeSearchID = new int[200, 200];
-    private bool[,] inClosedSet = new bool[200, 200];
-    private bool[,] inOpenSet = new bool[200, 200];
-
-    private bool IsInBounds(int ax, int ay)
+    private FlowField GetFlowField(Vector2Int targetNode)
     {
-        return ax >= 0 && ax < 200 && ay >= 0 && ay < 200;
-    }
-
-    private void EnsureNodeInitialized(int ax, int ay)
-    {
-        if (nodeSearchID[ax, ay] != searchID)
+        if (flowFieldCache.TryGetValue(targetNode, out FlowField cached))
         {
-            gScoreGrid[ax, ay] = float.MaxValue;
-            fScoreGrid[ax, ay] = float.MaxValue;
-            inClosedSet[ax, ay] = false;
-            inOpenSet[ax, ay] = false;
-            nodeSearchID[ax, ay] = searchID;
+            return cached;
         }
+
+        FlowField newField = GenerateFlowField(targetNode);
+        flowFieldCache[targetNode] = newField;
+        return newField;
     }
 
-    private List<Vector2Int> FindPathGrid(Vector2Int startNode, Vector2Int targetNode)
+    private FlowField GenerateFlowField(Vector2Int targetNode)
     {
-        searchID++;
-        
-        int startX = startNode.x + 100;
-        int startY = startNode.y + 100;
+        int targetX = targetNode.x + 100;
+        int targetY = targetNode.y + 100;
 
-        if (!IsInBounds(startX, startY) || !IsInBounds(targetNode.x + 100, targetNode.y + 100)) return null;
+        if (targetX < 0 || targetX >= 200 || targetY < 0 || targetY >= 200) return null;
 
-        List<Vector2Int> openSet = new List<Vector2Int>(1000); // Pre-allocate to avoid GC spikes
-        
-        EnsureNodeInitialized(startX, startY);
-        openSet.Add(startNode);
-        inOpenSet[startX, startY] = true;
-        gScoreGrid[startX, startY] = 0;
-        fScoreGrid[startX, startY] = GetDistance(startNode, targetNode);
+        FlowField ff = new FlowField();
+        ff.target = targetNode;
 
-        int maxIterations = 50000;
-        int iterations = 0;
+        for (int x = 0; x < 200; x++)
+        {
+            for (int y = 0; y < 200; y++)
+            {
+                ff.distanceGrid[x, y] = float.MaxValue;
+                ff.vectorGrid[x, y] = Vector2.zero;
+            }
+        }
 
+        openSet.Clear();
+        openSet.Add(targetNode, 0f);
+        ff.distanceGrid[targetX, targetY] = 0f;
+
+        // DIJKSTRA - Generate Distance Field
         while (openSet.Count > 0)
         {
-            iterations++;
-            if (iterations > maxIterations)
-            {
-                Debug.LogWarning("A* Pathfinding exceeded max iterations.");
-                return null;
-            }
-
-            // Find node with lowest F score
-            int bestIndex = 0;
-            Vector2Int current = openSet[0];
-            float bestF = fScoreGrid[current.x + 100, current.y + 100];
-
-            for (int i = 1; i < openSet.Count; i++)
-            {
-                Vector2Int node = openSet[i];
-                float f = fScoreGrid[node.x + 100, node.y + 100];
-                if (f < bestF)
-                {
-                    bestF = f;
-                    current = node;
-                    bestIndex = i;
-                }
-            }
-
-            if (current == targetNode)
-            {
-                return RetracePath(startNode, current);
-            }
-
-            // Fast O(1) removal using Swap and Pop
-            openSet[bestIndex] = openSet[openSet.Count - 1];
-            openSet.RemoveAt(openSet.Count - 1);
-
+            Vector2Int current = openSet.RemoveFirst();
             int cx = current.x + 100;
             int cy = current.y + 100;
-            inOpenSet[cx, cy] = false;
-            inClosedSet[cx, cy] = true;
+            float currentDist = ff.distanceGrid[cx, cy];
 
-            // Inline neighbor checks to prevent massive List allocations
             for (int dx = -1; dx <= 1; dx++)
             {
                 for (int dy = -1; dy <= 1; dy++)
                 {
                     if (dx == 0 && dy == 0) continue;
-                    
+
                     Vector2Int neighbor = new Vector2Int(current.x + dx, current.y + dy);
-                    if (!IsValidNeighbor(current, neighbor)) continue;
+                    if (!IsValidNeighbor(neighbor, current)) continue; // NOTE: reversed! Checking if neighbor can walk to current!
                     
-                    // Prevent cutting corners through walls
+                    // Prevent corner cutting
                     if (Mathf.Abs(dx) == 1 && Mathf.Abs(dy) == 1)
                     {
-                        if (!IsValidNeighbor(current, new Vector2Int(current.x + dx, current.y)) || 
-                            !IsValidNeighbor(current, new Vector2Int(current.x, current.y + dy)))
+                        if (!IsValidNeighbor(new Vector2Int(neighbor.x, current.y), current) || 
+                            !IsValidNeighbor(new Vector2Int(current.x, neighbor.y), current))
                         {
                             continue;
                         }
@@ -243,57 +149,69 @@ public class PathManager : MonoBehaviour
 
                     int nx = neighbor.x + 100;
                     int ny = neighbor.y + 100;
-                    
-                    if (!IsInBounds(nx, ny)) continue;
-                    EnsureNodeInitialized(nx, ny);
 
-                    if (inClosedSet[nx, ny]) continue;
+                    if (nx < 0 || nx >= 200 || ny < 0 || ny >= 200) continue;
 
-                    float tentativeGScore = gScoreGrid[cx, cy] + GetDistance(current, neighbor);
-                    
-                    if (!inOpenSet[nx, ny] || tentativeGScore < gScoreGrid[nx, ny])
+                    float distToNeighbor = (dx == 0 || dy == 0) ? 10f : 14f;
+                    float newDist = currentDist + distToNeighbor;
+
+                    if (newDist < ff.distanceGrid[nx, ny])
                     {
-                        parentXGrid[nx, ny] = current.x;
-                        parentYGrid[nx, ny] = current.y;
-                        gScoreGrid[nx, ny] = tentativeGScore;
-                        fScoreGrid[nx, ny] = tentativeGScore + GetDistance(neighbor, targetNode);
-
-                        if (!inOpenSet[nx, ny])
-                        {
-                            openSet.Add(neighbor);
-                            inOpenSet[nx, ny] = true;
-                        }
+                        ff.distanceGrid[nx, ny] = newDist;
+                        openSet.Add(neighbor, newDist);
                     }
                 }
             }
         }
 
-        return null;
-    }
-
-    private List<Vector2Int> RetracePath(Vector2Int startNode, Vector2Int current)
-    {
-        List<Vector2Int> path = new List<Vector2Int>();
-        path.Add(current);
-        while (current != startNode)
+        // GENERATE VECTOR FIELD
+        for (int x = 0; x < 200; x++)
         {
-            int ax = current.x + 100;
-            int ay = current.y + 100;
-            current = new Vector2Int(parentXGrid[ax, ay], parentYGrid[ax, ay]);
-            path.Add(current);
+            for (int y = 0; y < 200; y++)
+            {
+                if (ff.distanceGrid[x, y] == float.MaxValue) continue; // Unreachable
+                if (x == targetX && y == targetY) continue; // Target has no vector
+
+                Vector2Int current = new Vector2Int(x - 100, y - 100);
+                float bestDist = ff.distanceGrid[x, y];
+                Vector2 bestDir = Vector2.zero;
+
+                for (int dx = -1; dx <= 1; dx++)
+                {
+                    for (int dy = -1; dy <= 1; dy++)
+                    {
+                        if (dx == 0 && dy == 0) continue;
+                        
+                        Vector2Int neighbor = new Vector2Int(current.x + dx, current.y + dy);
+                        if (!IsValidNeighbor(current, neighbor)) continue;
+                        
+                        // Prevent corner cutting for vectors too
+                        if (Mathf.Abs(dx) == 1 && Mathf.Abs(dy) == 1)
+                        {
+                            if (!IsValidNeighbor(current, new Vector2Int(neighbor.x, current.y)) || 
+                                !IsValidNeighbor(current, new Vector2Int(current.x, neighbor.y)))
+                            {
+                                continue;
+                            }
+                        }
+
+                        int nx = neighbor.x + 100;
+                        int ny = neighbor.y + 100;
+
+                        if (nx < 0 || nx >= 200 || ny < 0 || ny >= 200) continue;
+
+                        if (ff.distanceGrid[nx, ny] < bestDist)
+                        {
+                            bestDist = ff.distanceGrid[nx, ny];
+                            bestDir = new Vector2(dx, dy).normalized;
+                        }
+                    }
+                }
+                ff.vectorGrid[x, y] = bestDir;
+            }
         }
-        path.Reverse();
-        return path;
-    }
 
-    private float GetDistance(Vector2Int nodeA, Vector2Int nodeB)
-    {
-        int dstX = Mathf.Abs(nodeA.x - nodeB.x);
-        int dstY = Mathf.Abs(nodeA.y - nodeB.y);
-
-        if (dstX > dstY)
-            return 14 * dstY + 10 * (dstX - dstY);
-        return 14 * dstX + 10 * (dstY - dstX);
+        return ff;
     }
 
     private bool IsValidNeighbor(Vector2Int from, Vector2Int to)
@@ -303,10 +221,119 @@ public class PathManager : MonoBehaviour
         float heightFrom = GridManager.Instance.GetCellHeight(from);
         float heightTo = GridManager.Instance.GetCellHeight(to);
         
-        // Prevent walking straight up/down steep cliffs (height diff > 1.2)
-        // Ramps have an intermediate height so they allow traversal.
         if (Mathf.Abs(heightFrom - heightTo) > 1.2f) return false;
         
         return true;
+    }
+
+    private struct HeapNode
+    {
+        public Vector2Int pos;
+        public float fScore;
+        public HeapNode(Vector2Int pos, float fScore)
+        {
+            this.pos = pos;
+            this.fScore = fScore;
+        }
+    }
+
+    private class MinHeap
+    {
+        private HeapNode[] elements;
+        private int count;
+
+        public MinHeap(int maxElements)
+        {
+            elements = new HeapNode[maxElements];
+            count = 0;
+        }
+
+        public int Count => count;
+
+        public void Clear()
+        {
+            count = 0;
+        }
+
+        public void Add(Vector2Int item, float fScore)
+        {
+            if (count >= elements.Length) return;
+            HeapNode node = new HeapNode(item, fScore);
+            elements[count] = node;
+            SortUp(count);
+            count++;
+        }
+
+        public Vector2Int RemoveFirst()
+        {
+            HeapNode firstItem = elements[0];
+            count--;
+            elements[0] = elements[count];
+            SortDown(0);
+            return firstItem.pos;
+        }
+
+        private void SortDown(int index)
+        {
+            while (true)
+            {
+                int childIndexLeft = index * 2 + 1;
+                int childIndexRight = index * 2 + 2;
+                int swapIndex = 0;
+
+                if (childIndexLeft < count)
+                {
+                    swapIndex = childIndexLeft;
+
+                    if (childIndexRight < count)
+                    {
+                        if (elements[childIndexRight].fScore < elements[childIndexLeft].fScore)
+                        {
+                            swapIndex = childIndexRight;
+                        }
+                    }
+
+                    if (elements[swapIndex].fScore < elements[index].fScore)
+                    {
+                        Swap(index, swapIndex);
+                        index = swapIndex;
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    return;
+                }
+            }
+        }
+
+        private void SortUp(int index)
+        {
+            int parentIndex = (index - 1) / 2;
+
+            while (true)
+            {
+                if (elements[index].fScore < elements[parentIndex].fScore)
+                {
+                    Swap(index, parentIndex);
+                    index = parentIndex;
+                    parentIndex = (index - 1) / 2;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        private void Swap(int indexA, int indexB)
+        {
+            HeapNode temp = elements[indexA];
+            elements[indexA] = elements[indexB];
+            elements[indexB] = temp;
+        }
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class WaveManager : MonoBehaviour
 {
@@ -15,10 +16,21 @@ public class WaveManager : MonoBehaviour
     [SerializeField]
     private Wave[] waves;
 
-    private Transform spawnPoint;
     private int currentWave = 0;
-    private float spawnTimer = 0f;
     private int enemiesSpawnedInWave = 0;
+
+    public List<Spawner> activeSpawners = new List<Spawner>();
+
+    public void RegisterSpawner(Spawner spawner)
+    {
+        if (!activeSpawners.Contains(spawner))
+            activeSpawners.Add(spawner);
+    }
+
+    public void UnregisterSpawner(Spawner spawner)
+    {
+        activeSpawners.Remove(spawner);
+    }
 
     private void Awake()
     {
@@ -61,13 +73,22 @@ public class WaveManager : MonoBehaviour
 
         if (enemiesSpawnedInWave < wave.enemyCount)
         {
-            spawnTimer += Time.deltaTime;
-
-            if (spawnTimer >= wave.spawnInterval)
+            if (activeSpawners.Count == 0)
             {
-                SpawnEnemy(wave.enemyType);
-                spawnTimer = 0f;
-                enemiesSpawnedInWave++;
+                Debug.LogWarning("No active spawners found! Cannot spawn enemies.");
+                enemiesSpawnedInWave = wave.enemyCount;
+            }
+            else
+            {
+                int creepsToSpawn = wave.enemyCount - enemiesSpawnedInWave;
+                for (int i = 0; i < creepsToSpawn; i++)
+                {
+                    foreach (var spawner in activeSpawners)
+                    {
+                        SpawnEnemy(wave.enemyType, spawner, enemiesSpawnedInWave);
+                    }
+                    enemiesSpawnedInWave++;
+                }
             }
         }
     }
@@ -82,16 +103,17 @@ public class WaveManager : MonoBehaviour
 
         currentWave = waveNumber;
         enemiesSpawnedInWave = 0;
-        spawnTimer = 0f;
     }
 
-    private void SpawnEnemy(Enemy.EnemyType type)
+    private void SpawnEnemy(Enemy.EnemyType type, Spawner spawner, int index)
     {
+        if (spawner.waypoints == null || spawner.waypoints.Length == 0) return;
+
         GameObject enemyObj = new GameObject("Enemy");
         Enemy enemy = enemyObj.AddComponent<Enemy>();
         enemy.SetEnemyType(type);
         
-        enemyObj.transform.position = PathManager.Instance != null ? PathManager.Instance.GetSpawnPoint() : new Vector3(-90, 0.5f, 0);
+        enemyObj.transform.position = spawner.waypoints[0];
 
         // Add collider for targeting
         BoxCollider enemyCollider = enemyObj.AddComponent<BoxCollider>();
@@ -107,13 +129,14 @@ public class WaveManager : MonoBehaviour
         // Remove collider from primitive
         DestroyImmediate(visual.GetComponent<BoxCollider>());
         
-        // Set material color
+        // Set material color to match the spawner/player
         Renderer renderer = visual.GetComponent<Renderer>();
         if (renderer != null)
         {
-            Color color = type == Enemy.EnemyType.Basic ? Color.green : Color.red;
-            renderer.material.color = color;
+            renderer.material.color = spawner.playerColor;
         }
+        
+        enemy.Init(spawner.waypoints, index);
         
         visual.SetActive(true);
         enemyObj.SetActive(true);

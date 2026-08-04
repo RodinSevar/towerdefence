@@ -29,14 +29,21 @@ public class Enemy : MonoBehaviour, ISelectable
 
     // Pathfinding state
     private int targetWaypointIndex = 1; // 0 is usually spawn, so head to 1
-    private List<Vector3> currentPath;
-    private int currentPathNodeIndex = 0;
     
     private GameObject selectionRing;
     private Renderer visualRenderer;
     private Color baseColor;
 
     private List<StatusEffect> activeEffects = new List<StatusEffect>();
+    private Vector3[] myWaypoints;
+    private Vector3 formationOffset;
+
+    public void Init(Vector3[] waypoints, int index)
+    {
+        myWaypoints = waypoints;
+        formationOffset = GetSpiralOffset(index, 0.8f);
+        transform.position += formationOffset;
+    }
 
     private void OnEnable()
     {
@@ -70,12 +77,6 @@ public class Enemy : MonoBehaviour, ISelectable
             }
         }
         
-        if (PathManager.Instance != null)
-        {
-            PathManager.Instance.OnMazeChanged += RecalculatePath;
-            RecalculatePath();
-        }
-        
         if (MinimapManager.Instance != null)
         {
             MinimapManager.Instance.RegisterUnit(transform, true);
@@ -84,34 +85,9 @@ public class Enemy : MonoBehaviour, ISelectable
 
     private void OnDestroy()
     {
-        if (PathManager.Instance != null)
-        {
-            PathManager.Instance.OnMazeChanged -= RecalculatePath;
-        }
     }
 
-    private void RecalculatePath()
-    {
-        if (PathManager.Instance == null || targetWaypointIndex >= PathManager.Instance.GetWaypointCount()) return;
 
-        Vector3 targetPos = PathManager.Instance.GetWaypoint(targetWaypointIndex);
-        currentPath = PathManager.Instance.FindPath(transform.position, targetPos);
-        currentPathNodeIndex = 0;
-
-        if (currentPath == null || currentPath.Count == 0)
-        {
-            Debug.LogWarning("Enemy could not find path!");
-        }
-        else
-        {
-            // Skip the first node (which is the center of the cell the enemy is currently in)
-            // to prevent the enemy from turning around and walking backwards to the center.
-            if (currentPath.Count > 1)
-            {
-                currentPathNodeIndex = 1;
-            }
-        }
-    }
 
     private void Update()
     {
@@ -182,28 +158,42 @@ public class Enemy : MonoBehaviour, ISelectable
 
     private void MoveAlongPath()
     {
-        if (PathManager.Instance == null) return;
+        if (PathManager.Instance == null || myWaypoints == null) return;
 
         // Reached final waypoint
-        if (targetWaypointIndex >= PathManager.Instance.GetWaypointCount())
+        if (targetWaypointIndex >= myWaypoints.Length)
         {
             ReachedEnd();
             return;
         }
 
-        if (currentPath == null || currentPathNodeIndex >= currentPath.Count)
+        Vector3 targetNode = myWaypoints[targetWaypointIndex];
+        
+        // Ignore Y for distance check to prevent overshooting on ramps
+        Vector3 flatPos = new Vector3(transform.position.x, 0, transform.position.z);
+        Vector3 flatTarget = new Vector3(targetNode.x, 0, targetNode.z);
+        
+        float distanceToTarget = Vector3.Distance(flatPos, flatTarget);
+        if (distanceToTarget < 1.0f) // reached major waypoint
         {
-            // Reached current major waypoint, target the next one
             targetWaypointIndex++;
-            if (targetWaypointIndex < PathManager.Instance.GetWaypointCount())
+            if (targetWaypointIndex >= myWaypoints.Length)
             {
-                RecalculatePath();
+                ReachedEnd();
+                return;
             }
-            return;
+            targetNode = myWaypoints[targetWaypointIndex];
         }
 
-        Vector3 targetNode = currentPath[currentPathNodeIndex];
-        Vector3 moveDir = (targetNode - transform.position).normalized;
+        Vector2 flowDir = PathManager.Instance.GetFlowDirection(transform.position, targetNode);
+        if (flowDir == Vector2.zero)
+        {
+            // If the flow field returns 0, we might be blocked or at the exact destination.
+            // Steer directly towards target just in case, or stop.
+            flowDir = new Vector2(targetNode.x - transform.position.x, targetNode.z - transform.position.z).normalized;
+        }
+
+        Vector3 moveDir = new Vector3(flowDir.x, 0, flowDir.y);
         
         float currentSpeed = stats.speed;
         
@@ -221,22 +211,9 @@ public class Enemy : MonoBehaviour, ISelectable
         
         transform.position += moveDir * currentSpeed * Time.deltaTime;
         
-        Vector3 lookDir = new Vector3(moveDir.x, 0, moveDir.z);
-        if (lookDir != Vector3.zero)
+        if (moveDir != Vector3.zero)
         {
-            transform.rotation = Quaternion.LookRotation(lookDir);
-        }
-
-        // Ignore Y for distance check to prevent overshooting on ramps
-        Vector3 flatPos = new Vector3(transform.position.x, 0, transform.position.z);
-        Vector3 flatTarget = new Vector3(targetNode.x, 0, targetNode.z);
-        
-        float distanceToNode = Vector3.Distance(flatPos, flatTarget);
-        if (distanceToNode < 0.1f) // reached path node
-        {
-            currentPathNodeIndex++;
-            // Snap to target to prevent drift
-            transform.position = targetNode;
+            transform.rotation = Quaternion.LookRotation(moveDir);
         }
     }
 
@@ -295,7 +272,7 @@ public class Enemy : MonoBehaviour, ISelectable
     public float GetHealth() => currentHealth;
     public float GetMaxHealth() => stats.health;
     public EnemyType GetEnemyType() => currentType;
-    public float GetProgress() => PathManager.Instance != null ? (float)targetWaypointIndex / PathManager.Instance.GetWaypointCount() : 0f;
+    public float GetProgress() => myWaypoints != null ? (float)targetWaypointIndex / myWaypoints.Length : 0f;
 
     // ISelectable implementation
     public string GetDisplayName()
@@ -333,4 +310,28 @@ public class Enemy : MonoBehaviour, ISelectable
     public bool CanUpgrade() => false;
     public int GetUpgradeCost() => 0;
     public void Upgrade() { }
+
+    private Vector3 GetSpiralOffset(int index, float spacing)
+    {
+        if (index == 0) return Vector3.zero;
+        
+        int x = 0;
+        int z = 0;
+        int dx = 0;
+        int dz = -1;
+        
+        for (int i = 0; i < index; i++)
+        {
+            if (x == z || (x < 0 && x == -z) || (x > 0 && x == 1 - z))
+            {
+                int temp = dx;
+                dx = -dz;
+                dz = temp;
+            }
+            x += dx;
+            z += dz;
+        }
+        
+        return new Vector3(x * spacing, 0, z * spacing);
+    }
 }
