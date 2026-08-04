@@ -124,7 +124,7 @@ public class PathManager : MonoBehaviour
         float cellSize = GridManager.Instance.GetCellSize();
         foreach (var node in path)
         {
-            worldPath.Add(new Vector3(node.x * cellSize, startPos.y, node.y * cellSize));
+            worldPath.Add(GridManager.Instance.GetWorldPosition(node));
         }
         
         if (worldPath.Count > 0 && Vector3.Distance(worldPath[worldPath.Count - 1], targetPos) > 0.01f)
@@ -135,20 +135,49 @@ public class PathManager : MonoBehaviour
         return worldPath;
     }
 
+    private int searchID = 0;
+    private float[,] gScoreGrid = new float[200, 200];
+    private float[,] fScoreGrid = new float[200, 200];
+    private int[,] parentXGrid = new int[200, 200];
+    private int[,] parentYGrid = new int[200, 200];
+    private int[,] nodeSearchID = new int[200, 200];
+    private bool[,] inClosedSet = new bool[200, 200];
+    private bool[,] inOpenSet = new bool[200, 200];
+
+    private bool IsInBounds(int ax, int ay)
+    {
+        return ax >= 0 && ax < 200 && ay >= 0 && ay < 200;
+    }
+
+    private void EnsureNodeInitialized(int ax, int ay)
+    {
+        if (nodeSearchID[ax, ay] != searchID)
+        {
+            gScoreGrid[ax, ay] = float.MaxValue;
+            fScoreGrid[ax, ay] = float.MaxValue;
+            inClosedSet[ax, ay] = false;
+            inOpenSet[ax, ay] = false;
+            nodeSearchID[ax, ay] = searchID;
+        }
+    }
+
     private List<Vector2Int> FindPathGrid(Vector2Int startNode, Vector2Int targetNode)
     {
-        List<Vector2Int> openSet = new List<Vector2Int>();
-        HashSet<Vector2Int> closedSet = new HashSet<Vector2Int>();
+        searchID++;
         
-        Dictionary<Vector2Int, Vector2Int> cameFrom = new Dictionary<Vector2Int, Vector2Int>();
-        Dictionary<Vector2Int, float> gScore = new Dictionary<Vector2Int, float>();
-        Dictionary<Vector2Int, float> fScore = new Dictionary<Vector2Int, float>();
+        int startX = startNode.x + 100;
+        int startY = startNode.y + 100;
 
+        if (!IsInBounds(startX, startY) || !IsInBounds(targetNode.x + 100, targetNode.y + 100)) return null;
+
+        List<Vector2Int> openSet = new List<Vector2Int>(1000); // Pre-allocate to avoid GC spikes
+        
+        EnsureNodeInitialized(startX, startY);
         openSet.Add(startNode);
-        gScore[startNode] = 0;
-        fScore[startNode] = GetDistance(startNode, targetNode);
+        inOpenSet[startX, startY] = true;
+        gScoreGrid[startX, startY] = 0;
+        fScoreGrid[startX, startY] = GetDistance(startNode, targetNode);
 
-        // Increased max iterations to safely cover the entire 196x196 map (38,000+ cells)
         int maxIterations = 50000;
         int iterations = 0;
 
@@ -161,47 +190,79 @@ public class PathManager : MonoBehaviour
                 return null;
             }
 
+            // Find node with lowest F score
+            int bestIndex = 0;
             Vector2Int current = openSet[0];
+            float bestF = fScoreGrid[current.x + 100, current.y + 100];
+
             for (int i = 1; i < openSet.Count; i++)
             {
-                if (fScore.ContainsKey(openSet[i]) && fScore.ContainsKey(current))
+                Vector2Int node = openSet[i];
+                float f = fScoreGrid[node.x + 100, node.y + 100];
+                if (f < bestF)
                 {
-                    if (fScore[openSet[i]] < fScore[current] || (fScore[openSet[i]] == fScore[current] && GetDistance(openSet[i], targetNode) < GetDistance(current, targetNode)))
-                    {
-                        current = openSet[i];
-                    }
+                    bestF = f;
+                    current = node;
+                    bestIndex = i;
                 }
             }
 
             if (current == targetNode)
             {
-                return RetracePath(cameFrom, current);
+                return RetracePath(startNode, current);
             }
 
-            openSet.Remove(current);
-            closedSet.Add(current);
+            // Fast O(1) removal using Swap and Pop
+            openSet[bestIndex] = openSet[openSet.Count - 1];
+            openSet.RemoveAt(openSet.Count - 1);
 
-            foreach (Vector2Int neighbor in GetNeighbors(current))
+            int cx = current.x + 100;
+            int cy = current.y + 100;
+            inOpenSet[cx, cy] = false;
+            inClosedSet[cx, cy] = true;
+
+            // Inline neighbor checks to prevent massive List allocations
+            for (int dx = -1; dx <= 1; dx++)
             {
-                if (closedSet.Contains(neighbor) || GridManager.Instance.IsCellOccupied(neighbor))
+                for (int dy = -1; dy <= 1; dy++)
                 {
-                    continue;
-                }
-
-                float tentativeGScore = gScore.ContainsKey(current) ? gScore[current] + GetDistance(current, neighbor) : float.MaxValue;
-                bool containsNeighbor = openSet.Contains(neighbor);
-                
-                if (!gScore.ContainsKey(neighbor)) gScore[neighbor] = float.MaxValue;
-
-                if (tentativeGScore < gScore[neighbor] || !containsNeighbor)
-                {
-                    cameFrom[neighbor] = current;
-                    gScore[neighbor] = tentativeGScore;
-                    fScore[neighbor] = gScore[neighbor] + GetDistance(neighbor, targetNode);
-
-                    if (!containsNeighbor)
+                    if (dx == 0 && dy == 0) continue;
+                    
+                    Vector2Int neighbor = new Vector2Int(current.x + dx, current.y + dy);
+                    if (!IsValidNeighbor(current, neighbor)) continue;
+                    
+                    // Prevent cutting corners through walls
+                    if (Mathf.Abs(dx) == 1 && Mathf.Abs(dy) == 1)
                     {
-                        openSet.Add(neighbor);
+                        if (!IsValidNeighbor(current, new Vector2Int(current.x + dx, current.y)) || 
+                            !IsValidNeighbor(current, new Vector2Int(current.x, current.y + dy)))
+                        {
+                            continue;
+                        }
+                    }
+
+                    int nx = neighbor.x + 100;
+                    int ny = neighbor.y + 100;
+                    
+                    if (!IsInBounds(nx, ny)) continue;
+                    EnsureNodeInitialized(nx, ny);
+
+                    if (inClosedSet[nx, ny]) continue;
+
+                    float tentativeGScore = gScoreGrid[cx, cy] + GetDistance(current, neighbor);
+                    
+                    if (!inOpenSet[nx, ny] || tentativeGScore < gScoreGrid[nx, ny])
+                    {
+                        parentXGrid[nx, ny] = current.x;
+                        parentYGrid[nx, ny] = current.y;
+                        gScoreGrid[nx, ny] = tentativeGScore;
+                        fScoreGrid[nx, ny] = tentativeGScore + GetDistance(neighbor, targetNode);
+
+                        if (!inOpenSet[nx, ny])
+                        {
+                            openSet.Add(neighbor);
+                            inOpenSet[nx, ny] = true;
+                        }
                     }
                 }
             }
@@ -210,13 +271,15 @@ public class PathManager : MonoBehaviour
         return null;
     }
 
-    private List<Vector2Int> RetracePath(Dictionary<Vector2Int, Vector2Int> cameFrom, Vector2Int current)
+    private List<Vector2Int> RetracePath(Vector2Int startNode, Vector2Int current)
     {
         List<Vector2Int> path = new List<Vector2Int>();
         path.Add(current);
-        while (cameFrom.ContainsKey(current))
+        while (current != startNode)
         {
-            current = cameFrom[current];
+            int ax = current.x + 100;
+            int ay = current.y + 100;
+            current = new Vector2Int(parentXGrid[ax, ay], parentYGrid[ax, ay]);
             path.Add(current);
         }
         path.Reverse();
@@ -233,28 +296,17 @@ public class PathManager : MonoBehaviour
         return 14 * dstX + 10 * (dstY - dstX);
     }
 
-    private List<Vector2Int> GetNeighbors(Vector2Int node)
+    private bool IsValidNeighbor(Vector2Int from, Vector2Int to)
     {
-        List<Vector2Int> neighbors = new List<Vector2Int>();
-
-        for (int x = -1; x <= 1; x++)
-        {
-            for (int y = -1; y <= 1; y++)
-            {
-                if (x == 0 && y == 0) continue;
-                
-                if (Mathf.Abs(x) == 1 && Mathf.Abs(y) == 1)
-                {
-                    if (GridManager.Instance.IsCellOccupied(new Vector2Int(node.x + x, node.y)) || 
-                        GridManager.Instance.IsCellOccupied(new Vector2Int(node.x, node.y + y)))
-                    {
-                        continue;
-                    }
-                }
-
-                neighbors.Add(new Vector2Int(node.x + x, node.y + y));
-            }
-        }
-        return neighbors;
+        if (GridManager.Instance.IsCellOccupied(to)) return false;
+        
+        float heightFrom = GridManager.Instance.GetCellHeight(from);
+        float heightTo = GridManager.Instance.GetCellHeight(to);
+        
+        // Prevent walking straight up/down steep cliffs (height diff > 1.2)
+        // Ramps have an intermediate height so they allow traversal.
+        if (Mathf.Abs(heightFrom - heightTo) > 1.2f) return false;
+        
+        return true;
     }
 }

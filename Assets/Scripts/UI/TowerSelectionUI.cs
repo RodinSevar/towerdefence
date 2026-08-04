@@ -11,6 +11,7 @@ public class TowerSelectionUI : MonoBehaviour
     private GameObject towerButtonPrefab;
 
     private Tower[] towerPrefabs;
+    private System.Collections.Generic.Dictionary<Tower, Button> buttonMap = new System.Collections.Generic.Dictionary<Tower, Button>();
 
     private void Start()
     {
@@ -86,6 +87,27 @@ public class TowerSelectionUI : MonoBehaviour
             buttonRect.sizeDelta = new Vector2(130, 60);
 
             button.onClick.AddListener(() => SelectTower(tower));
+            buttonMap[tower] = button;
+        }
+    }
+
+    private void Update()
+    {
+        if (TowerManager.Instance == null) return;
+        
+        Tower selected = TowerManager.Instance.GetSelectedTowerPrefab();
+        foreach (var kvp in buttonMap)
+        {
+            ColorBlock colors = kvp.Value.colors;
+            if (kvp.Key == selected)
+            {
+                colors.normalColor = new Color(0.8f, 0.8f, 0.2f); // Yellow highlight
+            }
+            else
+            {
+                colors.normalColor = new Color(0.3f, 0.3f, 0.3f); // Default
+            }
+            kvp.Value.colors = colors;
         }
     }
 

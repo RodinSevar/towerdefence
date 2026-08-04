@@ -15,6 +15,8 @@ public class GridManager : MonoBehaviour
     private int gridHeight = 196;
 
     private HashSet<Vector2Int> occupiedCells;
+    private HashSet<Vector2Int> unbuildableCells;
+    private Dictionary<Vector2Int, float> cellHeights;
 
     private void Awake()
     {
@@ -30,6 +32,8 @@ public class GridManager : MonoBehaviour
     private void InitializeGrid()
     {
         occupiedCells = new HashSet<Vector2Int>();
+        unbuildableCells = new HashSet<Vector2Int>();
+        cellHeights = new Dictionary<Vector2Int, float>();
     }
 
     /// <summary>
@@ -39,7 +43,26 @@ public class GridManager : MonoBehaviour
     {
         float x = Mathf.Round(worldPos.x / cellSize) * cellSize;
         float z = Mathf.Round(worldPos.z / cellSize) * cellSize;
-        return new Vector3(x, worldPos.y, z);
+        Vector2Int cell = WorldToGridCell(new Vector3(x, 0, z));
+        float y = GetCellHeight(cell);
+        return new Vector3(x, y, z);
+    }
+
+    public void SetCellHeight(Vector2Int cell, float height)
+    {
+        cellHeights[cell] = height;
+    }
+
+    public float GetCellHeight(Vector2Int cell)
+    {
+        if (cellHeights != null && cellHeights.TryGetValue(cell, out float height))
+            return height;
+        return 0.5f; // Default ground height if none set
+    }
+
+    public Vector3 GetWorldPosition(Vector2Int cell)
+    {
+        return new Vector3(cell.x * cellSize, GetCellHeight(cell), cell.y * cellSize);
     }
 
     /// <summary>
@@ -87,7 +110,15 @@ public class GridManager : MonoBehaviour
     public bool CanBuildAt(Vector3 worldPos)
     {
         Vector2Int cell = WorldToGridCell(worldPos);
-        return !IsCellOccupied(cell);
+        return !IsCellOccupied(cell) && !unbuildableCells.Contains(cell);
+    }
+
+    /// <summary>
+    /// Marks a cell as unbuildable (e.g. for ramps)
+    /// </summary>
+    public void MarkUnbuildable(Vector2Int cell)
+    {
+        unbuildableCells.Add(cell);
     }
 
     /// <summary>

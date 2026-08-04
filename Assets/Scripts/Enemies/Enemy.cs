@@ -102,6 +102,15 @@ public class Enemy : MonoBehaviour, ISelectable
         {
             Debug.LogWarning("Enemy could not find path!");
         }
+        else
+        {
+            // Skip the first node (which is the center of the cell the enemy is currently in)
+            // to prevent the enemy from turning around and walking backwards to the center.
+            if (currentPath.Count > 1)
+            {
+                currentPathNodeIndex = 1;
+            }
+        }
     }
 
     private void Update()
@@ -212,15 +221,22 @@ public class Enemy : MonoBehaviour, ISelectable
         
         transform.position += moveDir * currentSpeed * Time.deltaTime;
         
-        if (moveDir != Vector3.zero)
+        Vector3 lookDir = new Vector3(moveDir.x, 0, moveDir.z);
+        if (lookDir != Vector3.zero)
         {
-            transform.rotation = Quaternion.LookRotation(moveDir);
+            transform.rotation = Quaternion.LookRotation(lookDir);
         }
 
-        float distanceToNode = Vector3.Distance(transform.position, targetNode);
+        // Ignore Y for distance check to prevent overshooting on ramps
+        Vector3 flatPos = new Vector3(transform.position.x, 0, transform.position.z);
+        Vector3 flatTarget = new Vector3(targetNode.x, 0, targetNode.z);
+        
+        float distanceToNode = Vector3.Distance(flatPos, flatTarget);
         if (distanceToNode < 0.1f) // reached path node
         {
             currentPathNodeIndex++;
+            // Snap to target to prevent drift
+            transform.position = targetNode;
         }
     }
 

@@ -63,7 +63,7 @@ public class SceneSetup : MonoBehaviour
             
             MeshRenderer renderer = groundObj.AddComponent<MeshRenderer>();
             renderer.material = new Material(Shader.Find("Standard"));
-            renderer.material.color = new Color(0.5f, 0.5f, 0.5f);
+            renderer.material.color = new Color(0.8f, 0.8f, 0.8f);
         }
 
         // Create spawn point if not exists

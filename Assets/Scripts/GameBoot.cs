@@ -74,20 +74,7 @@ public class GameBoot : MonoBehaviour
             Debug.LogError("Error setting up camera: " + e.Message);
         }
 
-        // Create ground if not exists
-        if (GameObject.FindWithTag("Ground") == null)
-        {
-            GameObject groundObj = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            groundObj.name = "Ground";
-            groundObj.tag = "Ground";
-            
-            // A default Unity plane is 10x10 units. To make it 196x196, scale by 19.6.
-            groundObj.transform.localScale = new Vector3(19.6f, 1f, 19.6f);
-            groundObj.transform.position = Vector3.zero;
-
-            MeshRenderer renderer = groundObj.GetComponent<MeshRenderer>();
-            renderer.material.color = new Color(0.1f, 0.25f, 0.1f); // Set to dark green
-        }
+        // Ground creation has been moved to MapGenerator in SetupManagers()
 
         // Create spawn point if not exists
         if (GameObject.FindWithTag("SpawnPoint") == null)
@@ -116,6 +103,31 @@ public class GameBoot : MonoBehaviour
         {
             GameObject gridObj = new GameObject("GridManager");
             gridObj.AddComponent<GridManager>();
+        }
+
+        // Generate Map
+        if (FindAnyObjectByType<MapGenerator>() == null)
+        {
+            GameObject mapObj = new GameObject("MapGenerator");
+            mapObj.tag = "Ground";
+            MapGenerator gen = mapObj.AddComponent<MapGenerator>();
+            
+            // Try to load a custom image map from the Resources folder
+            Texture2D customMap = Resources.Load<Texture2D>("MapLayout");
+            if (customMap != null)
+            {
+                if (customMap.isReadable)
+                {
+                    var field = gen.GetType().GetField("mapTexture", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    if (field != null) field.SetValue(gen, customMap);
+                }
+                else
+                {
+                    Debug.LogWarning("The MapLayout.png image was found, but it is not readable! You must select the image in Unity and check 'Read/Write' in the Inspector. Falling back to default map generation.");
+                }
+            }
+            
+            gen.GenerateMap();
         }
         
         // Create GameManager if not exists
