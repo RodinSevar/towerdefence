@@ -67,9 +67,9 @@ public class WPMImporter
                 // Warcraft 3 Pathing Bitmasks:
                 // 0x02 = Unwalkable
                 // 0x08 = Unbuildable
-                // 0x40 / 0x80 = Often used for unbuildable borders or blight
+                // 0x40 / 0x80 = Often used for unbuildable borders or blight, but in some custom maps (like Wintermaul) it's used liberally on walkable terrain.
                 bool unwalkable = (combined & 0x02) != 0;
-                bool unbuildable = (combined & 0x08) != 0 || (combined & 0x40) != 0 || (combined & 0x80) != 0;
+                bool unbuildable = (combined & 0x08) != 0; // Only strictly unbuildable cells
 
                 Color c = Color.black; // Default: Fully Walkable & Buildable (The Maze Lanes)
                 

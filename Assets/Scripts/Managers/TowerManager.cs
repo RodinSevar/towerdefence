@@ -184,7 +184,7 @@ public class TowerManager : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
             // Check if we hit the ground plane
-            if (hit.collider.CompareTag("Ground"))
+            if (hit.collider.CompareTag("Ground") || hit.collider.GetComponent<MapGenerator>() != null)
             {
                 // Snap to grid
                 Vector3 snappedPos = GridManager.Instance.SnapToGrid(hit.point);
@@ -192,12 +192,14 @@ public class TowerManager : MonoBehaviour
                 // Check if building is allowed at this position
                 if (!GridManager.Instance.CanBuildAt(snappedPos))
                 {
+                    Debug.Log($"Tower placement failed: Cannot build at {snappedPos} (Occupied or Unbuildable)");
                     return; // Can't build here
                 }
                 
                 int cost = selectedTowerPrefab.GetComponent<Tower>().GetCost();
                 if (GameManager.Instance.GetCurrentGold() < cost)
                 {
+                    Debug.Log($"Tower placement failed: Not enough gold (Cost: {cost}, Have: {GameManager.Instance.GetCurrentGold()})");
                     return; // Not enough gold
                 }
                 
@@ -209,7 +211,7 @@ public class TowerManager : MonoBehaviour
                 {
                     // Revert and deny placement
                     GridManager.Instance.FreeCell(cell);
-                    Debug.Log("Tower placement blocked: Prevents path completion.");
+                    Debug.Log($"Tower placement blocked: Placing at {cell} prevents path completion for at least one spawner.");
                     return;
                 }
                 

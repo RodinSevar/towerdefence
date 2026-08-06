@@ -52,6 +52,7 @@ public class PathManager : MonoBehaviour
                 FlowField ff = GetFlowField(targetNode);
                 if (ff == null || ff.distanceGrid[startNode.x + 100, startNode.y + 100] == float.MaxValue)
                 {
+                    Debug.Log($"Maze Validation Failed for Spawner {spawner.gameObject.name}! Start Node {startNode} cannot reach Target Node {targetNode}. Target FlowField valid: {ff != null}");
                     return false;
                 }
             }
