@@ -1,0 +1,4100 @@
+﻿STRING 1
+{
+Player 1
+}
+
+STRING 2
+{
+Force 1
+}
+
+STRING 3
+// Units: ushd (Scout), Name (Name)
+{
+Scout
+}
+
+STRING 4
+// Units: eC00 (Element Chooser), Name (Name)
+{
+Element Chooser
+}
+
+STRING 5
+// Units: hC02 (Flare Tower), Name (Name)
+{
+Flare Tower
+}
+
+STRING 6
+// Units: hC02 (Flare Tower), Tip (Tooltip - Basic)
+{
+Build |cffffcc00F|rlare Tower
+}
+
+STRING 7
+// Units: hwtw (Crystal Fury), Hotkey (Hotkey)
+{
+F
+}
+
+STRING 9
+// Units: nC03 (Fire Minion), Name (Name)
+{
+Fire Minion
+}
+
+STRING 10
+// Units: nC03 (Fire Minion), Tip (Tooltip - Basic)
+{
+Train Fire |cffffcc00M|rinion
+}
+
+STRING 12
+// Units: hC01 (Forge of Fire), Name (Name)
+{
+Forge of Fire
+}
+
+STRING 13
+// Units: hC01 (Forge of Fire), Tip (Tooltip - Basic)
+{
+Build Forge of |cffffcc00F|rire
+}
+
+STRING 15
+// Units: hC04 (Engineer), Name (Name)
+{
+Engineer
+}
+
+STRING 16
+// Units: eC05 (Night Ranger), Name (Name)
+{
+Night Ranger
+}
+
+STRING 17
+// Units: hC06 (Tech Center), Name (Name)
+{
+Tech Center
+}
+
+STRING 18
+// Units: hC06 (Tech Center), Tip (Tooltip - Basic)
+{
+Build T|cffffcc00e|rch Center
+}
+
+STRING 19
+// Units: nwgt (Earth Gate), Hotkey (Hotkey)
+{
+E
+}
+
+STRING 20
+// Units: hC06 (Tech Center), Ubertip (Tooltip - Extended)
+{
+Build a Tech Center to build towers equipped with human technology. Tech towers have long range and moderate damage, but long cooldowns. Tech Towers do extra damage to heavy armor, and reduced to fortified and light.
+}
+
+STRING 21
+// Units: hC07 (Scientist), Name (Name)
+{
+Scientist
+}
+
+STRING 22
+// Units: hC07 (Scientist), Tip (Tooltip - Basic)
+{
+Train |cffffcc00S|rcientist
+}
+
+STRING 23
+// Units: hgtw (Crystal Shooter), Hotkey (Hotkey)
+{
+S
+}
+
+STRING 28
+// Units: oC09 (Power Plant), Name (Name)
+{
+Power Plant
+}
+
+STRING 29
+// Units: oC09 (Power Plant), Tip (Tooltip - Basic)
+{
+Build Power Pla|cffffcc00n|rt
+}
+
+STRING 30
+// Units: emow (Nature Pool), Hotkey (Hotkey)
+{
+N
+}
+
+STRING 31
+// Units: oC09 (Power Plant), Ubertip (Tooltip - Extended)
+{
+The Power Plant trains electricity to do your bidding. Electric Towers have a fast attack and cooldown, but low damage. Electricity does extra damage to light armored units.
+}
+
+STRING 32
+// Units: eC10 (Spark), Name (Name)
+{
+Spark
+}
+
+STRING 33
+// Units: eC10 (Spark), Tip (Tooltip - Basic)
+{
+Train |cffffcc00S|rpark
+}
+
+STRING 35
+// Units: hC11 (Shock Tower), Name (Name)
+{
+Shock Tower
+}
+
+STRING 36
+// Units: hC11 (Shock Tower), Tip (Tooltip - Basic)
+{
+Build |cffffcc00S|rhock Tower
+}
+
+STRING 38
+// Units: eC12 (Stone Sanctuary), Name (Name)
+{
+Stone Sanctuary
+}
+
+STRING 39
+// Units: eC12 (Stone Sanctuary), Tip (Tooltip - Basic)
+{
+Create S|cffffcc00t|rone Sanctuary
+}
+
+STRING 40
+// Units: eC12 (Stone Sanctuary), Hotkey (Hotkey)
+{
+T
+}
+
+STRING 42
+// Units: uC13 (Stone Summoner), Name (Name)
+{
+Stone Summoner
+}
+
+STRING 43
+// Units: uC13 (Stone Summoner), Tip (Tooltip - Basic)
+{
+Train St|cffffcc00o|rne Summoner
+}
+
+STRING 44
+// Units: uC13 (Stone Summoner), Hotkey (Hotkey)
+{
+O
+}
+
+STRING 46
+// Units: oC14 (Pebble Tower), Name (Name)
+{
+Pebble Tower
+}
+
+STRING 47
+// Units: oC14 (Pebble Tower), Tip (Tooltip - Basic)
+{
+Build |cffffcc00P|rebble Tower
+}
+
+STRING 48
+// Units: oC14 (Pebble Tower), Hotkey (Hotkey)
+{
+P
+}
+
+STRING 50
+{
+Player 2
+}
+
+STRING 51
+{
+Player 3
+}
+
+STRING 52
+{
+Player 4
+}
+
+STRING 53
+{
+Player 5
+}
+
+STRING 54
+{
+Player 6
+}
+
+STRING 55
+{
+Player 7
+}
+
+STRING 56
+{
+Player 8
+}
+
+STRING 57
+{
+Player 9
+}
+
+STRING 58
+{
+Forces of Northrend
+}
+
+STRING 59
+{
+|c0000cdf9Wintermaul Tower Defense v1.1
+
+-You select an element at your element chooser, the elements all have their strengths and weaknesses, so pick one that suits your playing style.
+-Once you have selected your element, build the worker at your element building
+-Attackers come from the top three places at the top of the map. You must keep them from reaching the bottom where the ship is by building towers.
+-If the attacker on level 30 boards the ship, you lose.
+-The "Sell" function is ON the towers, not a command you type in.
+-Good Luck!!!|r
+}
+
+STRING 60
+{
+|c0000cdf9For help on how to play type... -help
+To see the HUGE amount of updates press F9|r
+}
+
+STRING 61
+{
+|c0000cdf9Next level in 30 seconds|r
+}
+
+STRING 62
+// Units: nC15 (TriggerMan), Name (Name)
+{
+TriggerMan
+}
+
+STRING 75
+// Units: nC17 (Baby Dragon), Name (Name)
+{
+Baby Dragon
+}
+
+STRING 77
+{
+|c0000cdf9You have failed|r
+}
+
+STRING 80
+{
+You have failed...
+    Try again
+}
+
+STRING 87
+{
+Force 2
+}
+
+STRING 88
+{
+Wintermaul X14 Balanced Version
+}
+
+STRING 89
+{
+9
+}
+
+STRING 90
+{
+Build towers to keep the Forces of Northrend from escaping.
+Double starting money version.
+7 spawn locations
+Features include
+-60+ Tower
+-30 Levels
+3 New Races added!
+Replaced Poison with Space
+Duke Wintermaul made weaker.
+
+edited by Sum_Asinus
+
+}
+
+STRING 91
+{
+dukewintermaul
+}
+
+STRING 92
+{
+dukewintermaul presents
+}
+
+STRING 93
+{
+|c00000000Wintermaul X14 Balanced Version
+}
+
+STRING 94
+{
+Wintermaul X13 Ultimate Version
+Double starting money. Added 4 spawn locations, more races, more levels (up to 50)  and new towers. (dukewintermaul)
+Added Demonic Race and Heaven Race. 
+Replaced Poison with Space.
+dukewintermaul made weaker. (dukewintermaul)
+Have Fun!
+Many thanks to bloodyspear, matteo77,  bobby1234 and of course me (dukewintermaul) for testing and helping out.
+
+}
+
+STRING 95
+// Units: oC18 (Storm Caller), Name (Name)
+{
+Storm Caller
+}
+
+STRING 97
+// Units: nC03 (Fire Minion), Hotkey (Hotkey)
+{
+M
+}
+
+STRING 99
+// Units: oC19 (Flame Dancer), Name (Name)
+{
+Flame Dancer
+}
+
+STRING 100
+// Units: oC19 (Flame Dancer), Tip (Tooltip - Basic)
+{
+Build Flame|cffffcc00D|rancer
+}
+
+STRING 101
+// Units: oC19 (Flame Dancer), Hotkey (Hotkey)
+{
+D
+}
+
+STRING 104
+// Units: hC01 (Forge of Fire), Ubertip (Tooltip - Extended)
+{
+Allows you to summon the powers of fire to aid you. Fire towers have moderate damage and splash damage. Fire Towers do extra damage to Heavy Armor, but reduced to Fortified and Light.
+}
+
+STRING 105
+// Units: hC20 (Poison Pool), Name (Name)
+{
+Poison Pool
+}
+
+STRING 106
+// Units: hC20 (Poison Pool), Tip (Tooltip - Basic)
+{
+Build |cffffcc00P|roison Pool
+}
+
+STRING 107
+// Units: hC20 (Poison Pool), Ubertip (Tooltip - Extended)
+{
+Poison brings moderate damage, medium range, and medium rate of fire. In addition, they slow units. But the cost of poison doesn't make these the cheapest towers around. Poison Towers do equal damage to all armor types.
+}
+
+STRING 108
+// Units: hC21 (Envenomed Spike), Name (Name)
+{
+Envenomed Spike
+}
+
+STRING 109
+// Units: hC21 (Envenomed Spike), Tip (Tooltip - Basic)
+{
+Construct Enve|cffffcc00n|rmed Spike
+}
+
+STRING 111
+// Units: oC22 (Alchemist), Name (Name)
+{
+Alchemist
+}
+
+STRING 112
+// Units: oC22 (Alchemist), Tip (Tooltip - Basic)
+{
+Train |cffffcc00A|rlchemist
+}
+
+STRING 113
+// Units: hctw (Crystal Blaster), Hotkey (Hotkey)
+{
+A
+}
+
+STRING 115
+// Units: eC23 (Ice Freezer), Name (Name)
+{
+Ice Freezer
+}
+
+STRING 116
+// Units: oC24 (Icicle Tosser), Name (Name)
+{
+Icicle Tosser
+}
+
+STRING 117
+// Units: oC24 (Icicle Tosser), Tip (Tooltip - Basic)
+{
+Build |cffffcc00I|rcicle Tosser
+}
+
+STRING 118
+// Units: eC23 (Ice Freezer), Hotkey (Hotkey)
+{
+I
+}
+
+STRING 122
+// Units: oC25 (Ice Former), Name (Name)
+{
+Ice Former
+}
+
+STRING 123
+// Units: oC25 (Ice Former), Tip (Tooltip - Basic)
+{
+Train I|cffffcc00c|re Former
+}
+
+STRING 124
+// Units: hbla (Crystal Castle), Hotkey (Hotkey)
+{
+C
+}
+
+STRING 128
+{
+|c0000cdf9Very good, no chances have been wasted|r
+}
+
+STRING 129
+// Units: hC08 (Sniper Post), Name (Name)
+{
+Sniper Post
+}
+
+STRING 130
+// Units: hC08 (Sniper Post), Tip (Tooltip - Basic)
+{
+Build Sniper |cffffcc00P|rost
+}
+
+STRING 132
+// Units: hC27 (Poison Spire), Name (Name)
+{
+Poison Spire
+}
+
+STRING 133
+// Units: hC27 (Poison Spire), Tip (Tooltip - Basic)
+{
+Build Poison |cffffcc00S|rpire
+}
+
+STRING 140
+// Units: eC23 (Ice Freezer), Ubertip (Tooltip - Extended)
+{
+Creates Ice to fight on your side. Ice Towers slow enemy units, as well as having a nice rate of fire, but somwhat low range. Ice Towers have a high minimum damage. Ice Towers do extra damage to light armor, and reduced to fortified
+}
+
+STRING 141
+// Units: uC28 (Stalker), Name (Name)
+{
+Stalker
+}
+
+STRING 142
+// Units: nC29 (Water Runner), Name (Name)
+{
+Water Runner
+}
+
+STRING 143
+// Units: nC30 (Ice Troll), Name (Name)
+{
+Ice Troll
+}
+
+STRING 144
+// Units: oC31 (Wolf Rider), Name (Name)
+{
+Wolf Rider
+}
+
+STRING 165
+// Units: hC34 (Snowball Launcher), Name (Name)
+{
+Snowball Launcher
+}
+
+STRING 176
+// Units: oC35 (Rock Blaster), Name (Name)
+{
+Rock Blaster
+}
+
+STRING 177
+// Units: oC35 (Rock Blaster), Tip (Tooltip - Basic)
+{
+Build |cffffcc00R|rock Blaster
+}
+
+STRING 178
+// Units: oC35 (Rock Blaster), Hotkey (Hotkey)
+{
+R
+}
+
+STRING 180
+// Units: hC36 (Chain Lightning Caster), Name (Name)
+{
+Chain Lightning Caster
+}
+
+STRING 183
+// Units: oC37 (Blizzard Master), Name (Name)
+{
+Blizzard Master
+}
+
+STRING 184
+// Units: oC37 (Blizzard Master), Tip (Tooltip - Basic)
+{
+Train a |cffffcc00B|rlizzard Master
+}
+
+STRING 185
+// Units: oC37 (Blizzard Master), Hotkey (Hotkey)
+{
+B
+}
+
+STRING 190
+// Units: nC39 (Frosty Reptile), Name (Name)
+{
+Frosty Reptile
+}
+
+STRING 191
+// Units: nC40 (Demonic Pet), Name (Name)
+{
+Demonic Pet
+}
+
+STRING 192
+// Units: nC41 (Matured Dragon), Name (Name)
+{
+Matured Dragon
+}
+
+STRING 193
+// Units: nC42 (Ice Shard Golem), Name (Name)
+{
+Ice Shard Golem
+}
+
+STRING 194
+// Units: uC43 (Eternal Spirit), Name (Name)
+{
+Eternal Spirit
+}
+
+STRING 195
+// Units: hC44 (Supply Tank), Name (Name)
+{
+Supply Tank
+}
+
+STRING 201
+{
+|c0000cdf9Test Mode Enabled|r
+}
+
+STRING 203
+{
+<Quit that noob>
+}
+
+STRING 204
+{
+<Quit that noob>
+}
+
+STRING 205
+{
+<Quit that noob>
+}
+
+STRING 206
+{
+<Quit that noob>
+}
+
+STRING 207
+{
+<Quit that noob>
+}
+
+STRING 208
+{
+<Quit that noob>
+}
+
+STRING 209
+{
+<Quit that noob>
+}
+
+STRING 210
+{
+<Quit that noob>
+}
+
+STRING 211
+{
+<Quit that noob>
+}
+
+STRING 213
+// Units: oC18 (Storm Caller), Tip (Tooltip - Basic)
+{
+Build Stor|cffffcc00m|r Caller
+}
+
+STRING 214
+// Units: hC36 (Chain Lightning Caster), Tip (Tooltip - Basic)
+{
+Build Chai|cffffcc00n|r Lightning Caster
+}
+
+STRING 228
+// Units: uC45 (Walking Corpse), Name (Name)
+{
+Walking Corpse
+}
+
+STRING 230
+// Units: oC47 (Totem Carrier), Name (Name)
+{
+Totem Carrier
+}
+
+STRING 231
+// Units: hC48 (Unholy Knight), Name (Name)
+{
+Unholy Knight
+}
+
+STRING 232
+// Units: nC49 (Crystal Mage), Name (Name)
+{
+Crystal Mage
+}
+
+STRING 233
+// Units: nC50 (Frozen Infernal), Name (Name)
+{
+Frozen Infernal
+}
+
+STRING 234
+// Units: nC51 (Adult Dragon), Name (Name)
+{
+Adult Dragon
+}
+
+STRING 259
+// Units: eC12 (Stone Sanctuary), Ubertip (Tooltip - Extended)
+{
+Conjure up hunks of stone to assist you. Stone Towers have high damage and low range. Stone Towers sometimes do 2x damage, and do extra damage to fortified armor.
+}
+
+STRING 271
+// Units: hC94 (Poison Crawler), Hotkey (Hotkey)
+{
+W
+}
+
+STRING 272
+// Units: hC53 (Stone Projector), Name (Name)
+{
+Stone Projector
+}
+
+STRING 273
+// Units: hC53 (Stone Projector), Tip (Tooltip - Basic)
+{
+Bring up a Stone Pro|cffffcc00j|rector
+}
+
+STRING 274
+// Units: hC53 (Stone Projector), Hotkey (Hotkey)
+{
+J
+}
+
+STRING 276
+// Units: hC54 (V2 Rocket Launcher), Name (Name)
+{
+V2 Rocket Launcher
+}
+
+STRING 277
+// Units: hC54 (V2 Rocket Launcher), Tip (Tooltip - Basic)
+{
+Construct a |cffffcc00V|r2 Rocket Launcher
+}
+
+STRING 278
+// Units: eC00 (Element Chooser), Hotkey (Hotkey)
+{
+V
+}
+
+STRING 280
+// Units: hC55 (Ion Cannon Center), Name (Name)
+{
+Ion Cannon Center
+}
+
+STRING 281
+// Units: hC55 (Ion Cannon Center), Tip (Tooltip - Basic)
+{
+Build an I|cffffcc00o|rn Cannon Center
+}
+
+STRING 284
+// Units: oC56 (Sludge Flinger), Name (Name)
+{
+Sludge Flinger
+}
+
+STRING 285
+// Units: oC56 (Sludge Flinger), Tip (Tooltip - Basic)
+{
+Build Sl|cffffcc00u|rdge Flinger
+}
+
+STRING 286
+// Units: oC56 (Sludge Flinger), Hotkey (Hotkey)
+{
+U
+}
+
+STRING 290
+// Units: nC57 (Sell), Name (Name)
+{
+Sell
+}
+
+STRING 293
+// Units: hC66 (Enhanced Arrow Tower), Tip (Tooltip - Basic)
+{
+Build |cffffcc00E|rnhanced Guard Tower
+}
+
+STRING 294
+// Units: oC58 (Meteor Watcher), Name (Name)
+{
+Meteor Watcher
+}
+
+STRING 295
+// Units: oC58 (Meteor Watcher), Tip (Tooltip - Basic)
+{
+Build Meteo|cffffcc00r|r Watcher
+}
+
+STRING 305
+// Units: nC03 (Fire Minion), Ubertip (Tooltip - Extended)
+{
+Fire worker. Can build various fire structures
+}
+
+STRING 306
+// Units: hC07 (Scientist), Ubertip (Tooltip - Extended)
+{
+Tech worker, can build technology buildings
+}
+
+STRING 307
+// Units: eC10 (Spark), Ubertip (Tooltip - Extended)
+{
+Electric builder, can buld electricity based buildings
+}
+
+STRING 308
+// Units: uC13 (Stone Summoner), Ubertip (Tooltip - Extended)
+{
+Stone Worker, builds stone buildings. This builder SUMMONS, meaning, do not stand there after he started building
+}
+
+STRING 309
+// Units: oC22 (Alchemist), Ubertip (Tooltip - Extended)
+{
+Poison worker. This guy builds poison towers
+}
+
+STRING 311
+// Units: oC25 (Ice Former), Ubertip (Tooltip - Extended)
+{
+The builder of Ice Towers
+}
+
+STRING 312
+// Units: ushd (Scout), EditorSuffix (Name - Editor Suffix)
+{
+lvl 1
+}
+
+STRING 313
+// Units: hC04 (Engineer), EditorSuffix (Name - Editor Suffix)
+{
+lvl 2
+}
+
+STRING 314
+// Units: eC05 (Night Ranger), EditorSuffix (Name - Editor Suffix)
+{
+lvl 3
+}
+
+STRING 315
+// Units: hC16 (Barbarian), EditorSuffix (Name - Editor Suffix)
+{
+lvl 4
+}
+
+STRING 316
+// Units: nC17 (Baby Dragon), EditorSuffix (Name - Editor Suffix)
+{
+lvl 5
+}
+
+STRING 317
+// Units: hC08 (Sniper Post), Ubertip (Tooltip - Extended)
+{
+Second Tech Tower. The Sniper Post has even longer range, and a slightly shorter cooldown. 28-34 damage |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 318
+// Units: uC28 (Stalker), EditorSuffix (Name - Editor Suffix)
+{
+lvl 6
+}
+
+STRING 319
+// Units: nC29 (Water Runner), EditorSuffix (Name - Editor Suffix)
+{
+lvl 7
+}
+
+STRING 320
+// Units: nC30 (Ice Troll), EditorSuffix (Name - Editor Suffix)
+{
+lvl 8
+}
+
+STRING 321
+// Units: oC31 (Wolf Rider), EditorSuffix (Name - Editor Suffix)
+{
+lvl 9
+}
+
+STRING 323
+// Units: nC33 (Hovercraft), EditorSuffix (Name - Editor Suffix)
+{
+lvl 11
+}
+
+STRING 324
+// Units: eC38 (Goblin Machine), EditorSuffix (Name - Editor Suffix)
+{
+lvl 12
+}
+
+STRING 325
+// Units: nC39 (Frosty Reptile), EditorSuffix (Name - Editor Suffix)
+{
+lvl 13
+}
+
+STRING 326
+// Units: nC40 (Demonic Pet), EditorSuffix (Name - Editor Suffix)
+{
+lvl 14
+}
+
+STRING 327
+// Units: nC41 (Matured Dragon), EditorSuffix (Name - Editor Suffix)
+{
+lvl 15
+}
+
+STRING 328
+// Units: nC42 (Ice Shard Golem), EditorSuffix (Name - Editor Suffix)
+{
+lvl 16
+}
+
+STRING 329
+// Units: uC43 (Eternal Spirit), EditorSuffix (Name - Editor Suffix)
+{
+lvl 17
+}
+
+STRING 330
+// Units: hC44 (Supply Tank), EditorSuffix (Name - Editor Suffix)
+{
+lvl 18
+}
+
+STRING 331
+// Units: uC45 (Walking Corpse), EditorSuffix (Name - Editor Suffix)
+{
+lvl 19
+}
+
+STRING 333
+// Units: oC47 (Totem Carrier), EditorSuffix (Name - Editor Suffix)
+{
+lvl 21
+}
+
+STRING 334
+// Units: hC48 (Unholy Knight), EditorSuffix (Name - Editor Suffix)
+{
+lvl 22
+}
+
+STRING 335
+// Units: nC49 (Crystal Mage), EditorSuffix (Name - Editor Suffix)
+{
+lvl 23
+}
+
+STRING 336
+// Units: nC50 (Frozen Infernal), EditorSuffix (Name - Editor Suffix)
+{
+lvl 24
+}
+
+STRING 337
+// Units: nC51 (Adult Dragon), EditorSuffix (Name - Editor Suffix)
+{
+lvl 25
+}
+
+STRING 338
+// Units: hC54 (V2 Rocket Launcher), Ubertip (Tooltip - Extended)
+{
+Alas, Human Tech will never stop. The V2 Rocket launcher has a higher range and far greater damage, but reloading takes time, so the cooldown's a big greater. 100-130 damage |n|n|cffffcc00Attacks land units and trees.|r
+}
+
+STRING 339
+// Units: hC55 (Ion Cannon Center), Ubertip (Tooltip - Extended)
+{
+A great addition to any Tech defense, the Ion Cannon Center does a LOT of damage at enormous range. The cooldown, is, of course, greater as well. 300-375 damage +500 damage on impact |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 340
+// Units: hC66 (Enhanced Arrow Tower), Ubertip (Tooltip - Extended)
+{
+Light technology tower. Has a long range and decent damage. 3-7 damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 356
+// Units: hC02 (Flare Tower), Ubertip (Tooltip - Extended)
+{
+Light fire tower, does light damage. 3-8 damage, and light splash damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 362
+// Units: oC24 (Icicle Tosser), Ubertip (Tooltip - Extended)
+{
+Basic Ice Structure. Decent rate of fire, good minimum damage, slows enemies. 6 damage |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 366
+// Units: oC37 (Blizzard Master), Ubertip (Tooltip - Extended)
+{
+Ice just improved again. The Blizzard Master is a expensive, but worthwhile investment. 80-90 damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 367
+// Units: hC34 (Snowball Launcher), Ubertip (Tooltip - Extended)
+{
+The next step up in snow defense, the snowball launcher has far higher damage, and fires further. It attacks faster, too. 26 damage |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 370
+// Units: hC66 (Enhanced Arrow Tower), Name (Name)
+{
+Enhanced Arrow Tower
+}
+
+STRING 371
+// Units: oC58 (Meteor Watcher), Ubertip (Tooltip - Extended)
+{
+The third iteration of the Flame line. While the damage is greater, the splash from the meteor is large. 75-100 damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 380
+// Units: hC59 (Nuclear Missile Silo), Name (Name)
+{
+Nuclear Missile Silo
+}
+
+STRING 381
+// Units: hC59 (Nuclear Missile Silo), Tip (Tooltip - Basic)
+{
+Build N|cffffcc00u|rclear Missile Silo
+}
+
+STRING 384
+// Units: oC60 (Thunder Rod), Name (Name)
+{
+Thunder Rod
+}
+
+STRING 385
+// Units: oC60 (Thunder Rod), Tip (Tooltip - Basic)
+{
+Build T|cffffcc00h|runder Rod
+}
+
+STRING 386
+// Units: oC60 (Thunder Rod), Hotkey (Hotkey)
+{
+H
+}
+
+STRING 389
+// Units: eC23 (Ice Freezer), Tip (Tooltip - Basic)
+{
+Create |cffffcc00I|rce Freezer
+}
+
+STRING 390
+// Units: oC61 (Water Sprayer), Name (Name)
+{
+Water Sprayer
+}
+
+STRING 391
+// Units: oC61 (Water Sprayer), Tip (Tooltip - Basic)
+{
+Build |cffffcc00W|rater Sprayer
+}
+
+STRING 397
+{
+|c0000cdf9Bounty has been increased|r
+}
+
+STRING 399
+// Units: hC16 (Barbarian), Name (Name)
+{
+Barbarian
+}
+
+STRING 400
+// Units: nC33 (Hovercraft), Name (Name)
+{
+Hovercraft
+}
+
+STRING 402
+// Units: oC62 (Nova Creator), Name (Name)
+{
+Nova Creator
+}
+
+STRING 403
+// Units: oC62 (Nova Creator), Tip (Tooltip - Basic)
+{
+Build No|cffffcc00v|ra Creator
+}
+
+STRING 404
+// Units: oC62 (Nova Creator), Ubertip (Tooltip - Extended)
+{
+The final defense for Ice will more than do a good job. While it has no special abilities, it does a large payload of damage. 700-700 damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 405
+// Units: hC63 (Laser Cannon), Name (Name)
+{
+Laser Cannon
+}
+
+STRING 406
+// Units: hC63 (Laser Cannon), Tip (Tooltip - Basic)
+{
+Construct a |cffffcc00L|raser Cannon
+}
+
+STRING 407
+// Units: hhou (Crystal Slower), Hotkey (Hotkey)
+{
+L
+}
+
+STRING 411
+// Units: oC64 (Blast Furnace), Name (Name)
+{
+Blast Furnace
+}
+
+STRING 412
+// Units: oC64 (Blast Furnace), Tip (Tooltip - Basic)
+{
+Build |cffffcc00B|rlast Furnace
+}
+
+STRING 413
+// Units: oC64 (Blast Furnace), Ubertip (Tooltip - Extended)
+{
+First, the most noticable difference in the Blast Furnace is the splash damage, it's nearly double the Meteor Watcher. An excellent addition to any defense. 225-250 damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 414
+// Units: oC65 (Flame Staff), Name (Name)
+{
+Flame Staff
+}
+
+STRING 415
+// Units: oC65 (Flame Staff), Tip (Tooltip - Basic)
+{
+Build Flam|cffffcc00e|r Staff
+}
+
+STRING 418
+// Units: oC19 (Flame Dancer), Ubertip (Tooltip - Extended)
+{
+Medium fire tower. Has greater splash damage and attacks fairly quickly. 20-50 damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 419
+// Units: nC57 (Sell), Tip (Tooltip - Basic)
+{
+|c0000cdf9Sell this tower back for 75% of what you paid|r
+}
+
+STRING 420
+// Units: oC26 (Faerie Mage), Name (Name)
+{
+Faerie Mage
+}
+
+STRING 421
+// Units: oC26 (Faerie Mage), Tip (Tooltip - Basic)
+{
+Build |cffffcc00F|raerie Tower
+}
+
+STRING 423
+// Units: oC67 (Paralyzer), Name (Name)
+{
+Paralyzer
+}
+
+STRING 426
+// Units: oC67 (Paralyzer), Tip (Tooltip - Basic)
+{
+Order a Paraly|cffffcc00z|rer
+}
+
+STRING 427
+// Units: oC67 (Paralyzer), Hotkey (Hotkey)
+{
+Z
+}
+
+STRING 434
+{
+|c0000cdf9Duke-Wintermaul boarded the ship!|r
+}
+
+STRING 442
+// Units: hC11 (Shock Tower), Ubertip (Tooltip - Extended)
+{
+Light electric tower. Does light damage in moderate range. Attacks extremely fast. 4 damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 443
+// Units: oC18 (Storm Caller), Ubertip (Tooltip - Extended)
+{
+The Storm Caller is a large advance in the Electric line. It's damage is much higher, but it's range slightly lower. 30 damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 444
+// Units: eC38 (Goblin Machine), Name (Name)
+{
+Goblin Machine
+}
+
+STRING 445
+// Units: oC60 (Thunder Rod), Ubertip (Tooltip - Extended)
+{
+A truly helpful Tower for any situation, the Thunder Rod does basically no base damage. It removes 25% of any opponents current health. Doesn't work on bosses. 1-1 damage +25% enemy hp |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 446
+// Units: oC61 (Water Sprayer), Ubertip (Tooltip - Extended)
+{
+An interesting addition to the Ice tree is the Water Sprayer. It does small amounts of damage and attacks very slow, but it immobilizing the target permanantly. Doesn't work on bosses. 50-50 damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 447
+// Units: oC67 (Paralyzer), Ubertip (Tooltip - Extended)
+{
+At first sight, the Paralyzer looks like one of those crappy towers. It doesn't kill units, but rather leaves them with ten hit points. Doesn't work on bosses. 1-1 damage +Leaves target with 10 hp |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 448
+// Units: oC68 (Battery), Name (Name)
+{
+Battery
+}
+
+STRING 449
+// Units: oC68 (Battery), Tip (Tooltip - Basic)
+{
+Build |cffffcc00B|rattery
+}
+
+STRING 451
+// Units: nC69 (Polar Bear), Name (Name)
+{
+Polar Bear
+}
+
+STRING 452
+// Units: nC69 (Polar Bear), EditorSuffix (Name - Editor Suffix)
+{
+lvl 26
+}
+
+STRING 453
+// Units: eC52 (Possessed Hunter), Name (Name)
+{
+Possessed Hunter
+}
+
+STRING 454
+// Units: eC52 (Possessed Hunter), EditorSuffix (Name - Editor Suffix)
+{
+lvl 27
+}
+
+STRING 455
+// Units: oC70 (Corrupt Cheiftain), Name (Name)
+{
+Corrupt Cheiftain
+}
+
+STRING 456
+// Units: oC70 (Corrupt Cheiftain), EditorSuffix (Name - Editor Suffix)
+{
+lvl 28
+}
+
+STRING 457
+// Units: uC71 (Ancient Dragon), Name (Name)
+{
+Ancient Dragon
+}
+
+STRING 458
+// Units: uC71 (Ancient Dragon), EditorSuffix (Name - Editor Suffix)
+{
+lvl 29
+}
+
+STRING 460
+// Units: hC95 (Spider Fiend), EditorSuffix (Name - Editor Suffix)
+{
+lvl 30
+}
+
+STRING 461
+// Units: oC73 (Grave Marker), Name (Name)
+{
+Grave Marker
+}
+
+STRING 462
+// Units: oC73 (Grave Marker), Tip (Tooltip - Basic)
+{
+Build |cffffcc00G|rrave Marker
+}
+
+STRING 463
+// Units: efon (Gaia's Servant), Hotkey (Hotkey)
+{
+G
+}
+
+STRING 465
+// Units: oC74 (Gas Chamber), Name (Name)
+{
+Gas Chamber
+}
+
+STRING 484
+// Units: oC73 (Grave Marker), Ubertip (Tooltip - Extended)
+{
+While it does nothing special, the Grave Marker is another staple addition to Poison. 270-340 damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 485
+// Units: oC74 (Gas Chamber), Tip (Tooltip - Basic)
+{
+Build Gas Cha|cffffcc00m|rber
+}
+
+STRING 490
+// Units: hC77 (Jon Cowan), EditorSuffix (Name - Editor Suffix)
+{
+BONUS 2
+}
+
+STRING 491
+// Units: hC77 (Jon Cowan), Name (Name)
+{
+Jon Cowan
+}
+
+STRING 492
+// Units: zC78 (Sparta606), EditorSuffix (Name - Editor Suffix)
+{
+BONUS 3
+}
+
+STRING 493
+// Units: zC78 (Sparta606), Name (Name)
+{
+Sparta606
+}
+
+STRING 494
+// Units: hC79 (DEMON SHEEP), EditorSuffix (Name - Editor Suffix)
+{
+BONUS 4
+}
+
+STRING 495
+// Units: hC79 (DEMON SHEEP), Name (Name)
+{
+DEMON SHEEP
+}
+
+STRING 500
+{
+|c0000ff00You have recieved another piece of lumber!|r
+}
+
+STRING 502
+// Units: hC21 (Envenomed Spike), Ubertip (Tooltip - Extended)
+{
+Light poison tower. Good range, damage, and rate of fire. 4-8 damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 503
+// Units: hC27 (Poison Spire), Ubertip (Tooltip - Extended)
+{
+The next in the line of Poison. These towers have a slightly longer cooldown, but much higher damage. Also slows units. 20-35 Damage |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 505
+// Units: oC56 (Sludge Flinger), Ubertip (Tooltip - Extended)
+{
+A breakthrough in Poison results in the Sludge Flinger. With the highest range of all the Poison towers, it can deal it's high damage at a great range, but with slower results. 70-90 damage |n|n|cffffcc00Attacks land units.|r
+}
+
+STRING 506
+// Units: oC65 (Flame Staff), Ubertip (Tooltip - Extended)
+{
+At the height of all the fiery things looms the Flame Staff. It seems to have learned a trick from Electirc Towers, it's very fast, but it has lowish splash and damage. 100-150 damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 507
+// Units: oC74 (Gas Chamber), Ubertip (Tooltip - Extended)
+{
+The final interation of Poison is a force to be reckoned with. With, obviously, the highest damage of Poison, and a fast attack speed, this is a very powerful tower. 500-590 damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 509
+{
+|c0000cdf9Wintermaul TD
+Pick Difficulty|r
+}
+
+STRING 510
+{
+|c0000cdf9Easy (40 Lives)|r
+}
+
+STRING 511
+{
+|c0000cdf9Normal (20 Lives)|r
+}
+
+STRING 512
+{
+|c0000cdf9Hard (10 Lives)|r
+}
+
+STRING 513
+{
+|c0000cdf9Perfection (1 Life)|r
+}
+
+STRING 514
+{
+|c0000cdf9Difficulty has been set to easy (40 lives) |r
+}
+
+STRING 515
+{
+|c0000cdf9Difficulty has been set to normal (20 lives) |r
+}
+
+STRING 516
+{
+|c0000cdf9Difficulty has been set to hard (10 lives) |r
+}
+
+STRING 517
+{
+|c0000cdf9PERFECTION MODE ENABLED (1 LIFE) |r
+}
+
+STRING 518
+{
+|c0000cdf9-Player 1 (Red) has 30 seconds to pick a difficulty
+-If he does not choose or Player 1 (Red) is not playing, difficulty will automatically be set to normal (20 lives)|r
+}
+
+STRING 520
+// Units: hC36 (Chain Lightning Caster), Ubertip (Tooltip - Extended)
+{
+This may not do much physical damage, but it nails many enemies with it's chain lightning attack. Very short range and medium cooldown. 1 standard damage + Chain Lightning |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 522
+// Units: hC63 (Laser Cannon), Ubertip (Tooltip - Extended)
+{
+This tower puts the Z in Laser. (Wait...) This tower has the strengths of all the elements and the weaknesses of none. It takes two minutes to build. 250-250 damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 523
+// Units: oC68 (Battery), Ubertip (Tooltip - Extended)
+{
+The last in the line of Electricity does the entire element justice. It has the longest range, highest damage, and shortest cooldown of all electric towers. 150-200 damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 524
+{
+1.1 Updates
+}
+
+STRING 525
+{
+|c0000cdf9-Difficulty settings added
+-Pathing system tweaked
+-Chain Lightning Caster cooldown increased from 1 second to 2 seconds
+-Removed splash on Nuclear Missile Silo, tweaked attack animation, and decreased cooldown from 10 seconds to 6 seconds
+-Laser Cannon's price increased to 750 from 500, damage reduced to 250 from 500
+-Battery damage reduced to 150-200 from 400-450, attack art fixed
+-Thunder Rod cooldown increased to 2 seconds from .85 seconds
+-Envenomed Spike cooldown increased to 1.25 seconds from .90 seconds
+-Enhanced Arrow Tower and Sniper Post range increased by 100
+-Levels 10 and 20 have 25% less hit points
+-Attackers on level 10 and 20 move more slowly
+-Level 20 has 5 less armor
+-Levels 1-9 have 50% more hit points
+-Levels 11-15 have 25% more hit points|r
+}
+
+STRING 526
+// Units: hC59 (Nuclear Missile Silo), Ubertip (Tooltip - Extended)
+{
+The ultimate in Tech towers, conviently disguised as a simple Orc building. The tower has insane range and very high damage. 902-1000 damage. |n|n|cffffcc00Attacks land and air units
+}
+
+STRING 527
+// Units: nctl (Darkout), Name (Name)
+{
+Darkout
+}
+
+STRING 528
+// Units: hmpr (Shadow Demon), Name (Name)
+{
+Shadow Demon
+}
+
+STRING 529
+// Units: negt (Dark Eko Blaster), Name (Name)
+{
+Dark Eko Blaster
+}
+
+STRING 530
+// Units: ncap (Dream Eater), Name (Name)
+{
+Dream Eater
+}
+
+STRING 531
+// Units: ndru (Shadow Stalker), Name (Name)
+{
+Shadow Stalker
+}
+
+STRING 532
+// Units: ngol (Shadow Tosser), Name (Name)
+{
+Shadow Tosser
+}
+
+STRING 533
+// Units: nwgt (Earth Gate), Name (Name)
+{
+Earth Gate
+}
+
+STRING 534
+// Units: nwgt (Earth Gate), Tip (Tooltip - Basic)
+{
+Create |cffffcc00E|arth Gate
+}
+
+STRING 539
+// Units: emow (Nature Pool), Tip (Tooltip - Basic)
+{
+Create |cffffcc00N|rature Pool
+}
+
+STRING 541
+// Units: emow (Nature Pool), Name (Name)
+{
+Nature Pool
+}
+
+STRING 542
+// Units: hC80 (Terran Protector), Name (Name)
+{
+Terran Protector
+}
+
+STRING 545
+// Units: hC82 (Gaia's Box), Name (Name)
+{
+Gaia's Box
+}
+
+STRING 549
+// Units: hC80 (Terran Protector), Tip (Tooltip - Basic)
+{
+Build |cffffcc00T|rerran Protector
+}
+
+STRING 551
+// Units: nwgt (Earth Gate), Ubertip (Tooltip - Extended)
+{
+Use earth bound structures to fight on your side.  Earth structures have large splash damage.
+}
+
+STRING 552
+// Units: hC82 (Gaia's Box), Ubertip (Tooltip - Extended)
+{
+Little is known of this box.  A gift from gaia, it has huge splash and magical damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 557
+// Units: hC82 (Gaia's Box), Tip (Tooltip - Basic)
+{
+Build Gaia's |cffffcc00B|rox
+}
+
+STRING 558
+// Units: eC83 (Gaia), Name (Name)
+{
+Gaia
+}
+
+STRING 559
+// Units: eC83 (Gaia), Tip (Tooltip - Basic)
+{
+Build |cffffcc00G|raia
+}
+
+STRING 560
+// Units: eC83 (Gaia), Ubertip (Tooltip - Extended)
+{
+The highest tower in earth's defense, a spitting image of Gaia with strength to match. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 561
+// Units: efon (Gaia's Servant), Name (Name)
+{
+Gaia's Servant
+}
+
+STRING 562
+// Units: efon (Gaia's Servant), Tip (Tooltip - Basic)
+{
+Train |cffffcc00G|aia'a Servant
+}
+
+STRING 563
+// Units: efon (Gaia's Servant), Ubertip (Tooltip - Extended)
+{
+Train a follower Gaia, which builds Earth based structures.
+}
+
+STRING 565
+// Units: emow (Nature Pool), Ubertip (Tooltip - Extended)
+{
+Light earth tower, does 3-6, and some splash damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 567
+// Units: uC81 (Undead Summoner), Name (Name)
+{
+Undead Summoner
+}
+
+STRING 568
+// Units: uC81 (Undead Summoner), Tip (Tooltip - Basic)
+{
+Train Undead Summoner
+}
+
+STRING 569
+// Units: uC81 (Undead Summoner), Ubertip (Tooltip - Extended)
+{
+Undead Worker, builds undead buildings. This builder SUMMONS, meaning, do not stand there after he started building
+}
+
+STRING 590
+// Units: hC80 (Terran Protector), Ubertip (Tooltip - Extended)
+{
+Heavy earth tower, does medium damage. 31-38 damage, and splash damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 594
+// Units: hbla (Crystal Castle), Name (Name)
+{
+Crystal Castle
+}
+
+STRING 597
+// Units: uC98 (Crystal Molder), Name (Name)
+{
+Crystal Molder
+}
+
+STRING 600
+// Units: hctw (Crystal Blaster), Name (Name)
+{
+Crystal Blaster
+}
+
+STRING 603
+// Units: hwtw (Crystal Fury), Name (Name)
+{
+Crystal Fury
+}
+
+STRING 606
+// Units: hhou (Crystal Slower), Name (Name)
+{
+Crystal Slower
+}
+
+STRING 609
+// Units: eC93 (Crystal Dissolver), Name (Name)
+{
+Crystal Dissolver
+}
+
+STRING 612
+// Units: hgtw (Crystal Shooter), Name (Name)
+{
+Crystal Shooter
+}
+
+STRING 619
+// Units: uC98 (Crystal Molder), Ubertip (Tooltip - Extended)
+{
+Summons crystal towers.
+}
+
+STRING 621
+// Units: hgtw (Crystal Shooter), Ubertip (Tooltip - Extended)
+{
+Basic tower of the crystal defense. The Crystal Shooter has relatively high chaos damage for its cost.
+}
+
+STRING 622
+// Units: hctw (Crystal Blaster), Ubertip (Tooltip - Extended)
+{
+The second tower of crystal defense. Does much higher damage than the Shooter, and also deals splash damage.
+}
+
+STRING 623
+// Units: hwtw (Crystal Fury), Ubertip (Tooltip - Extended)
+{
+The Crystal Fury is a fast attacking tower with high damage and critical strike. One of the deadliest towers of crystal defense.
+}
+
+STRING 624
+// Units: hhou (Crystal Slower), Ubertip (Tooltip - Extended)
+{
+The Crystal Slower is one of the best slowing towers in the game. It deals splash damage and slows the enemies. It costs quite a bit, however.
+}
+
+STRING 635
+// Units: oC91 (Crystal Buster), Name (Name)
+{
+Crystal Buster
+}
+
+STRING 638
+// Units: oC91 (Crystal Buster), Tip (Tooltip - Basic)
+{
+Build Crystal |cffffcc00B|ruster
+}
+
+STRING 640
+// Units: oC91 (Crystal Buster), Ubertip (Tooltip - Extended)
+{
+The Crystal Buster is like the Blaster. Th Buster, however, has a larger range, higher damage, and a greater splash. It's quite expensive, though.
+}
+
+STRING 641
+// Units: eC93 (Crystal Dissolver), Tip (Tooltip - Basic)
+{
+Build Crystal |cffffcc00D|rissolver
+}
+
+STRING 643
+// Units: hgtw (Crystal Shooter), Tip (Tooltip - Basic)
+{
+Build Crystal |cffffcc00S|rhooter
+}
+
+STRING 644
+// Units: hctw (Crystal Blaster), Tip (Tooltip - Basic)
+{
+Build Crystal Bl|cffffcc00a|rster
+}
+
+STRING 645
+// Units: hwtw (Crystal Fury), Tip (Tooltip - Basic)
+{
+Build Crystal |cffffcc00F|rury
+}
+
+STRING 646
+// Units: hhou (Crystal Slower), Tip (Tooltip - Basic)
+{
+Build Crystal S|cffffcc00l|rower
+}
+
+STRING 647
+// Units: hbla (Crystal Castle), Tip (Tooltip - Basic)
+{
+Build Crystal |cffffcc00C|rastle
+}
+
+STRING 648
+// Units: uC98 (Crystal Molder), Tip (Tooltip - Basic)
+{
+Train Crystal |cffffcc00M|rolder
+}
+
+STRING 649
+// Units: eC93 (Crystal Dissolver), Ubertip (Tooltip - Extended)
+{
+The ultimate tower of crystal defense. The Crystal Dissolver has a long range, high damage, and fast speed. It is expensive, but it's worth it.
+}
+
+STRING 650
+// Units: hbla (Crystal Castle), Ubertip (Tooltip - Extended)
+{
+The Crystal Defense consist of only 2 early game towers. But later in the game, 4 extremely powerful towers become affordable- making Crystal superior to all other towers in late game.
+}
+
+STRING 651
+// Units: hC94 (Poison Crawler), Name (Name)
+{
+Poison Crawler
+}
+
+STRING 652
+// Units: hC94 (Poison Crawler), Tip (Tooltip - Basic)
+{
+Build Poison Cra|cffffcc00w|rler
+}
+
+STRING 654
+// Units: hC94 (Poison Crawler), Ubertip (Tooltip - Extended)
+{
+A unique poison tower that has quite a few effects. The Poison Crawler slows the enemy. It also reduces the enemy's HP to 50%. It has a long cooldown, however.
+}
+
+STRING 661
+{
+|c0000cdf9Excellent! You have sucessfully completed the "real" part of Wintermaul TD. But what's a good TD without Bonus levels? Enjoy the five bonus levels without fear, as you can no longer lose lives.|r
+}
+
+STRING 663
+// Units: hC76 (Armored Wisp), EditorSuffix (Name - Editor Suffix)
+{
+lvl 31
+}
+
+STRING 664
+// Units: hC95 (Spider Fiend), Name (Name)
+{
+Spider Fiend
+}
+
+STRING 665
+// Units: hC75 (Incinerator), Name (Name)
+{
+Incinerator
+}
+
+STRING 666
+// Units: hC75 (Incinerator), Tip (Tooltip - Basic)
+{
+Build |cffffcc00I|rncinerator
+}
+
+STRING 668
+// Units: hC75 (Incinerator), Ubertip (Tooltip - Extended)
+{
+Has an extremely fast attack speed, but the Incinerator lacks something that the rest of Fire has- splash damage. A great tower for any level.
+}
+
+STRING 670
+// Units: hC32 (Sparkler), Name (Name)
+{
+Sparkler
+}
+
+STRING 671
+// Units: hC32 (Sparkler), Tip (Tooltip - Basic)
+{
+Build Sp|cffffcc00a|rrkler
+}
+
+STRING 673
+// Units: hC32 (Sparkler), Ubertip (Tooltip - Extended)
+{
+A special tower that has two separate attacks- one for ground and one for air. This is a very effective tower and one of the most well-rounded towers in the game.
+}
+
+STRING 674
+// Units: hC97 (Stone Destroyer), Name (Name)
+{
+Stone Destroyer
+}
+
+STRING 675
+// Units: hC97 (Stone Destroyer), Tip (Tooltip - Basic)
+{
+Summon Stone D|cffffcc00e|rstroyer
+}
+
+STRING 676
+// Units: hC97 (Stone Destroyer), Ubertip (Tooltip - Extended)
+{
+The only stone tower with decent range. The Stone Destroyer has a fairly long cooldown, but high damage. A must-have if you need the range.
+}
+
+STRING 677
+// Units: hC99 (Cold Exploder), Name (Name)
+{
+Cold Exploder
+}
+
+STRING 678
+// Units: hC99 (Cold Exploder), Tip (Tooltip - Basic)
+{
+Build Cold E|cffffcc00x|rploder
+}
+
+STRING 679
+// Units: hC99 (Cold Exploder), Hotkey (Hotkey)
+{
+X
+}
+
+STRING 680
+// Units: hC99 (Cold Exploder), Ubertip (Tooltip - Extended)
+{
+The Cold Exploder doesn't do much damage, but it has a huge splash. This splash of cold will slow large amounts of enemies. This tower has a high cooldown period, however. It's a good idea for every ice player to make at least one of these.
+}
+
+STRING 681
+// Units: hC86 (Earth's Soul), Tip (Tooltip - Basic)
+{
+Build Earth's S|cffffcc00o|rul
+}
+
+STRING 682
+// Units: hC86 (Earth's Soul), Ubertip (Tooltip - Extended)
+{
+The Earth's Soul does relatively high damage, and has a large splash. It has a tolerable cooldown time, and will make a good addition to your Earth lineup.
+}
+
+STRING 683
+// Units: hC86 (Earth's Soul), Name (Name)
+{
+Earth's Soul
+}
+
+STRING 684
+// Units: hC90 (Cruise Missile Launcher), Name (Name)
+{
+Cruise Missile Launcher
+}
+
+STRING 687
+// Units: oC35 (Rock Blaster), Ubertip (Tooltip - Extended)
+{
+Next in the Stone line is the Rock Blaster. This structure has higher damage and range, but attacks a tiny bit slower. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 688
+// Units: oC26 (Faerie Mage), Ubertip (Tooltip - Extended)
+{
+This Stone Tower is a welome addition to the stone line. This tower reduces the armor of the attacked unit by 5 and does formitable damage on it's own.  |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 690
+// Units: hC90 (Cruise Missile Launcher), Tip (Tooltip - Basic)
+{
+Build C|cffffcc00r|ruise Missile Launcher
+}
+
+STRING 691
+// Units: hC90 (Cruise Missile Launcher), Ubertip (Tooltip - Extended)
+{
+The Cruise Missile Launcher has a large range, high damage, and a huge splash. It has a long cooldown, however. A good addition to any tech tower lineup.
+}
+
+STRING 692
+// Units: oC14 (Pebble Tower), Ubertip (Tooltip - Extended)
+{
+Beginning Stone Tower. Moderate damage. Does 2x damage. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 693
+// Units: hC53 (Stone Projector), Ubertip (Tooltip - Extended)
+{
+One step for Stone, one giant leap for defense. The Stone Projector attacks a little slower, but it's damage is far higher. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 694
+{
+ICE: Up top, it's a good idea to have a lot of snowball launchers in the early stages of the game. Then when you get the money, you should put an Exploder up to the line to freeze most of the enemies. If used with Poison, an Exploder is really the only ice tower necessary, because of it's huge splash. Down at the bottom, making a maze of all ice towers is the most effective way to use it. Try to put an Exploder in the front of your maze to slow enemies before they enter.
+}
+
+STRING 695
+{
+FIRE: Fire is best used up top. It really isn't that effective anywhere else, with the exception of the Flame Staff and Incinerator. As those 2 towers are the 2 most expensive of Fire, it's not a good choice for the bottom to pick Fire as their first element. But as for the top, getting a Meteor Watcher as soon as possible is usually the best choice. Then move on to Blast Furnaces, and finally the Flame Staff. Stack all of these up to the front line. The Incinerator is good when dropped back a little to clean up your leaks.
+}
+
+STRING 696
+{
+EARTH: Earth is best used at the top, and the top only. You should start by building Terrain Protectors at the front line to bomb the enemies as they spawn. Then move onto Gaia's Box, and do the same. And just keep on moving up in towers as you get the money, and keep bombing the front line with them. If you have the money, you could start to form a maze, which will work wonders up top.
+}
+
+STRING 697
+{
+TECH: Tech is best used on the bottom. It's pretty bad on top throughout the entire game. On the bottom, start with a few arrow and sniper towers. Then just save up, and build a large amount of Ion Cannons, Cruise Missile Launchers, and Nuclear Missile Launchers. When these three towers are built together in the back of the map in large quantities, they will kill huge amounts of units. This is a truly devastating strategy when all three back players use it.
+}
+
+STRING 698
+{
+CRYSTAL: Crystal towers are high-end towers, but at an expensive cost. They could be used anywhere on the map, so here's a breakdown of the strategies. On the top, it's all about Blasters and Busters. You'll have to start off with a few Shooters, but once Blasters become affordable, start building them up on the front line. Do the same with Busters. You might want to drop a Fury back a little to pick off any leaks you have. For the rest of the map, you should go through all of the towers, with the possible exception of the Buster. Start by mazing with Shooters and Blasters. Then, when you get the money, place a Fury and/or Slower at the end of your maze to pick off leaks. Once you have a stable defense, start saving for the Dissolver, which is the best non-laser tower in the game.
+}
+
+STRING 699
+{
+POISON: Poison is best used in the middle and bottom areas of the map. It's not that good on top as a first choice, but as a second choice, when the first element was ice, poison proves extremely useful up top. On the bottom, the best strategy is to maze. When you get the money, build 2-3 Spires. Later in the game, a few Crawlers work very well at wearing down the enemies. Then of course there is the Gas Chamber, which I find goes best at the end of your maze. One or two Sludge Flingers or Grave Makers are good additions in the middle of the maze. Don't build too many of those, though. If an ally near you is ice, maze with them to make a deadly combo.
+}
+
+STRING 701
+{
+STONE: Stone is pretty effective no matter where it's used. It's a little less effective up top, however, because of the lack of range. I find that Stone is best used by Orange and Purple. All that is needed for these two positions is 7 or 8 towers. Start with all pebble towers, then replace them with all Rock Blasters, then all Projectors. Once you're done with that, build 1 or 2 Faery Mages, and also 1 or 2 Destroyers in the front of your towers so its range is used to its full ability. A Paralyzer is nice at the end of the game when combined with all of these towers. Once you have done this, continue a normal maze. As for the rest of the positions, mazing with all of the towers is suggested.
+}
+
+STRING 702
+{
+ELECTRICITY: Electric towers are good anywhere, but mostly in the middle and bottom areas of the map. You should start by mazing shock towers, then build 2 or 3 Storm Callers in your maze. Chain Lightning works extremely well earlier in the game- NOT on top, however. The Sparkler has a good ground attack, and it is one of the best air towers in the game. It's always a good idea to have 1 Thunder Rod at the very beginning of your maze. Then there's the Battery, which you could put anywhere in your maze- front, back, middle, it really doesn't matter. The Battery is the must have tower for Electricity.
+}
+
+STRING 703
+// Units: hC34 (Snowball Launcher), Tip (Tooltip - Basic)
+{
+Build Snowball |cffffcc00L|rauncher
+}
+
+STRING 706
+{
+|c00ff0000BOSS LEVEL|r
+}
+
+STRING 708
+// Units: uC72 (dukewintermaul), EditorSuffix (Name - Editor Suffix)
+{
+lvl 32
+}
+
+STRING 709
+// Units: hC76 (Armored Wisp), Name (Name)
+{
+Armored Wisp
+}
+
+STRING 710
+// Units: hC46 (Gravity Generator), Name (Name)
+{
+Gravity Generator
+}
+
+STRING 711
+// Units: eC00 (Element Chooser), Tip (Tooltip - Basic)
+{
+Build Gra|cffffcc00v|rity Generator
+}
+
+STRING 712
+// Units: uC84 (Gravity Lord), Name (Name)
+{
+Gravity Lord
+}
+
+STRING 713
+// Units: uC84 (Gravity Lord), Tip (Tooltip - Basic)
+{
+Train |cffffcc00G|rravity Lord
+}
+
+STRING 714
+// Units: uC84 (Gravity Lord), Ubertip (Tooltip - Extended)
+{
+Builds Gravity Towers.
+}
+
+STRING 715
+// Units: hC85 (Gravity Source), Name (Name)
+{
+Gravity Source
+}
+
+STRING 716
+// Units: hC85 (Gravity Source), Tip (Tooltip - Basic)
+{
+Build Gravity |cffffcc00S|rource
+}
+
+STRING 717
+// Units: hC85 (Gravity Source), Ubertip (Tooltip - Extended)
+{
+Basic Gravity Tower. The Gravity Source has decent damage, and will do well in the early stages of the game.
+}
+
+STRING 718
+// Units: hC87 (Gravity's Pull), Name (Name)
+{
+Gravity's Pull
+}
+
+STRING 719
+// Units: hC87 (Gravity's Pull), Tip (Tooltip - Basic)
+{
+Build Gravity's |cffffcc00P|rull
+}
+
+STRING 720
+// Units: hC87 (Gravity's Pull), Ubertip (Tooltip - Extended)
+{
+The next tower of Gravity's defense has the ability to slow enemies. It also does splash damage in a moderate amount. Gravity's Pull posseses a short range, however.
+}
+
+STRING 721
+// Units: hC88 (Pulsar), Name (Name)
+{
+Pulsar
+}
+
+STRING 722
+// Units: hC88 (Pulsar), Tip (Tooltip - Basic)
+{
+Build P|cffffcc00u|rlsar
+}
+
+STRING 727
+// Units: hC88 (Pulsar), Ubertip (Tooltip - Extended)
+{
+The Pulsar is a fast attacking tower with decent damage and splash. It is most powerful when used in numbers. This is a must-have for any Gravity player.
+}
+
+STRING 728
+// Units: hC89 (Mind Blaster), Name (Name)
+{
+Mind Blaster
+}
+
+STRING 729
+// Units: hC89 (Mind Blaster), Tip (Tooltip - Basic)
+{
+Build |cffffcc00M|rind Blaster
+}
+
+STRING 731
+// Units: hC92 (Black Hole), Name (Name)
+{
+Black Hole
+}
+
+STRING 732
+// Units: hC92 (Black Hole), Tip (Tooltip - Basic)
+{
+Build |cffffcc00B|rlack Hole
+}
+
+STRING 735
+// Units: hC89 (Mind Blaster), Ubertip (Tooltip - Extended)
+{
+The Mind Blaster reduces the enemy's HP by 30%. It fairly fast attack and range. A good addition to your Gravity line-up.
+}
+
+STRING 736
+// Units: hC96 (Gravity Bomber), Name (Name)
+{
+Gravity Bomber
+}
+
+STRING 737
+// Units: hC96 (Gravity Bomber), Tip (Tooltip - Basic)
+{
+Build Gravity B|cffffcc00o|rmber
+}
+
+STRING 738
+// Units: hC96 (Gravity Bomber), Ubertip (Tooltip - Extended)
+{
+The Gravity Bomber provides high damage with Critical Strike. It has the longest range out of all Gravity towers, but a long cooldown. Still, it is a good idea to get one of these.
+}
+
+STRING 740
+// Units: hC92 (Black Hole), Ubertip (Tooltip - Extended)
+{
+The Black Hole attacks a group of units, and does 550 damage to each of them. It has a short range, and a high cooldown however. This is the most powerful tower of Gravity defense.
+}
+
+STRING 741
+// Units: hC46 (Gravity Generator), Ubertip (Tooltip - Extended)
+{
+Gravity Towers have special abilities and vary greatly from each other. They could be difficult to use for the first time, but once you form a strategy they can be devastating. Gravity is much better against ground than air.
+}
+
+STRING 751
+// Units: h000 (Boot Nexus), Name (Name)
+{
+Boot Nexus
+}
+
+STRING 752
+// Units: h001 (Surface Nexus), Name (Name)
+{
+Surface Nexus
+}
+
+STRING 753
+{
+Die!
+}
+
+STRING 754
+{
+Die!
+}
+
+STRING 755
+{
+Die!
+}
+
+STRING 756
+{
+Die!
+}
+
+STRING 757
+{
+Die!
+}
+
+STRING 758
+{
+Die!
+}
+
+STRING 759
+{
+Die!
+}
+
+STRING 760
+{
+Die!
+}
+
+STRING 761
+// Units: o000 (Fire Wolf), Name (Name)
+{
+Fire Wolf
+}
+
+STRING 762
+// Units: o000 (Fire Wolf), Tip (Tooltip - Basic)
+{
+Summon |cffffcc00F|rire Wolf
+}
+
+STRING 763
+// Units: o000 (Fire Wolf), Ubertip (Tooltip - Extended)
+{
+Good dammage and range, average speed, decent splash. good for its cost
+}
+
+STRING 764
+// Units: o002 (Demonic Empire), Name (Name)
+{
+Demonic Empire
+}
+
+STRING 765
+// Units: o002 (Demonic Empire), Tip (Tooltip - Basic)
+{
+Build |cffffcc00D|remonic Empire
+}
+
+STRING 766
+// Units: o002 (Demonic Empire), Ubertip (Tooltip - Extended)
+{
+Trains the Demon King.  Demons have high dammage range and most of the time, good splash.  Only, their speed isnt killer.  Try them!
+}
+
+STRING 767
+// Units: n000 (Demon King), Name (Name)
+{
+Demon King
+}
+
+STRING 768
+// Units: n000 (Demon King), Tip (Tooltip - Basic)
+{
+Summon |cffffcc00D|remon King
+}
+
+STRING 769
+// Units: n000 (Demon King), Ubertip (Tooltip - Extended)
+{
+Summons Demonic Tours.
+}
+
+STRING 770
+// Units: o003 (Demonic Warlock), Name (Name)
+{
+Demonic Warlock
+}
+
+STRING 771
+// Units: o003 (Demonic Warlock), Tip (Tooltip - Basic)
+{
+Build Demonic|cffffcc00W|rarlock
+}
+
+STRING 772
+// Units: o003 (Demonic Warlock), Ubertip (Tooltip - Extended)
+{
+Very much like the Fire Wolf, but slower, stronger.
+}
+
+STRING 773
+// Units: o004 (Posessed AxeMaster), Name (Name)
+{
+Posessed AxeMaster
+}
+
+STRING 774
+// Units: o004 (Posessed AxeMaster), Tip (Tooltip - Basic)
+{
+Build |cffffcc00P|rosessed AxeMaster
+}
+
+STRING 775
+// Units: o004 (Posessed AxeMaster), Ubertip (Tooltip - Extended)
+{
+Alot like the Meteor Watcher, the posessed AxeMaster has good splash. 100 range, 100-115 dammage.
+}
+
+STRING 776
+// Units: o007 (Dragon's Lair), Name (Name)
+{
+Dragon's Lair
+}
+
+STRING 780
+// Units: o005 (Demon Soul), Name (Name)
+{
+Demon Soul
+}
+
+STRING 781
+// Units: o005 (Demon Soul), Tip (Tooltip - Basic)
+{
+Build Demon |cffffcc00S|roul
+}
+
+STRING 782
+// Units: o005 (Demon Soul), Ubertip (Tooltip - Extended)
+{
+An great overall tower, has no weakness, but no advantage.
+}
+
+STRING 783
+// Units: o006 (Blood Centaur), Name (Name)
+{
+Blood Centaur
+}
+
+STRING 784
+// Units: o006 (Blood Centaur), Tip (Tooltip - Basic)
+{
+Build Blood |cffffcc00C|rentaur
+}
+
+STRING 785
+// Units: o006 (Blood Centaur), Ubertip (Tooltip - Extended)
+{
+The final demonic tower is worth its cost!  Awesome tower.  All above average stats exept its slow speed.  Awesome tower. 
+}
+
+STRING 786
+// Units: o007 (Dragon's Lair), Tip (Tooltip - Basic)
+{
+Build Dragon's |cffffcc00L|rair
+}
+
+STRING 787
+// Units: o007 (Dragon's Lair), Ubertip (Tooltip - Extended)
+{
+Very Strange Tower indeed.  while it can do 10 dammage, it can also do 800 with splash and at enormous range
+}
+
+STRING 788
+// Units: u000 (Angel), Name (Name)
+{
+Angel
+}
+
+STRING 790
+// Units: u000 (Angel), Ubertip (Tooltip - Extended)
+{
+Summons Heavenly Towers.
+}
+
+STRING 791
+// Units: h002 (Heaven Portal), Name (Name)
+{
+Heaven Portal
+}
+
+STRING 792
+// Units: h002 (Heaven Portal), Tip (Tooltip - Basic)
+{
+Build |cffffcc00H|reaven Portal
+}
+
+STRING 793
+// Units: h002 (Heaven Portal), Ubertip (Tooltip - Extended)
+{
+Heavenly towers are hard to classify.  average in about everything, try them!
+}
+
+STRING 794
+// Units: h003 (Holy Guard Tower), Name (Name)
+{
+Holy Guard Tower
+}
+
+STRING 795
+// Units: h003 (Holy Guard Tower), Tip (Tooltip - Basic)
+{
+Build Holy |cffffcc00G|ruard Tower
+}
+
+STRING 796
+// Units: h003 (Holy Guard Tower), Ubertip (Tooltip - Extended)
+{
+Good dammage and speed but low range. no splash and fast build.
+}
+
+STRING 797
+// Units: h004 (Heaven Guard), Name (Name)
+{
+Heaven Guard
+}
+
+STRING 798
+// Units: h004 (Heaven Guard), Tip (Tooltip - Basic)
+{
+Build Heaven G|cffffcc00u|rard 
+}
+
+STRING 799
+// Units: h004 (Heaven Guard), Ubertip (Tooltip - Extended)
+{
+The second heaven tower is slower than the previous.  however, the range and dammage are way better and it has critical strike.
+}
+
+STRING 800
+// Units: h006 (Gate Keeper), Name (Name)
+{
+Gate Keeper
+}
+
+STRING 801
+// Units: h006 (Gate Keeper), Hotkey (Hotkey)
+{
+K
+}
+
+STRING 802
+// Units: h006 (Gate Keeper), Tip (Tooltip - Basic)
+{
+Build to Gate |cffffcc00K|reeper
+}
+
+STRING 805
+// Units: h005 (Saint Spirit), Name (Name)
+{
+Saint Spirit
+}
+
+STRING 806
+// Units: h005 (Saint Spirit), Tip (Tooltip - Basic)
+{
+Built |cffffcc00S|raint Spirit
+}
+
+STRING 807
+// Units: h005 (Saint Spirit), Ubertip (Tooltip - Extended)
+{
+The 4th tower of heaven is the only one that has - still small- splash.  high dammage, average speed and range.  A great tower.
+}
+
+STRING 808
+// Units: h007 (Archangel), Name (Name)
+{
+Archangel
+}
+
+STRING 809
+// Units: h007 (Archangel), Tip (Tooltip - Basic)
+{
+Build |cffffcc00A|rrchangel
+}
+
+STRING 810
+// Units: h007 (Archangel), Ubertip (Tooltip - Extended)
+{
+Very fast tower. pretty high dammage, small range, no splash.  A very useful tower for any level.
+}
+
+STRING 811
+// Units: Hart (God), Propernames (Proper Names)
+{
+God
+}
+
+STRING 812
+// Units: h008 (God), Tip (Tooltip - Basic)
+{
+Call Go|cffffcc00D|r
+}
+
+STRING 813
+// Units: h008 (God), Ubertip (Tooltip - Extended)
+{
+The Final Heaven tower has everything exept splash.  It costs a bundle, but its worth it!
+}
+
+STRING 814
+// Units: u000 (Angel), Tip (Tooltip - Basic)
+{
+Train |cffffcc00A|rngel
+}
+
+STRING 815
+// Units: h006 (Gate Keeper), Ubertip (Tooltip - Extended)
+{
+The Gate Keeper is very special.  it has no dammage at all, but permanantely reduces the speed of all enemies around it.  Works on Duke. A must-have.
+}
+
+STRING 816
+// Units: u001 (Meteor), Name (Name)
+{
+Meteor
+}
+
+STRING 817
+// Units: u001 (Meteor), Tip (Tooltip - Basic)
+{
+Train |cffffcc00M|reteor
+}
+
+STRING 818
+// Units: u001 (Meteor), Ubertip (Tooltip - Extended)
+{
+Summons Spacial buildings.
+}
+
+STRING 819
+// Units: u002 (Space Station), Name (Name)
+{
+Space Station
+}
+
+STRING 820
+// Units: u002 (Space Station), Tip (Tooltip - Basic)
+{
+Summon |cffffcc00S|rpace Station
+}
+
+STRING 821
+// Units: u002 (Space Station), Ubertip (Tooltip - Extended)
+{
+Space is VERY unusual.  This race is queen of special-effect towers. Best chosen as second race because of its high prices.
+}
+
+STRING 822
+// Units: o008 (Space Ship), Name (Name)
+{
+Space Ship
+}
+
+STRING 823
+// Units: o008 (Space Ship), Tip (Tooltip - Basic)
+{
+Build |cffffcc00S|rpace Ship
+}
+
+STRING 824
+// Units: o008 (Space Ship), Ubertip (Tooltip - Extended)
+{
+The Space Ship has average everything, even splash.  Its expensive, but worth it!
+}
+
+STRING 825
+// Units: o009 (Galactic Beam), Name (Name)
+{
+Galactic Beam
+}
+
+STRING 826
+// Units: o009 (Galactic Beam), Tip (Tooltip - Basic)
+{
+Shoot Galactic|cffffcc00B|ream
+}
+
+STRING 828
+// Units: o00A (Planetary Machine Gun), Name (Name)
+{
+Planetary Machine Gun
+}
+
+STRING 829
+// Units: o00A (Planetary Machine Gun), Tip (Tooltip - Basic)
+{
+Build Planetary |cffffcc00M|rachine Gun
+}
+
+STRING 830
+// Units: o00A (Planetary Machine Gun), Ubertip (Tooltip - Extended)
+{
+Very like the Scorcher in Zoator, it has very,very fast attack.  It has long range, and good dammage. No splash.  Expensive!
+}
+
+STRING 831
+// Units: o009 (Galactic Beam), Ubertip (Tooltip - Extended)
+{
+The second spacial tower has HUGE splash, good speed. resonable range and dammage.
+}
+
+STRING 832
+// Units: o00B (Star Blaster), Name (Name)
+{
+Star Blaster
+}
+
+STRING 833
+// Units: o00B (Star Blaster), Tip (Tooltip - Basic)
+{
+Build S|cffffcc00t|rar Blaster
+}
+
+STRING 834
+// Units: o00B (Star Blaster), Ubertip (Tooltip - Extended)
+{
+Incredible range, great dammage, good splash, slow speed.  What else can you wish for? This is the Star Blaster.
+}
+
+STRING 835
+// Units: o00C (Insane Gravity), Name (Name)
+{
+Insane Gravity
+}
+
+STRING 836
+// Units: o00C (Insane Gravity), Tip (Tooltip - Basic)
+{
+Create |cffffcc00I|rnsane Gravity
+}
+
+STRING 837
+// Units: o00C (Insane Gravity), Ubertip (Tooltip - Extended)
+{
+Awesome tower.  The Insane Gravity casts slow AND reduces the hp of anything that comes near it by 25%.  only slow works on Duke.
+}
+
+STRING 838
+// Units: o00D (The Void), Name (Name)
+{
+The Void
+}
+
+STRING 839
+// Units: o00D (The Void), Tip (Tooltip - Basic)
+{
+Summon The  |cffffcc00V|roid
+}
+
+STRING 840
+// Units: o00D (The Void), Ubertip (Tooltip - Extended)
+{
+The best tower in the game: The Void.  it kills anything that comes near it(except Duke).  for Duke, it takes away 5% of his life.  The price is outrageous,however.
+}
+
+STRING 841
+// Units: hC02 (Flare Tower), Hotkey (Hotkey)
+{
+F
+}
+
+STRING 842
+// Units: hC01 (Forge of Fire), Hotkey (Hotkey)
+{
+F
+}
+
+STRING 843
+// Units: hC06 (Tech Center), Hotkey (Hotkey)
+{
+E
+}
+
+STRING 844
+// Units: hC07 (Scientist), Hotkey (Hotkey)
+{
+S
+}
+
+STRING 845
+// Units: oC09 (Power Plant), Hotkey (Hotkey)
+{
+N
+}
+
+STRING 846
+// Units: eC10 (Spark), Hotkey (Hotkey)
+{
+S
+}
+
+STRING 847
+// Units: hC11 (Shock Tower), Hotkey (Hotkey)
+{
+S
+}
+
+STRING 848
+// Units: oC18 (Storm Caller), Hotkey (Hotkey)
+{
+M
+}
+
+STRING 849
+// Units: hC20 (Poison Pool), Hotkey (Hotkey)
+{
+P
+}
+
+STRING 850
+// Units: hC21 (Envenomed Spike), Hotkey (Hotkey)
+{
+N
+}
+
+STRING 851
+// Units: oC22 (Alchemist), Hotkey (Hotkey)
+{
+A
+}
+
+STRING 852
+// Units: oC24 (Icicle Tosser), Hotkey (Hotkey)
+{
+I
+}
+
+STRING 853
+// Units: oC25 (Ice Former), Hotkey (Hotkey)
+{
+C
+}
+
+STRING 854
+// Units: hC27 (Poison Spire), Hotkey (Hotkey)
+{
+S
+}
+
+STRING 855
+// Units: hC36 (Chain Lightning Caster), Hotkey (Hotkey)
+{
+N
+}
+
+STRING 856
+// Units: hC34 (Snowball Launcher), Hotkey (Hotkey)
+{
+L
+}
+
+STRING 857
+// Units: hC54 (V2 Rocket Launcher), Hotkey (Hotkey)
+{
+V
+}
+
+STRING 858
+// Units: hC55 (Ion Cannon Center), Hotkey (Hotkey)
+{
+O
+}
+
+STRING 859
+// Units: oC58 (Meteor Watcher), Hotkey (Hotkey)
+{
+R
+}
+
+STRING 860
+// Units: hC59 (Nuclear Missile Silo), Hotkey (Hotkey)
+{
+U
+}
+
+STRING 861
+// Units: oC62 (Nova Creator), Hotkey (Hotkey)
+{
+V
+}
+
+STRING 862
+// Units: hC63 (Laser Cannon), Hotkey (Hotkey)
+{
+L
+}
+
+STRING 863
+// Units: oC64 (Blast Furnace), Hotkey (Hotkey)
+{
+B
+}
+
+STRING 864
+// Units: oC65 (Flame Staff), Hotkey (Hotkey)
+{
+E
+}
+
+STRING 865
+// Units: hC66 (Enhanced Arrow Tower), Hotkey (Hotkey)
+{
+E
+}
+
+STRING 866
+// Units: hC08 (Sniper Post), Hotkey (Hotkey)
+{
+P
+}
+
+STRING 867
+// Units: oC26 (Faerie Mage), Hotkey (Hotkey)
+{
+F
+}
+
+STRING 868
+// Units: oC68 (Battery), Hotkey (Hotkey)
+{
+B
+}
+
+STRING 869
+// Units: oC73 (Grave Marker), Hotkey (Hotkey)
+{
+G
+}
+
+STRING 870
+// Units: oC74 (Gas Chamber), Hotkey (Hotkey)
+{
+M
+}
+
+STRING 871
+// Units: hC80 (Terran Protector), Hotkey (Hotkey)
+{
+T
+}
+
+STRING 872
+// Units: eC83 (Gaia), Hotkey (Hotkey)
+{
+G
+}
+
+STRING 873
+// Units: hC82 (Gaia's Box), Hotkey (Hotkey)
+{
+B
+}
+
+STRING 874
+// Units: uC81 (Undead Summoner), Hotkey (Hotkey)
+{
+U
+}
+
+STRING 875
+// Units: hC86 (Earth's Soul), Hotkey (Hotkey)
+{
+O
+}
+
+STRING 876
+// Units: uC98 (Crystal Molder), Hotkey (Hotkey)
+{
+M
+}
+
+STRING 877
+// Units: oC91 (Crystal Buster), Hotkey (Hotkey)
+{
+B
+}
+
+STRING 878
+// Units: eC93 (Crystal Dissolver), Hotkey (Hotkey)
+{
+D
+}
+
+STRING 879
+// Units: hC75 (Incinerator), Hotkey (Hotkey)
+{
+I
+}
+
+STRING 880
+// Units: hC32 (Sparkler), Hotkey (Hotkey)
+{
+A
+}
+
+STRING 881
+// Units: hC97 (Stone Destroyer), Hotkey (Hotkey)
+{
+E
+}
+
+STRING 882
+// Units: hC90 (Cruise Missile Launcher), Hotkey (Hotkey)
+{
+R
+}
+
+STRING 883
+// Units: hC46 (Gravity Generator), Tip (Tooltip - Basic)
+{
+Build Gra|cffffcc00v|rity Generator
+}
+
+STRING 884
+// Units: hC46 (Gravity Generator), Hotkey (Hotkey)
+{
+V
+}
+
+STRING 885
+// Units: uC84 (Gravity Lord), Hotkey (Hotkey)
+{
+G
+}
+
+STRING 886
+// Units: hC85 (Gravity Source), Hotkey (Hotkey)
+{
+S
+}
+
+STRING 887
+// Units: hC87 (Gravity's Pull), Hotkey (Hotkey)
+{
+P
+}
+
+STRING 888
+// Units: hC88 (Pulsar), Hotkey (Hotkey)
+{
+U
+}
+
+STRING 889
+// Units: hC89 (Mind Blaster), Hotkey (Hotkey)
+{
+M
+}
+
+STRING 890
+// Units: hC96 (Gravity Bomber), Hotkey (Hotkey)
+{
+O
+}
+
+STRING 891
+// Units: hC92 (Black Hole), Hotkey (Hotkey)
+{
+B
+}
+
+STRING 892
+// Units: o000 (Fire Wolf), Hotkey (Hotkey)
+{
+F
+}
+
+STRING 893
+// Units: o002 (Demonic Empire), Hotkey (Hotkey)
+{
+D
+}
+
+STRING 894
+// Units: o004 (Posessed AxeMaster), Hotkey (Hotkey)
+{
+P
+}
+
+STRING 895
+// Units: o005 (Demon Soul), Hotkey (Hotkey)
+{
+S
+}
+
+STRING 896
+// Units: o006 (Blood Centaur), Hotkey (Hotkey)
+{
+C
+}
+
+STRING 897
+// Units: o007 (Dragon's Lair), Hotkey (Hotkey)
+{
+L
+}
+
+STRING 898
+// Units: u000 (Angel), Hotkey (Hotkey)
+{
+A
+}
+
+STRING 899
+// Units: h002 (Heaven Portal), Hotkey (Hotkey)
+{
+H
+}
+
+STRING 900
+// Units: h004 (Heaven Guard), Hotkey (Hotkey)
+{
+U
+}
+
+STRING 901
+// Units: h005 (Saint Spirit), Hotkey (Hotkey)
+{
+S
+}
+
+STRING 902
+// Units: h007 (Archangel), Hotkey (Hotkey)
+{
+A
+}
+
+STRING 903
+// Units: h008 (God), Hotkey (Hotkey)
+{
+D
+}
+
+STRING 904
+// Units: u001 (Meteor), Hotkey (Hotkey)
+{
+M
+}
+
+STRING 905
+// Units: o008 (Space Ship), Hotkey (Hotkey)
+{
+S
+}
+
+STRING 906
+// Units: o009 (Galactic Beam), Hotkey (Hotkey)
+{
+B
+}
+
+STRING 907
+// Units: o00A (Planetary Machine Gun), Hotkey (Hotkey)
+{
+M
+}
+
+STRING 908
+// Units: o00B (Star Blaster), Hotkey (Hotkey)
+{
+T
+}
+
+STRING 909
+// Units: o00C (Insane Gravity), Hotkey (Hotkey)
+{
+I
+}
+
+STRING 910
+// Units: o00D (The Void), Hotkey (Hotkey)
+{
+V
+}
+
+STRING 911
+// Units: Otch (Earth-Quake Manager), Name (Name)
+{
+Earth-Quake Manager
+}
+
+STRING 912
+// Units: Hamg (Archmage), Propernames (Proper Names)
+{
+dukewintermaul
+}
+
+STRING 913
+// Units: Nman (Power-Plant-Owner), Name (Name)
+{
+Power-Plant-Owner
+}
+
+STRING 914
+// Units: Nman (Power-Plant-Owner), Propernames (Proper Names)
+{
+Power-Plant-Owner
+}
+
+STRING 915
+// Units: hwt3 (Mr.Freeze), Name (Name)
+{
+Mr.Freeze
+}
+
+STRING 916
+// Units: nmoo (Ice Cave), Name (Name)
+{
+Ice Cave
+}
+
+STRING 917
+// Units: nehy (Land-Fire-Dragon), Name (Name)
+{
+Land-Fire-Dragon
+}
+
+STRING 918
+// Units: nvde (The Gravity Master), Name (Name)
+{
+The Gravity Master
+}
+
+STRING 919
+// Units: hpea (The Super Teched Peasant), Name (Name)
+{
+The Super Teched Peasant
+}
+
+STRING 920
+// Units: hpea (The Super Teched Peasant), Ubertip (Tooltip - Extended)
+{
+Super Unit. A must get. NOTE....DO NOT BUILD THE BUILDING HE BUILDS IF YOU WAST YOUR GOLD ON THEM YOU WILLL BE OWNED
+}
+
+STRING 921
+// Units: Opgh (Poisoned Blademaster), Propernames (Proper Names)
+{
+Poisoned Grom Hellscream
+}
+
+STRING 922
+// Units: Opgh (Poisoned Blademaster), Name (Name)
+{
+Poisoned Blademaster
+}
+
+STRING 923
+// Units: npgr (Marses Life source), Name (Name)
+{
+Marses Life source
+}
+
+STRING 924
+// Units: emtg (The Huge Stone Man), Name (Name)
+{
+The Huge Stone Man
+}
+
+STRING 925
+// Units: Hart (God), Name (Name)
+{
+God
+}
+
+STRING 926
+// Units: h008 (God), Name (Name)
+{
+God
+}
+
+STRING 927
+// Units: hspt (Martian), Name (Name)
+{
+Martian
+}
+
+STRING 928
+// Units: Otch (Earth-Quake Manager), Ubertip (Tooltip - Extended)
+{
+Warrior Hero, exceptional at absorbing damage and melee combat. Can learn Shockwave, War Stomp, Endurance Aura and Reincarnation. |n|n|cffffcc00Attacks land units. He also has splash damage.
+}
+
+STRING 929
+// Units: Otch (Earth-Quake Manager), Description (Description)
+{
+Warrior Hero, exceptional at absorbing damage and melee combat. Can learn Shockwave, War Stomp, Endurance Aura and Reincarnation. |n|n|cffffcc00Attacks land units. He also has splash damage.
+}
+
+STRING 930
+// Units: Otch (Earth-Quake Manager), EditorSuffix (Name - Editor Suffix)
+{
+Earth-Quake Manager
+}
+
+STRING 931
+// Units: Nman (Power-Plant-Owner), Ubertip (Tooltip - Extended)
+{
+Huge hero. super powerful. Must have.
+}
+
+STRING 932
+// Units: hwt3 (Mr.Freeze), Ubertip (Tooltip - Extended)
+{
+Frost warrior use him to slow and destroy your enimies.
+}
+
+STRING 933
+// Units: hwt3 (Mr.Freeze), Description (Description)
+{
+Frost warrior use him to slow and destroy your enimies.
+}
+
+STRING 934
+// Units: nmoo (Ice Cave), Ubertip (Tooltip - Extended)
+{
+This cave is cold...(LOL) super strong unit. Attacks land and air units
+}
+
+STRING 935
+// Units: nehy (Land-Fire-Dragon), Ubertip (Tooltip - Extended)
+{
+Heavy ranged land-type unit with Faerie Fire. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 936
+// Units: nehy (Land-Fire-Dragon), Description (Description)
+{
+Heavy ranged land-type unit with Faerie Fire. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 937
+// Units: nvde (The Gravity Master), Description (Description)
+{
+Heavy ranged unit that can cast Devour Magic and Forked Lightning. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 938
+// Units: hpea (The Super Teched Peasant), Description (Description)
+{
+Super Unit. A must get. NOTE....DO NOT BUILD THE BUILDING HE BUILDS IF YOU WAST YOUR GOLD ON THEM YOU WILLL BE OWNED
+}
+
+STRING 939
+// Units: Opgh (Poisoned Blademaster), Revivetip (Tooltip - Revive)
+{
+This poisoned hero is angry...(I wonder why) he is a super-powerful unit a must have.
+}
+
+STRING 940
+// Units: Opgh (Poisoned Blademaster), Description (Description)
+{
+This poisoned hero is angry...(I wonder why) he is a super-powerful unit a must have.
+}
+
+STRING 941
+// Units: emtg (The Huge Stone Man), Description (Description)
+{
+Massive melee unit that can disrupt enemy attackers and take incredible amounts of punishment. Has the Taunt and War Club abilities. Can learn Hardened Skin, and Resistant Skin. |n|n|cffffcc00Attacks land units.|r
+}
+
+STRING 942
+// Units: Hart (God), Ubertip (Tooltip - Extended)
+{
+Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Attacks land and air units.
+}
+
+STRING 943
+// Units: Hart (God), Description (Description)
+{
+Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Attacks land and air units.
+}
+
+STRING 944
+// Units: hspt (Martian), Ubertip (Tooltip - Extended)
+{
+Martian warrior trained to destroy spellcasters. Initially has Spell Steal, which manipulates buffs to your advantage, Spell Immunity and Feedback. Can also learn Control Magic. |n|n|cffffcc00Attacks land units.|r
+}
+
+STRING 945
+// Units: hspt (Martian), Description (Description)
+{
+Martian warrior trained to destroy spellcasters. Initially has Spell Steal, which manipulates buffs to your advantage, Spell Immunity and Feedback. Can also learn Control Magic. |n|n|cffffcc00Attacks land units.|r
+}
+
+STRING 946
+// Units: eaoe (Ancient of Lore), Ubertip (Tooltip - Extended)
+{
+Keeper of ground based people. It is srong, powerful and huge.
+}
+
+STRING 947
+// Units: hgyr (Pro Builder), Name (Name)
+{
+Pro Builder
+}
+
+STRING 949
+// Units: hcas (6th Grade Girls), Name (Name)
+{
+6th Grade Girls
+}
+
+STRING 950
+// Units: halt (7th Grade Boys), Name (Name)
+{
+7th Grade Boys
+}
+
+STRING 952
+// Units: Otch (Earth-Quake Manager), Tip (Tooltip - Basic)
+{
+Build Earth-Quake Manager
+}
+
+STRING 953
+// Units: hwt3 (Mr.Freeze), Tip (Tooltip - Basic)
+{
+Mr.Freeze
+}
+
+STRING 954
+// Units: hpea (The Super Teched Peasant), Tip (Tooltip - Basic)
+{
+Train The Super Teched Peasant
+}
+
+STRING 955
+// Units: Opgh (Poisoned Blademaster), Tip (Tooltip - Basic)
+{
+Build Poisoned Grom Hellscream
+}
+
+STRING 956
+// Units: Hart (God), Tip (Tooltip - Basic)
+{
+Build God
+}
+
+STRING 957
+// Units: hspt (Martian), Tip (Tooltip - Basic)
+{
+Build Martian
+}
+
+STRING 958
+// Units: hkee (Tester And Helpers Lodge), Name (Name)
+{
+Tester And Helpers Lodge
+}
+
+STRING 959
+// Units: hkee (Tester And Helpers Lodge), Ubertip (Tooltip - Extended)
+{
+Pro race. Noobs beware that you have to upgradetowers to get a better one.
+}
+
+STRING 960
+// Units: hkee (Tester And Helpers Lodge), Description (Description)
+{
+Pro race. Noobs beware that you have to upgradetowers to get a better one.
+}
+
+STRING 961
+// Units: hkee (Tester And Helpers Lodge), Tip (Tooltip - Basic)
+{
+Build Tester And Helper Lodge
+}
+
+STRING 962
+// Units: hdhw (Tester & Helper), Ubertip (Tooltip - Extended)
+{
+The Helpers and testers lodges builder.
+}
+
+STRING 963
+// Units: hdhw (Tester & Helper), Description (Description)
+{
+The Helpers and testers lodges builder.
+}
+
+STRING 964
+// Units: hdhw (Tester & Helper), Name (Name)
+{
+Tester & Helper
+}
+
+STRING 965
+// Units: hatw (Bloodyspear's house), Name (Name)
+{
+Bloodyspear's house
+}
+
+STRING 966
+// Units: hatw (Bloodyspear's house), Tip (Tooltip - Basic)
+{
+Bloodyspear's house
+}
+
+STRING 967
+// Units: hatw (Bloodyspear's house), Ubertip (Tooltip - Extended)
+{
+Magical defensive tower. Particularly effective against enemy Heroes and spellcasters. Has the Feedback ability, which causes its attacks to destroy mana, dealing extra damage equal to the mana destroyed. Can learn the Magic Sentry ability. |n|n|cffffcc00Attacks land and air units. Upgades to bobby1234's Grave
+}
+
+STRING 968
+// Units: hatw (Bloodyspear's house), Description (Description)
+{
+Magical defensive tower. Particularly effective against enemy Heroes and spellcasters. Has the Feedback ability, which causes its attacks to destroy mana, dealing extra damage equal to the mana destroyed. Can learn the Magic Sentry ability. |n|n|cffffcc00A
+}
+
+STRING 969
+// Units: nwc1 (bobby1234's Grave), Name (Name)
+{
+bobby1234's Grave
+}
+
+STRING 970
+// Units: nwc1 (bobby1234's Grave), Tip (Tooltip - Basic)
+{
+Build bobby1234's Grave
+}
+
+STRING 973
+// Units: Nman (Power-Plant-Owner), Tip (Tooltip - Basic)
+{
+Build Power-Plant-Owner
+}
+
+STRING 974
+// Units: nmoo (Ice Cave), Tip (Tooltip - Basic)
+{
+Build Ice Cave
+}
+
+STRING 975
+// Units: nvde (The Gravity Master), Tip (Tooltip - Basic)
+{
+Build The Gravity Master
+}
+
+STRING 976
+// Units: emtg (The Huge Stone Man), Tip (Tooltip - Basic)
+{
+Build The Huge Stone Man
+}
+
+STRING 977
+// Units: negm (Matteo77's Guard Tower), Name (Name)
+{
+Matteo77's Guard Tower
+}
+
+STRING 978
+// Units: negm (Matteo77's Guard Tower), Tip (Tooltip - Basic)
+{
+Build Matteo77's Guard Tower
+}
+
+STRING 979
+// Units: negm (Matteo77's Guard Tower), Ubertip (Tooltip - Extended)
+{
+This tower has got long range, some splash and short cooldown. But is not super powerful.
+}
+
+STRING 980
+// Units: negm (Matteo77's Guard Tower), Description (Description)
+{
+This tower has got long range, some splash and short cooldown. But is not super powerful.
+}
+
+STRING 981
+// Units: ntt1 (dukewintermaul's AK-47), Tip (Tooltip - Basic)
+{
+Build dukewintermaul's AK-47
+}
+
+STRING 982
+// Units: ntt1 (dukewintermaul's AK-47), Name (Name)
+{
+dukewintermaul's AK-47
+}
+
+STRING 983
+// Units: ntt1 (dukewintermaul's AK-47), Ubertip (Tooltip - Extended)
+{
+Fires bolts of deadly energy. Excellent at dealing massive damage to everything. Immune to magic. This tower has medium damage, short cooldown and short range. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 984
+// Units: ntt1 (dukewintermaul's AK-47), Description (Description)
+{
+Fires bolts of deadly energy. Excellent at dealing massive damage to everything. Immune to magic. This tower has medium damage, short cooldown and short range. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 985
+// Units: ndt2 (Dan's Snowball Machine), Name (Name)
+{
+Dan's Snowball Machine
+}
+
+STRING 986
+// Units: ndt2 (Dan's Snowball Machine), Tip (Tooltip - Basic)
+{
+Build Dan's Snowball Machine
+}
+
+STRING 987
+// Units: ndt2 (Dan's Snowball Machine), Ubertip (Tooltip - Extended)
+{
+Fires shards of ice at a very fast rate. Good at slowing down enemies. Immune to magic. Also has a large damage rate . |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 988
+// Units: ndt2 (Dan's Snowball Machine), Description (Description)
+{
+Fires shards of ice at a very fast rate. Good at slowing down enemies. Immune to magic. Also has a large damage rate . |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 989
+// Units: ugol (Money Mine), Name (Name)
+{
+Money Mine
+}
+
+STRING 990
+// Units: ugol (Money Mine), Tip (Tooltip - Basic)
+{
+Build Money Mine
+}
+
+STRING 991
+// Units: ugol (Money Mine), Ubertip (Tooltip - Extended)
+{
+Note is not a tower itis only a way to make money,  you also have to hire bloodyspear's minnions.
+}
+
+STRING 992
+// Units: ugol (Money Mine), Description (Description)
+{
+Note is not a tower itis only a way to make money,  you also have to hire bloodyspear's minnions.
+}
+
+STRING 993
+// Units: uaco (bloodyspear's minnions), Tip (Tooltip - Basic)
+{
+Train bloodyspear's minnions
+}
+
+STRING 994
+// Units: uaco (bloodyspear's minnions), Name (Name)
+{
+bloodyspear's minnions
+}
+
+STRING 995
+// Units: uaco (bloodyspear's minnions), Ubertip (Tooltip - Extended)
+{
+ONLY gets gold at the money mine.
+}
+
+STRING 996
+// Units: uaco (bloodyspear's minnions), Description (Description)
+{
+ONLY gets gold at the money mine.
+}
+
+STRING 997
+// Units: nft2 (Anthony's Flame-Thrower), Name (Name)
+{
+Anthony's Flame-Thrower
+}
+
+STRING 998
+// Units: nft2 (Anthony's Flame-Thrower), Tip (Tooltip - Basic)
+{
+Build Anthony's Flame-Thrower
+}
+
+STRING 999
+// Units: nft2 (Anthony's Flame-Thrower), Ubertip (Tooltip - Extended)
+{
+High damage short, cooldown, and short range tower. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 1000
+// Units: nft2 (Anthony's Flame-Thrower), Description (Description)
+{
+High damage short, cooldown, and short range tower. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 1001
+// Units: nbt1 (Matteo's Rock Machine), Ubertip (Tooltip - Extended)
+{
+High damage short, cooldown, and short range tower. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 1002
+// Units: nbt1 (Matteo's Rock Machine), Description (Description)
+{
+High damage short, cooldown, and short range tower. |n|n|cffffcc00Attacks land and air units.|r
+}
+
+STRING 1003
+// Units: nbt1 (Matteo's Rock Machine), Name (Name)
+{
+Matteo's Rock Machine
+}
+
+STRING 1004
+// Units: nbt1 (Matteo's Rock Machine), Tip (Tooltip - Basic)
+{
+Build Matteo's Rock Machine
+}
+
+STRING 1005
+// Units: ntx2 (Evan's Ultimate Tower), Name (Name)
+{
+Evan's Ultimate Tower
+}
+
+STRING 1006
+// Units: ntx2 (Evan's Ultimate Tower), Tip (Tooltip - Basic)
+{
+Upgrade to Evan's Ultimate Tower
+}
+
+STRING 1007
+// Units: ntx2 (Evan's Ultimate Tower), Ubertip (Tooltip - Extended)
+{
+This is the best lumber free tower in the game. It has short cooldown, long range and a huge damage rate.
+}
+
+STRING 1008
+// Units: ntx2 (Evan's Ultimate Tower), Description (Description)
+{
+This is the best lumber free tower in the game. It has short cooldown, long range and a huge damage rate.
+}
+
+STRING 1009
+// Units: hsor (Pro Builder), Name (Name)
+{
+Pro Builder
+}
+
+STRING 1010
+// Units: nwc1 (bobby1234's Grave), Description (Description)
+{
+This is not a tower you just have to get it to get a better tower.
+}
+
+STRING 1011
+// Units: nwc1 (bobby1234's Grave), Ubertip (Tooltip - Extended)
+{
+This is not a tower you just have to get it to get a better tower.
+}
+
+STRING 1012
+// Units: earc (Anti Stuck), Name (Name)
+{
+Anti Stuck
+}
+
+STRING 1013
+// Units: hbar (Unit Shop (Human)), Name (Name)
+{
+Unit Shop (Human)
+}
+
+STRING 1014
+// Units: hbar (Unit Shop (Human)), Tip (Tooltip - Basic)
+{
+Build Unit Shop (Human)
+}
+
+STRING 1015
+// Units: hbar (Unit Shop (Human)), Ubertip (Tooltip - Extended)
+{
+This sells units. NOT towers Buy this if you want units to kill stucks and any other unit.
+}
+
+STRING 1016
+// Units: hbar (Unit Shop (Human)), Description (Description)
+{
+This sells units. NOT towers Buy this if you want units to kill stucks and any other unit.
+}
+
+STRING 1017
+// Units: harm (Hero Shop), Name (Name)
+{
+Hero Shop
+}
+
+STRING 1018
+// Units: harm (Hero Shop), Tip (Tooltip - Basic)
+{
+Build Hero Shop
+}
+
+STRING 1019
+// Units: harm (Hero Shop), Ubertip (Tooltip - Extended)
+{
+Makes Hero's. This is not a tower.
+}
+
+STRING 1020
+// Units: Hmkg (Mountain King), Propernames (Proper Names)
+{
+dukewintermaul
+}
+
+STRING 1021
+// Units: Hblm (Blood Mage), Propernames (Proper Names)
+{
+dukewintermaul
+}
+
+STRING 1022
+// Units: Obla (Blademaster), Propernames (Proper Names)
+{
+dukewintermaul
+}
+
+STRING 1023
+// Units: Ofar (Far Seer), Propernames (Proper Names)
+{
+dukewintermaul
+}
+
+STRING 1024
+// Units: Oshd (Shadow Hunter), Propernames (Proper Names)
+{
+dukewintermaul
+}
+
+STRING 1025
+// Units: Ulic (Lich), Propernames (Proper Names)
+{
+dukewintermaul
+}
+
+STRING 1026
+// Units: Udre (Dreadlord), Propernames (Proper Names)
+{
+dukewintermaul
+}
+
+STRING 1027
+// Units: Ucrl (Crypt Lord), Propernames (Proper Names)
+{
+dukewintermaul
+}
+
+STRING 1028
+// Units: Emoo (Priestess of the Moon), Propernames (Proper Names)
+{
+dukewintermaul
+}
+
+STRING 1029
+// Units: Edem (Demon Hunter), Propernames (Proper Names)
+{
+dukewintermaul
+}
+
+STRING 1030
+// Units: Ewar (Warden), Propernames (Proper Names)
+{
+dukewintermaul
+}
+
+STRING 1031
+// Units: hlum (Item Shop), Name (Name)
+{
+Item Shop
+}
+
+STRING 1032
+// Units: hlum (Item Shop), Tip (Tooltip - Basic)
+{
+Build Item Shop
+}
+
+STRING 1033
+// Units: hlum (Item Shop), Ubertip (Tooltip - Extended)
+{
+Sells items for heros.
+}
+
+STRING 1034
+// Units: hlum (Item Shop), Description (Description)
+{
+Sells items for heros.
+}
+
+STRING 1035
+// Units: Harf (dukewintermaul), Name (Name)
+{
+dukewintermaul
+}
+
+STRING 1036
+// Items: tdx2 (Tome of Agility +2 ), Name (Name)
+{
+Tome of Agility +2 
+}
+
+STRING 1037
+// Items: tdx2 (Tome of Agility +2 ), Ubertip (Tooltip - Extended)
+{
+Permanently increases the Agility of the Hero by 2 when used has 50 charges.
+}
+
+STRING 1038
+// Items: tin2 (Tome of Intelligence +2), Ubertip (Tooltip - Extended)
+{
+Permanently increases the Intelligence of the Hero by 2 when used has 50 charges
+}
+
+STRING 1039
+// Items: tst2 (Tome of Strength +2), Ubertip (Tooltip - Extended)
+{
+Permanently increases the Strength of the Hero by 2 when used has 50 charges
+}
+
+STRING 1040
+{
+|c0000cdf9VeryEasy (100 Lives)
+}
+
+STRING 1041
+{
+|c0000cdf9Difficulty has been set to VeryEasy (100 lives) |r
+}
+
+STRING 1050
+// Units: nhrr (Harpy Rogue ), Name (Name)
+{
+Harpy Rogue 
+}
+
+STRING 1051
+// Units: nhrr (Harpy Rogue ), EditorSuffix (Name - Editor Suffix)
+{
+lvl 34
+}
+
+STRING 1052
+// Units: nhrh (Harpy Storm-hag  ), Name (Name)
+{
+Harpy Storm-hag  
+}
+
+STRING 1053
+// Units: nhrh (Harpy Storm-hag  ), EditorSuffix (Name - Editor Suffix)
+{
+lvl 40
+}
+
+STRING 1054
+// Units: nass (Crazy Assassin ), Name (Name)
+{
+Crazy Assassin 
+}
+
+STRING 1055
+// Units: nass (Crazy Assassin ), EditorSuffix (Name - Editor Suffix)
+{
+lvl 35
+}
+
+STRING 1056
+// Units: nsel (Matteo's Sea Elemental  ), Name (Name)
+{
+Matteo's Sea Elemental  
+}
+
+STRING 1057
+// Units: nsel (Matteo's Sea Elemental  ), EditorSuffix (Name - Editor Suffix)
+{
+lvl 36
+}
+
+STRING 1058
+// Units: nbel (Anthony's  Blood Elf Lieutenant  ), Name (Name)
+{
+Anthony's  Blood Elf Lieutenant  
+}
+
+STRING 1059
+// Units: nbel (Anthony's  Blood Elf Lieutenant  ), EditorSuffix (Name - Editor Suffix)
+{
+lvl 37
+}
+
+STRING 1060
+// Units: hbew (Dan's Wagon ), Name (Name)
+{
+Dan's Wagon 
+}
+
+STRING 1061
+// Units: hbew (Dan's Wagon ), EditorSuffix (Name - Editor Suffix)
+{
+lvl 38
+}
+
+STRING 1062
+// Units: ehpr (Evan's Hippogryph Riders (with broken wings) ), Name (Name)
+{
+Evan's Hippogryph Riders (with broken wings) 
+}
+
+STRING 1063
+// Units: ehpr (Evan's Hippogryph Riders (with broken wings) ), EditorSuffix (Name - Editor Suffix)
+{
+lvl 39
+}
+
+STRING 1064
+// Units: nhef (High Elf ), Name (Name)
+{
+High Elf 
+}
+
+STRING 1065
+// Units: nhef (High Elf ), EditorSuffix (Name - Editor Suffix)
+{
+lvl 41
+}
+
+STRING 1066
+// Units: necr (Rabbit Of Doom ), Name (Name)
+{
+Rabbit Of Doom 
+}
+
+STRING 1067
+// Units: necr (Rabbit Of Doom ), EditorSuffix (Name - Editor Suffix)
+{
+ lvl 42
+}
+
+STRING 1068
+// Units: nsno (Snowy Owl ), Name (Name)
+{
+Snowy Owl 
+}
+
+STRING 1069
+// Units: nsno (Snowy Owl ), EditorSuffix (Name - Editor Suffix)
+{
+lvl 43
+}
+
+STRING 1070
+// Units: hrtt (Siege Engine), EditorSuffix (Name - Editor Suffix)
+{
+ lvl 44
+}
+
+STRING 1071
+// Units: uban (Banshee), EditorSuffix (Name - Editor Suffix)
+{
+ lvl 45
+}
+
+STRING 1072
+// Units: nthr (Tharifas), EditorSuffix (Name - Editor Suffix)
+{
+lvl 46
+}
+
+STRING 1073
+// Units: nfod (Faceless One Deathbringer), EditorSuffix (Name - Editor Suffix)
+{
+lvl 47
+}
+
+STRING 1074
+// Units: nzom (Evan's  Zombies), Name (Name)
+{
+Evan's  Zombies
+}
+
+STRING 1075
+// Units: nzom (Evan's  Zombies), EditorSuffix (Name - Editor Suffix)
+{
+lvl 48
+}
+
+STRING 1076
+// Units: uktg (Kel'Thuzad), EditorSuffix (Name - Editor Suffix)
+{
+lvl 49
+}
+
+STRING 1077
+// Units: Harf (dukewintermaul), Propernames (Proper Names)
+{
+Evan Adonailo
+}
+
+STRING 1078
+// Units: Harf (dukewintermaul), EditorSuffix (Name - Editor Suffix)
+{
+lvl 50 Final lvl
+}
+
+STRING 1079
+// Units: uC72 (dukewintermaul), Name (Name)
+{
+dukewintermaul
+}
+
+STRING 1080
+// Units: owtw (Anti-Stuck), Name (Name)
+{
+Anti-Stuck
+}
+

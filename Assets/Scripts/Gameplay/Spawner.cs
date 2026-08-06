@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public class Spawner : MonoBehaviour
 {
     public Vector3[] waypoints;
+    public int indexOffset = 0;
     public Color playerColor = Color.white;
 
     private void Start()

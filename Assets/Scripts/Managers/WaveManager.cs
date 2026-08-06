@@ -136,7 +136,7 @@ public class WaveManager : MonoBehaviour
             renderer.material.color = spawner.playerColor;
         }
         
-        enemy.Init(spawner.waypoints, index);
+        enemy.Init(spawner.waypoints, index + spawner.indexOffset);
         
         visual.SetActive(true);
         enemyObj.SetActive(true);

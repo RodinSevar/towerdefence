@@ -1,0 +1,44 @@
+Top Left Right Spawn
+-3872 -3232 4416 5088
+
+Top Left Left Spawn
+-4480 -3872 4416 5088
+
+Top Middle Left Spawn 
+-896 -256 4384 5088
+
+Top Middle Right Spawn
+-256 384 4384 5088
+
+Top Right Right Spawn
+3808 4448 4416 5088
+
+Top Right Left Spawn
+3200 3808 4416 5088
+
+Middle Left Upper Spawn
+-5216 -4736 -576 -128
+
+Middle Left Lower Spawn
+-5216 -4736 -1024 -576
+
+Middle Middle Left Spawn
+-1408 -1152 640 1280
+
+Midle Middle Right Spawn
+640 896 640 1280
+
+Middle Right Top Spawn
+4736 5184 -352 128
+
+Middle Right Lower Spawn
+4736 5184 -832 -352
+
+Bottom Left Single Spawn
+-1184 -416 -1632 -1184
+
+Bottom Right Single Spawn
+96 640 -1632 -1184
+
+Bottom Middle Single Spawn
+-480 -32 -3104 -2784
