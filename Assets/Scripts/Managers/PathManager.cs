@@ -26,14 +26,25 @@ public class PathManager : MonoBehaviour
         public Vector2Int target;
         public float[,] distanceGrid = new float[200, 200];
         public Vector2[,] vectorGrid = new Vector2[200, 200];
+        public bool hasVectors = false;
+        public bool needsDistanceUpdate = true;
     }
 
     private Dictionary<Vector2Int, FlowField> flowFieldCache = new Dictionary<Vector2Int, FlowField>();
     private MinHeap openSet = new MinHeap(40000);
 
+    public void ClearCache()
+    {
+        foreach (var ff in flowFieldCache.Values)
+        {
+            ff.needsDistanceUpdate = true;
+            ff.hasVectors = false;
+        }
+    }
+
     public void NotifyMazeChanged()
     {
-        flowFieldCache.Clear();
+        ClearCache();
         OnMazeChanged?.Invoke();
     }
 
@@ -49,7 +60,7 @@ public class PathManager : MonoBehaviour
                 Vector2Int startNode = GridManager.Instance.WorldToGridCell(spawner.waypoints[i]);
                 Vector2Int targetNode = GridManager.Instance.WorldToGridCell(spawner.waypoints[i+1]);
                 
-                FlowField ff = GetFlowField(targetNode);
+                FlowField ff = GetFlowField(targetNode, false);
                 if (ff == null || ff.distanceGrid[startNode.x + 100, startNode.y + 100] == float.MaxValue)
                 {
                     Debug.Log($"Maze Validation Failed for Spawner {spawner.gameObject.name}! Start Node {startNode} cannot reach Target Node {targetNode}. Target FlowField valid: {ff != null}");
@@ -73,7 +84,7 @@ public class PathManager : MonoBehaviour
             return new Vector2(dir.x, dir.z);
         }
 
-        FlowField ff = GetFlowField(targetCell);
+        FlowField ff = GetFlowField(targetCell, true);
         if (ff == null) return Vector2.zero;
 
         int cx = currentCell.x + 100;
@@ -86,40 +97,48 @@ public class PathManager : MonoBehaviour
         return Vector2.zero;
     }
 
-    private FlowField GetFlowField(Vector2Int targetNode)
+    private FlowField GetFlowField(Vector2Int targetNode, bool generateVectors = true)
     {
-        if (flowFieldCache.TryGetValue(targetNode, out FlowField cached))
+        if (!flowFieldCache.TryGetValue(targetNode, out FlowField cached))
         {
-            return cached;
+            cached = new FlowField();
+            cached.target = targetNode;
+            flowFieldCache[targetNode] = cached;
+            GenerateDistanceField(cached);
+        }
+        else if (cached.needsDistanceUpdate)
+        {
+            GenerateDistanceField(cached);
         }
 
-        FlowField newField = GenerateFlowField(targetNode);
-        flowFieldCache[targetNode] = newField;
-        return newField;
+        if (generateVectors && !cached.hasVectors)
+        {
+            GenerateVectorField(cached);
+        }
+
+        return cached;
     }
 
-    private FlowField GenerateFlowField(Vector2Int targetNode)
+    private void GenerateDistanceField(FlowField ff)
     {
-        int targetX = targetNode.x + 100;
-        int targetY = targetNode.y + 100;
+        int targetX = ff.target.x + 100;
+        int targetY = ff.target.y + 100;
 
-        if (targetX < 0 || targetX >= 200 || targetY < 0 || targetY >= 200) return null;
-
-        FlowField ff = new FlowField();
-        ff.target = targetNode;
+        if (targetX < 0 || targetX >= 200 || targetY < 0 || targetY >= 200) return;
 
         for (int x = 0; x < 200; x++)
         {
             for (int y = 0; y < 200; y++)
             {
                 ff.distanceGrid[x, y] = float.MaxValue;
-                ff.vectorGrid[x, y] = Vector2.zero;
             }
         }
 
         openSet.Clear();
-        openSet.Add(targetNode, 0f);
+        openSet.Add(ff.target, 0f);
         ff.distanceGrid[targetX, targetY] = 0f;
+        ff.needsDistanceUpdate = false;
+        ff.hasVectors = false;
 
         // DIJKSTRA - Generate Distance Field
         while (openSet.Count > 0)
@@ -164,14 +183,28 @@ public class PathManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void GenerateVectorField(FlowField ff)
+    {
+        int targetX = ff.target.x + 100;
+        int targetY = ff.target.y + 100;
 
         // GENERATE VECTOR FIELD
         for (int x = 0; x < 200; x++)
         {
             for (int y = 0; y < 200; y++)
             {
-                if (ff.distanceGrid[x, y] == float.MaxValue) continue; // Unreachable
-                if (x == targetX && y == targetY) continue; // Target has no vector
+                if (ff.distanceGrid[x, y] == float.MaxValue)
+                {
+                    ff.vectorGrid[x, y] = Vector2.zero;
+                    continue; // Unreachable
+                }
+                if (x == targetX && y == targetY)
+                {
+                    ff.vectorGrid[x, y] = Vector2.zero;
+                    continue; // Target has no vector
+                }
 
                 Vector2Int current = new Vector2Int(x - 100, y - 100);
                 float bestDist = ff.distanceGrid[x, y];
@@ -211,8 +244,8 @@ public class PathManager : MonoBehaviour
                 ff.vectorGrid[x, y] = bestDir;
             }
         }
-
-        return ff;
+        
+        ff.hasVectors = true;
     }
 
     private bool IsValidNeighbor(Vector2Int from, Vector2Int to)

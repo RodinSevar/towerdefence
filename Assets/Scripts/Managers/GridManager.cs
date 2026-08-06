@@ -14,9 +14,9 @@ public class GridManager : MonoBehaviour
     [SerializeField]
     private int gridHeight = 196;
 
-    private HashSet<Vector2Int> occupiedCells;
-    private HashSet<Vector2Int> unbuildableCells;
-    private Dictionary<Vector2Int, float> cellHeights;
+    private bool[,] occupiedCellsArray;
+    private bool[,] unbuildableCellsArray;
+    private float[,] cellHeightsArray;
 
     private void Awake()
     {
@@ -31,9 +31,17 @@ public class GridManager : MonoBehaviour
 
     private void InitializeGrid()
     {
-        occupiedCells = new HashSet<Vector2Int>();
-        unbuildableCells = new HashSet<Vector2Int>();
-        cellHeights = new Dictionary<Vector2Int, float>();
+        occupiedCellsArray = new bool[256, 256];
+        unbuildableCellsArray = new bool[256, 256];
+        cellHeightsArray = new float[256, 256];
+        
+        for (int x = 0; x < 256; x++)
+        {
+            for (int y = 0; y < 256; y++)
+            {
+                cellHeightsArray[x, y] = 0.5f;
+            }
+        }
     }
 
     /// <summary>
@@ -50,13 +58,22 @@ public class GridManager : MonoBehaviour
 
     public void SetCellHeight(Vector2Int cell, float height)
     {
-        cellHeights[cell] = height;
+        int x = cell.x + 128;
+        int y = cell.y + 128;
+        if (x >= 0 && x < 256 && y >= 0 && y < 256)
+        {
+            cellHeightsArray[x, y] = height;
+        }
     }
 
     public float GetCellHeight(Vector2Int cell)
     {
-        if (cellHeights != null && cellHeights.TryGetValue(cell, out float height))
-            return height;
+        int x = cell.x + 128;
+        int y = cell.y + 128;
+        if (x >= 0 && x < 256 && y >= 0 && y < 256)
+        {
+            return cellHeightsArray[x, y];
+        }
         return 0.5f; // Default ground height if none set
     }
 
@@ -85,7 +102,9 @@ public class GridManager : MonoBehaviour
     public bool IsCellOccupied(Vector2Int cell)
     {
         if (!IsValidCell(cell)) return true;
-        return occupiedCells.Contains(cell);
+        int x = cell.x + 128;
+        int y = cell.y + 128;
+        return occupiedCellsArray[x, y];
     }
 
     /// <summary>
@@ -93,7 +112,12 @@ public class GridManager : MonoBehaviour
     /// </summary>
     public void OccupyCell(Vector2Int cell)
     {
-        occupiedCells.Add(cell);
+        int x = cell.x + 128;
+        int y = cell.y + 128;
+        if (x >= 0 && x < 256 && y >= 0 && y < 256)
+        {
+            occupiedCellsArray[x, y] = true;
+        }
     }
 
     /// <summary>
@@ -101,7 +125,12 @@ public class GridManager : MonoBehaviour
     /// </summary>
     public void FreeCell(Vector2Int cell)
     {
-        occupiedCells.Remove(cell);
+        int x = cell.x + 128;
+        int y = cell.y + 128;
+        if (x >= 0 && x < 256 && y >= 0 && y < 256)
+        {
+            occupiedCellsArray[x, y] = false;
+        }
     }
 
     /// <summary>
@@ -110,7 +139,12 @@ public class GridManager : MonoBehaviour
     public bool CanBuildAt(Vector3 worldPos)
     {
         Vector2Int cell = WorldToGridCell(worldPos);
-        return !IsCellOccupied(cell) && !unbuildableCells.Contains(cell);
+        int x = cell.x + 128;
+        int y = cell.y + 128;
+        
+        if (x < 0 || x >= 256 || y < 0 || y >= 256) return false;
+        
+        return !IsCellOccupied(cell) && !unbuildableCellsArray[x, y];
     }
 
     /// <summary>
@@ -118,7 +152,12 @@ public class GridManager : MonoBehaviour
     /// </summary>
     public void MarkUnbuildable(Vector2Int cell)
     {
-        unbuildableCells.Add(cell);
+        int x = cell.x + 128;
+        int y = cell.y + 128;
+        if (x >= 0 && x < 256 && y >= 0 && y < 256)
+        {
+            unbuildableCellsArray[x, y] = true;
+        }
     }
 
     /// <summary>

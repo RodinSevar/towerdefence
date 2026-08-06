@@ -207,13 +207,16 @@ public class TowerManager : MonoBehaviour
                 Vector2Int cell = GridManager.Instance.WorldToGridCell(snappedPos);
                 GridManager.Instance.OccupyCell(cell);
                 
+                PathManager.Instance.ClearCache();
                 if (!PathManager.Instance.ValidateFullMaze())
                 {
                     // Revert and deny placement
                     GridManager.Instance.FreeCell(cell);
+                    PathManager.Instance.ClearCache();
                     Debug.Log($"Tower placement blocked: Placing at {cell} prevents path completion for at least one spawner.");
                     return;
                 }
+                PathManager.Instance.ClearCache();
                 
                 if (GameManager.Instance.TrySpendGold(cost))
                 {
