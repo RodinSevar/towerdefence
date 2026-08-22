@@ -18,6 +18,7 @@ public class WaveManager : MonoBehaviour
 
     private int currentWave = 0;
     private int enemiesSpawnedInWave = 0;
+    private float spawnTimer = 0f;
 
     public List<Spawner> activeSpawners = new List<Spawner>();
 
@@ -75,14 +76,20 @@ public class WaveManager : MonoBehaviour
         {
             if (activeSpawners.Count == 0)
             {
+                activeSpawners.AddRange(FindObjectsByType<Spawner>(FindObjectsSortMode.None));
+            }
+
+            if (activeSpawners.Count == 0)
+            {
                 Debug.LogWarning("No active spawners found! Cannot spawn enemies.");
                 enemiesSpawnedInWave = wave.enemyCount;
             }
             else
             {
-                int creepsToSpawn = wave.enemyCount - enemiesSpawnedInWave;
-                for (int i = 0; i < creepsToSpawn; i++)
+                spawnTimer += Time.deltaTime;
+                if (spawnTimer >= wave.spawnInterval)
                 {
+                    spawnTimer = 0f;
                     foreach (var spawner in activeSpawners)
                     {
                         SpawnEnemy(wave.enemyType, spawner, enemiesSpawnedInWave);
@@ -103,6 +110,7 @@ public class WaveManager : MonoBehaviour
 
         currentWave = waveNumber;
         enemiesSpawnedInWave = 0;
+        spawnTimer = waves[waveNumber - 1].spawnInterval; // Spawn first enemy immediately
     }
 
     private void SpawnEnemy(Enemy.EnemyType type, Spawner spawner, int index)
