@@ -21,6 +21,8 @@ public class TowerManager : Singleton<TowerManager>
 
     private void Update()
     {
+        if (Mouse.current == null || Keyboard.current == null) return; // no input devices (e.g. headless run)
+
         if (isPlacingTower)
         {
             UpdatePreview();
@@ -177,6 +179,37 @@ public class TowerManager : Singleton<TowerManager>
         return pathOk;
     }
 
+    /// <summary>
+    /// Places <paramref name="tower"/> at the grid-snapped position if it is affordable, buildable and does not cut off
+    /// any spawner. Returns true if the tower was built. Independent of the build-menu selection and of mouse input.
+    /// </summary>
+    public bool TryPlaceTowerAt(TowerData tower, Vector3 worldPos)
+    {
+        Vector3 snappedPos = GridManager.Instance.SnapToGrid(worldPos);
+        Vector2Int cell = GridManager.Instance.WorldToGridCell(snappedPos);
+        if (!CanPlaceAt(cell, snappedPos, tower, true, out string failReason))
+        {
+            Debug.Log($"Tower placement failed at {cell}: {failReason}");
+            return false;
+        }
+
+        if (!GameManager.Instance.TrySpendGold(tower.BaseCost)) return false;
+        if (!GameManager.Instance.TrySpendLumber(tower.lumberCost))
+        {
+            GameManager.Instance.AddGold(tower.BaseCost); // undo the gold spend
+            return false;
+        }
+
+        GridManager.Instance.OccupyCell(cell);
+        Tower newTower = Instantiate(towerPrefab, snappedPos, Quaternion.identity);
+        newTower.Init(tower);
+        RegisterTower(newTower);
+
+        // Notify enemies that the maze has changed
+        PathManager.Instance.NotifyMazeChanged();
+        return true;
+    }
+
     private void TryPlaceTower()
     {
         if (selectedTower == null) return;
@@ -191,28 +224,9 @@ public class TowerManager : Singleton<TowerManager>
                 // Snap to grid
                 Vector3 snappedPos = GridManager.Instance.SnapToGrid(hit.point);
                 
-                Vector2Int cell = GridManager.Instance.WorldToGridCell(snappedPos);
-                if (!CanPlaceAt(cell, snappedPos, selectedTower, true, out string failReason))
+                if (TryPlaceTowerAt(selectedTower, snappedPos) && !Keyboard.current.shiftKey.isPressed)
                 {
-                    Debug.Log($"Tower placement failed at {cell}: {failReason}");
-                    return;
-                }
-
-                if (GameManager.Instance.TrySpendGold(selectedTower.BaseCost) && GameManager.Instance.TrySpendLumber(selectedTower.lumberCost))
-                {
-                    GridManager.Instance.OccupyCell(cell);
-                    Tower newTower = Instantiate(towerPrefab, snappedPos, Quaternion.identity);
-                    newTower.Init(selectedTower);
-                    
-                    RegisterTower(newTower);
-                    
-                    if (!Keyboard.current.shiftKey.isPressed)
-                    {
-                        CancelPlacement();
-                    }
-                    
-                    // Notify enemies that the maze has changed
-                    PathManager.Instance.NotifyMazeChanged();
+                    CancelPlacement();
                 }
             }
         }

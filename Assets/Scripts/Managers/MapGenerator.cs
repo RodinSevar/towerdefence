@@ -94,7 +94,7 @@ public class MapGenerator : MonoBehaviour
                         DrawWall(vertices, triangles, uvs, 
                             new Vector3(startX, left_yBR, startZ), new Vector3(startX, yBL, startZ), 
                             new Vector3(startX, left_yTR, endZ), new Vector3(startX, yTL, endZ),
-                            false);
+                            Vector3.right);
                     }
                 }
                 
@@ -108,7 +108,7 @@ public class MapGenerator : MonoBehaviour
                         DrawWall(vertices, triangles, uvs, 
                             new Vector3(endX, down_yTR, startZ), new Vector3(endX, yBR, startZ), 
                             new Vector3(startX, down_yTL, startZ), new Vector3(startX, yBL, startZ),
-                            true);
+                            Vector3.forward);
                     }
                 }
             }
@@ -183,8 +183,30 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    private void DrawWall(List<Vector3> vertices, List<int> triangles, List<Vector2> uvs, 
-        Vector3 b1, Vector3 t1, Vector3 b2, Vector3 t2, bool flip)
+    /// <summary>
+    /// Adds a wall quad between two cells of different height. b1/b2 are the neighbour cell's edge heights, t1/t2 the
+    /// current cell's. <paramref name="towardCurrent"/> points from the wall to the current cell. The visible face must point
+    /// from the higher cell toward the lower one, so the winding is chosen from which side is higher (a fixed winding made
+    /// half of the walls face into the ground and vanish). If the two ends disagree (a twisted ramp edge) both faces are drawn.
+    /// </summary>
+    private void DrawWall(List<Vector3> vertices, List<int> triangles, List<Vector2> uvs,
+        Vector3 b1, Vector3 t1, Vector3 b2, Vector3 t2, Vector3 towardCurrent)
+    {
+        float currentMinusNeighbour = (t1.y - b1.y) + (t2.y - b2.y);
+        bool endsAgree = (t1.y - b1.y) * (t2.y - b2.y) >= 0f;
+
+        if (currentMinusNeighbour > 0f && endsAgree) AddWallFace(vertices, triangles, uvs, b1, t1, b2, t2, -towardCurrent);
+        else if (currentMinusNeighbour < 0f && endsAgree) AddWallFace(vertices, triangles, uvs, b1, t1, b2, t2, towardCurrent);
+        else
+        {
+            AddWallFace(vertices, triangles, uvs, b1, t1, b2, t2, towardCurrent);
+            AddWallFace(vertices, triangles, uvs, b1, t1, b2, t2, -towardCurrent);
+        }
+    }
+
+    /// <summary>Adds the quad with its front face toward <paramref name="outward"/>.</summary>
+    private void AddWallFace(List<Vector3> vertices, List<int> triangles, List<Vector2> uvs,
+        Vector3 b1, Vector3 t1, Vector3 b2, Vector3 t2, Vector3 outward)
     {
         int v = vertices.Count;
         vertices.Add(b1);
@@ -199,9 +221,10 @@ public class MapGenerator : MonoBehaviour
         uvs.Add(uvColor);
         uvs.Add(uvColor);
 
-        if (!flip)
+        // Unity front faces are clockwise; the front normal is cross(b - a, c - a).
+        bool windingA = Vector3.Dot(Vector3.Cross(t1 - b1, b2 - b1), outward) >= 0f;
+        if (windingA)
         {
-            // Forward facing triangles
             triangles.Add(v);
             triangles.Add(v + 1);
             triangles.Add(v + 2);
@@ -212,7 +235,6 @@ public class MapGenerator : MonoBehaviour
         }
         else
         {
-            // Backward facing triangles
             triangles.Add(v);
             triangles.Add(v + 2);
             triangles.Add(v + 1);

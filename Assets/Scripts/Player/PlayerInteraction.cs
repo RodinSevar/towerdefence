@@ -12,6 +12,8 @@ public class PlayerInteraction : Singleton<PlayerInteraction>
 
     private void Update()
     {
+        if (Mouse.current == null || Keyboard.current == null) return; // no input devices (e.g. headless run)
+
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             // If the player is currently placing a tower, ignore selection clicks
