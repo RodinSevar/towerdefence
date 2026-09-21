@@ -6,12 +6,23 @@ public class WaveManager : Singleton<WaveManager>
     [SerializeField] private Enemy enemyPrefab;
     [SerializeField] private WaveSet waveSet;
 
+    [Tooltip("Creeps instantiated per frame. The map spawns a level at once; spreading it over a few frames avoids a hitch.")]
+    [SerializeField] private int spawnsPerFrame = 200;
+
     private WaveSet.Wave[] waves => waveSet != null ? waveSet.waves : System.Array.Empty<WaveSet.Wave>();
 
     private int currentWave = 0;
 
+    // Spawn progress of the current wave: every spawner gets enemyCount creeps
+    private bool isSpawning;
+    private WaveSet.Wave spawningWave;
+    private int spawnerIndex, creepIndex;
+
     // Spawners register themselves in Spawner.Start
     public List<Spawner> activeSpawners = new List<Spawner>();
+
+    /// <summary>True while the current wave still has creeps left to instantiate.</summary>
+    public bool IsSpawning => isSpawning;
 
     public void RegisterSpawner(Spawner spawner)
     {
@@ -25,8 +36,8 @@ public class WaveManager : Singleton<WaveManager>
     }
 
     /// <summary>
-    /// Spawns the given wave (1-based). As in the original map, every creep of the wave appears at once,
-    /// enemyCount at each spawner. Returns false if it could not start.
+    /// Begins spawning the given wave (1-based): enemyCount creeps at every spawner, as in the original map. They appear
+    /// over the next few frames. Returns false if the wave could not start.
     /// </summary>
     public bool StartWave(int waveNumber)
     {
@@ -49,14 +60,37 @@ public class WaveManager : Singleton<WaveManager>
         }
 
         currentWave = waveNumber;
-        foreach (var spawner in activeSpawners)
-        {
-            for (int i = 0; i < wave.enemyCount; i++)
-            {
-                SpawnEnemy(wave.enemy, spawner, i);
-            }
-        }
+        spawningWave = wave;
+        spawnerIndex = 0;
+        creepIndex = 0;
+        isSpawning = true;
         return true;
+    }
+
+    private void Update()
+    {
+        if (!isSpawning) return;
+
+        for (int budget = spawnsPerFrame; budget > 0 && isSpawning; budget--)
+        {
+            if (spawnerIndex >= activeSpawners.Count)
+            {
+                isSpawning = false;
+                break;
+            }
+            if (creepIndex >= spawningWave.enemyCount)
+            {
+                spawnerIndex++;
+                creepIndex = 0;
+                budget++; // moving to the next spawner costs nothing
+                continue;
+            }
+
+            SpawnEnemy(spawningWave.enemy, activeSpawners[spawnerIndex], creepIndex);
+            creepIndex++;
+        }
+
+        if (!isSpawning) GameManager.Instance.NotifyWaveSpawningComplete();
     }
 
     private void SpawnEnemy(EnemyData data, Spawner spawner, int index)

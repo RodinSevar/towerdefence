@@ -16,6 +16,9 @@ public class Tower : MonoBehaviour, ISelectable
     private int currentLevelIndex = 0;
     private TowerLevel CurrentLevel => data != null && data.levels.Length > 0 ? data.levels[currentLevelIndex] : null;
 
+    private Vector3 towerPosition;
+    private StatusEffect payloadEffect; // shared by every shot of the current level (creeps copy it on hit)
+    private Material visualTemplate; // the prefab's original material, colours are derived from it
     private Enemy targetEnemy = null;
     private float fireTimer = 0f;
 
@@ -39,12 +42,12 @@ public class Tower : MonoBehaviour, ISelectable
             return;
         }
 
+        towerPosition = transform.position;
+
         if (MinimapManager.Instance != null)
         {
             MinimapManager.Instance.RegisterUnit(transform, false);
         }
-
-        selectionRing.GetComponent<Renderer>().material.color = Color.green;
 
         if (data.attackStyle == TowerAttackStyle.Laser)
         {
@@ -74,7 +77,7 @@ public class Tower : MonoBehaviour, ISelectable
             {
                 // Update laser position if still firing
                 laserLine.SetPosition(0, firePoint.position);
-                laserLine.SetPosition(1, targetEnemy.transform.position + Vector3.up * 0.4f);
+                laserLine.SetPosition(1, targetEnemy.AimPoint);
             }
         }
 
@@ -98,37 +101,20 @@ public class Tower : MonoBehaviour, ISelectable
     {
         float range = CurrentLevel.range;
 
-        // Check if current target is still valid
-        if (targetEnemy != null && Vector3.Distance(transform.position, targetEnemy.transform.position) <= range)
+        // Keep the current target while it is alive and in range
+        if (targetEnemy != null && targetEnemy.IsAlive && (targetEnemy.Position - towerPosition).sqrMagnitude <= range * range)
         {
             return;
         }
 
-        // Find nearest enemy in range
-        targetEnemy = null;
-        float closestDistance = range;
-
-        Collider[] colliders = Physics.OverlapSphere(transform.position, range);
-        foreach (Collider col in colliders)
-        {
-            Enemy enemy = col.GetComponent<Enemy>();
-            if (enemy != null)
-            {
-                float distance = Vector3.Distance(transform.position, enemy.transform.position);
-                if (distance < closestDistance)
-                {
-                    closestDistance = distance;
-                    targetEnemy = enemy;
-                }
-            }
-        }
+        targetEnemy = EnemyManager.Instance.FindNearest(towerPosition, range);
     }
 
     private void AimAtTarget()
     {
         if (targetEnemy == null) return;
 
-        Vector3 direction = (targetEnemy.GetComponent<Collider>().bounds.center - transform.position).normalized;
+        Vector3 direction = (targetEnemy.AimPoint - towerPosition).normalized;
         firePoint.rotation = Quaternion.LookRotation(direction);
     }
 
@@ -147,30 +133,14 @@ public class Tower : MonoBehaviour, ISelectable
             {
                 laserLine.enabled = true;
                 laserLine.SetPosition(0, firePoint.position);
-                laserLine.SetPosition(1, targetEnemy.transform.position + Vector3.up * 0.4f);
+                laserLine.SetPosition(1, targetEnemy.AimPoint);
                 laserDisplayTimer = 0.1f; // Display laser for 0.1 seconds
             }
         }
         else
         {
-            GameObject projObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            projObj.transform.position = firePoint.position;
-
-            // Remove collider so it doesn't block rays
-            Destroy(projObj.GetComponent<Collider>());
-
-            projObj.transform.localScale = Vector3.one * level.projectileScale;
-            projObj.GetComponent<Renderer>().material.color = level.projectileColor;
-
-            Projectile proj = projObj.AddComponent<Projectile>();
-
-            StatusEffect payload = null;
-            if (level.hasStatusEffect)
-            {
-                payload = new StatusEffect(level.effectType, level.effectDuration, level.effectStrength);
-            }
-
-            proj.Initialize(targetEnemy, level.projectileSpeed, level.damage, payload);
+            Projectile.Spawn(firePoint.position, level.projectileScale, level.projectileColor,
+                targetEnemy, level.projectileSpeed, level.damage, payloadEffect);
         }
     }
 
@@ -186,11 +156,15 @@ public class Tower : MonoBehaviour, ISelectable
     private void ApplyCurrentLevelVisuals()
     {
         TowerLevel level = CurrentLevel;
+        payloadEffect = level != null && level.hasStatusEffect
+            ? new StatusEffect(level.effectType, level.effectDuration, level.effectStrength) : null;
         if (visual == null || level == null) return;
 
         visual.localScale = Vector3.one * level.visualScale;
         visual.localPosition = Vector3.zero;
-        visual.GetComponent<Renderer>().material.color = level.visualColor;
+        var visualRenderer = visual.GetComponent<Renderer>();
+        if (visualTemplate == null) visualTemplate = visualRenderer.sharedMaterial;
+        visualRenderer.sharedMaterial = MaterialCache.Get(visualTemplate, level.visualColor);
     }
 
     public int GetCost() => CurrentLevel != null ? CurrentLevel.cost : 0;

@@ -81,3 +81,14 @@ Formulas used: damage = base + dice x (sides + 1) / 2 (average roll, no randomne
   get the full count. Some levels also change lives (-10, -19, +20, +80 in the triggers); not implemented.
 - **Level 30 and 50 bosses** and special messages/events (levels 15, 20, 30, 32) are not implemented.
 - **Kill bounty** is paid as the average roll; the real game rolls dice per kill.
+
+## Performance benchmark
+`Assets/Scripts/Editor/PerfBench.cs` runs the real scene headless in play mode and logs `BENCH ...` lines: path validation
+and placement cost, frame time and GC allocation with a full wave (level 45 = 1800 creeps) and 80 towers, per-system
+attribution, spawn hitch, terrain wall facing, and a behavior check (kills, projectiles, minimap, picking) over a fixed 5 s
+of game time. Close Unity, then:
+
+```
+Unity -batchmode -nographics -projectPath . -executeMethod PerfBench.Run -logFile bench.log
+```
+Numbers are CPU/logic only (no rendering); GPU cost is not measured.

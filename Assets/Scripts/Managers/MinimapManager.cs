@@ -1,89 +1,124 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
+/// <summary>
+/// Draws creeps and towers on the minimap. All dots are painted into one small texture shown by a single RawImage,
+/// instead of one UI Image per unit: with ~1800 creeps, per-unit UI elements cost several milliseconds a frame in
+/// canvas rebuilds alone.
+/// </summary>
 public class MinimapManager : Singleton<MinimapManager>
 {
-    [SerializeField] private RectTransform minimapContainer;
-    
-    private Dictionary<Transform, RectTransform> unitDots = new Dictionary<Transform, RectTransform>();
-    
-    // Grid bounds
-    private float gridHalfSize = 98f;
-    private float minimapSize => minimapContainer != null ? minimapContainer.rect.width : 100f;
+    private const int TextureSize = 192;
+    private const float RefreshInterval = 1f / 30f;
 
-    public void RegisterUnit(Transform unitTransform, bool isEnemy)
+    [SerializeField] private RectTransform minimapContainer;
+
+    // World range shown by the minimap: -gridHalfSize..gridHalfSize on both axes
+    private float gridHalfSize = 98f;
+
+    // Dot sizes in minimap UI units (as before): enemies slightly smaller than towers
+    private const float EnemyDotUi = 3f, TowerDotUi = 4f;
+    private static readonly Color32 EnemyColor = new Color32(255, 0, 0, 255);
+    private static readonly Color32 TowerColor = new Color32(40, 60, 255, 255);
+
+    private readonly List<Transform> enemies = new List<Transform>();
+    private readonly List<Transform> towers = new List<Transform>();
+
+    private Texture2D texture;
+    private Color32[] pixels;
+    private float timer;
+
+    private void Start()
     {
         if (minimapContainer == null) return;
 
-        GameObject dotObj = new GameObject("Dot");
-        dotObj.transform.SetParent(minimapContainer, false);
-        
-        Image dotImage = dotObj.AddComponent<Image>();
-        dotImage.color = isEnemy ? Color.red : Color.blue;
-        
-        RectTransform dotRect = dotObj.GetComponent<RectTransform>();
-        dotRect.sizeDelta = isEnemy ? new Vector2(3, 3) : new Vector2(4, 4); // Enemies slightly smaller
-        dotRect.anchorMin = new Vector2(0.5f, 0.5f);
-        dotRect.anchorMax = new Vector2(0.5f, 0.5f);
-        
-        unitDots[unitTransform] = dotRect;
-        UpdateDotPosition(unitTransform, dotRect);
+        texture = new Texture2D(TextureSize, TextureSize, TextureFormat.RGBA32, false)
+        {
+            filterMode = FilterMode.Point,
+            wrapMode = TextureWrapMode.Clamp,
+        };
+        pixels = new Color32[TextureSize * TextureSize];
+
+        var go = new GameObject("MinimapDots", typeof(RectTransform), typeof(RawImage));
+        go.transform.SetParent(minimapContainer, false);
+        go.transform.SetAsFirstSibling(); // under the camera-view lines
+        var rect = (RectTransform)go.transform;
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+        var image = go.GetComponent<RawImage>();
+        image.texture = texture;
+        image.raycastTarget = false; // clicks go to the minimap itself
+    }
+
+    public void RegisterUnit(Transform unitTransform, bool isEnemy)
+    {
+        (isEnemy ? enemies : towers).Add(unitTransform);
     }
 
     public void UnregisterUnit(Transform unitTransform)
     {
-        if (unitDots.TryGetValue(unitTransform, out RectTransform dotRect))
-        {
-            if (dotRect != null && dotRect.gameObject != null)
-            {
-                Destroy(dotRect.gameObject);
-            }
-            unitDots.Remove(unitTransform);
-        }
+        // Swap-remove; order does not matter for drawing
+        if (Remove(enemies, unitTransform)) return;
+        Remove(towers, unitTransform);
+    }
+
+    private static bool Remove(List<Transform> list, Transform t)
+    {
+        int i = list.LastIndexOf(t);
+        if (i < 0) return false;
+        int last = list.Count - 1;
+        list[i] = list[last];
+        list.RemoveAt(last);
+        return true;
     }
 
     private void Update()
     {
-        // Update all enemy positions (towers don't move, but we can just update all for simplicity)
-        List<Transform> keysToRemove = null;
-        
-        foreach (var kvp in unitDots)
-        {
-            Transform unitTransform = kvp.Key;
-            RectTransform dotRect = kvp.Value;
+        if (texture == null) return;
 
-            if (unitTransform == null)
+        timer += Time.unscaledDeltaTime;
+        if (timer < RefreshInterval) return;
+        timer = 0f;
+
+        System.Array.Clear(pixels, 0, pixels.Length);
+        float pixelsPerUi = TextureSize / Mathf.Max(1f, minimapContainer.rect.width);
+        DrawDots(enemies, EnemyColor, Mathf.Max(2, Mathf.RoundToInt(EnemyDotUi * pixelsPerUi)));
+        DrawDots(towers, TowerColor, Mathf.Max(2, Mathf.RoundToInt(TowerDotUi * pixelsPerUi)));
+
+        texture.SetPixels32(pixels);
+        texture.Apply(false);
+    }
+
+    private void DrawDots(List<Transform> units, Color32 color, int size)
+    {
+        float scale = TextureSize / (2f * gridHalfSize);
+        int half = size / 2;
+        for (int i = units.Count - 1; i >= 0; i--)
+        {
+            Transform t = units[i];
+            if (t == null) // destroyed without unregistering
             {
-                if (keysToRemove == null) keysToRemove = new List<Transform>();
-                keysToRemove.Add(unitTransform);
-                if (dotRect != null) Destroy(dotRect.gameObject);
+                units[i] = units[units.Count - 1];
+                units.RemoveAt(units.Count - 1);
                 continue;
             }
 
-            UpdateDotPosition(unitTransform, dotRect);
-        }
-
-        if (keysToRemove != null)
-        {
-            foreach (Transform t in keysToRemove)
+            Vector3 p = t.position;
+            int cx = Mathf.RoundToInt((p.x + gridHalfSize) * scale) - half;
+            int cy = Mathf.RoundToInt((p.z + gridHalfSize) * scale) - half;
+            for (int y = cy; y < cy + size; y++)
             {
-                unitDots.Remove(t);
+                if (y < 0 || y >= TextureSize) continue;
+                int row = y * TextureSize;
+                for (int x = cx; x < cx + size; x++)
+                {
+                    if (x < 0 || x >= TextureSize) continue;
+                    pixels[row + x] = color;
+                }
             }
         }
-    }
-
-    private void UpdateDotPosition(Transform unitTransform, RectTransform dotRect)
-    {
-        // Map World coordinates to Minimap coordinates
-        // World: -98 to 98
-        // Minimap: -50 to 50 (since anchored to center 0.5)
-        
-        float mapRatio = (minimapSize / 2f) / gridHalfSize;
-        
-        float mapX = unitTransform.position.x * mapRatio;
-        float mapY = unitTransform.position.z * mapRatio; // Map world Z to UI Y
-        
-        dotRect.anchoredPosition = new Vector2(mapX, mapY);
     }
 }

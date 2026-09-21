@@ -13,7 +13,8 @@
 - [x] `Singleton<T>` base class for the 7 manager singletons
 - [x] UI now lives in the scene (built once by `Tools > Build UI`, `Assets/Scripts/Editor/UIBuilder.cs`); fields wired via `SerializedObject`, reflection and `GameBoot.SetupUI` removed. Edit the Canvas in the scene directly from now on.
 - [x] Towers and enemies are prefabs (`Assets/Prefabs`) driven by `TowerData` / `EnemyData` / `WaveSet` assets in `Assets/Data`. `Tools > Build Game Data` creates missing assets/prefabs and wires the managers. Also fixed double tower registration and the sell-refund mismatch.
-- [ ] Projectiles are still built at runtime (`Tower.FireAtTarget` creates a sphere); make a Projectile prefab and pool them.
+- [x] Projectiles are pooled (`Projectile.Spawn`); a real Projectile prefab is still optional polish.
+- [x] Performance pass (measured with `PerfBench`, level 45 = 1800 creeps + 80 towers): placement 61 ms -> 4 ms (worst frame after placing 118 -> 4 ms), average frame 14.8 -> 1.2 ms, GC 216 -> 6 KB/frame, spawn hitch 47 ms -> 5 ms, creep material leak fixed. Path system rewritten (flat grid, greedy validation, budgeted flow-field refresh), `EnemyManager` (one tick loop + spatial grid; creeps have no colliders), minimap drawn into one texture.
 - [ ] Tower/enemy icons (`TowerData.icon`) and the command-card swap to Sell/Upgrade when a tower is selected (WC3 style).
 - [x] `TowerManager`: shared `CanPlaceAt`, click-per-attempt (shift+drag still paints), ghost material works under URP
 - [x] Wave/game flow: a wave is cleared only when spawning is finished AND no creeps are alive (fixes early next-wave / early win); no win after game over; `HashSet` for active creeps; `timeScale` reset on load; missing spawners/enemy now log an error and don't silently skip.
@@ -24,8 +25,6 @@
 - [ ] Tower behaviour not simulated yet (ids kept in `TowerData.abilityIds`): stock abilities (slow, poison, chain lightning, cleave, ...; their numbers live in the game's own data, not the map), missile splash (`ua1f/h/q`), second attacks (`ua2*`), tower build time, attack/defense types. Cooldown 0 towers (the 1500-gold "ultimates") are clamped to 0.1s, which makes them extremely strong; check against the real game.
 - [ ] Tower icons: the map uses `.blp` icons; convert or draw placeholders and assign `TowerData.icon`.
 - [ ] `yellow_right` spawns only 1 creep per level; show a "Level N in..." countdown in the HUD; some levels change lives (see `war3map.j`).
-- [ ] **`Tower.Update`:** `Physics.OverlapSphere` + `GetComponent<Enemy>()` per tower per targeting tick. Fine now; consider a
-      shared enemy registry and distance checks if creep counts grow.
 - [ ] **`PathManager` grid size** hard-coded 200x200 (vs GridManager 256 / 196). Fold into the pathing rewrite: expose
       grid dimensions from `GridManager` and use them everywhere.
 - [ ] `MapGenerator` is located via reflection in `GameBoot` (`mapTexture` private field) -> add a public setter or serialize in the scene.

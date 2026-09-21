@@ -38,7 +38,18 @@ public class PlayerInteraction : Singleton<PlayerInteraction>
     {
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
         
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        // Creeps have no colliders; pick them from the creep registry and compare with whatever the physics ray hit first.
+        bool hitPhysics = Physics.Raycast(ray, out RaycastHit hit);
+        float physicsDistance = hitPhysics ? hit.distance : float.MaxValue;
+        float creepDistance = float.MaxValue;
+        Enemy creep = EnemyManager.Instance != null ? EnemyManager.Instance.PickAlongRay(ray, 0.6f, out creepDistance) : null;
+        if (creep != null && creepDistance < physicsDistance)
+        {
+            SelectUnit(creep);
+            return;
+        }
+
+        if (hitPhysics)
         {
             ISelectable unit = hit.collider.GetComponentInParent<ISelectable>();
             

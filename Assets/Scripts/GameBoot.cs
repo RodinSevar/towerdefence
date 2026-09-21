@@ -147,6 +147,13 @@ public class GameBoot : MonoBehaviour
             pmObj.AddComponent<PathManager>();
         }
 
+        // Create EnemyManager if not exists (ticks all creeps and answers spatial queries)
+        if (FindAnyObjectByType<EnemyManager>() == null)
+        {
+            GameObject emObj = new GameObject("EnemyManager");
+            emObj.AddComponent<EnemyManager>();
+        }
+
         // Create TowerManager if not exists
         if (FindAnyObjectByType<TowerManager>() == null)
         {

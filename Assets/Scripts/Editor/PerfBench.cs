@@ -97,6 +97,8 @@ public static class PerfBench
             case 6: PlacementUnderLoad(); break;
             case 7: MeasureSpike(); break;
             case 8: Attribution(); break;
+            case 9: Behavior(); break;
+            case 12: WaitSpawn(); break;
         }
     }
 
@@ -104,6 +106,9 @@ public static class PerfBench
     {
         GameManager.Instance.CancelInvoke();          // no automatic wave
         GameManager.Instance.AddGold(10000000);
+        // creeps leaking must not end the game (GameOver freezes game time); give the bench effectively unlimited lives
+        typeof(GameManager).GetField("currentLives", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            .SetValue(GameManager.Instance, 1000000);
         var spawners = WaveManager.Instance.activeSpawners;
         Debug.Log($"BENCH env spawners={spawners.Count} towerData={Towers().Length} unityVersion={Application.unityVersion}");
         step = 10;
@@ -323,13 +328,29 @@ public static class PerfBench
         step = 4;
     }
 
+    private static double spawnStart, spawnMaxDt;
+    private static int spawnFrames, materialsBefore;
+
     private static void SpawnWave()
     {
-        var sw = Stopwatch.StartNew();
+        materialsBefore = Resources.FindObjectsOfTypeAll<Material>().Length;
+        spawnStart = Time.realtimeSinceStartupAsDouble;
         bool ok = WaveManager.Instance.StartWave(BenchWave);
-        double ms = sw.Elapsed.TotalMilliseconds;
+        Debug.Log($"BENCH spawnWave wave={BenchWave} started={ok}");
+        spawnFrames = 0; spawnMaxDt = 0;
+        step = 12;
+    }
+
+    private static void WaitSpawn()
+    {
+        spawnFrames++;
+        double dt = Time.unscaledDeltaTime;
+        if (dt > spawnMaxDt) spawnMaxDt = dt;
+        if (WaveManager.Instance.IsSpawning) return;
+
         int enemies = UnityEngine.Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None).Length;
-        Debug.Log($"BENCH spawnWave wave={BenchWave} ok={ok} enemies={enemies} spawn_ms={ms:F1}");
+        int materialsAfter = Resources.FindObjectsOfTypeAll<Material>().Length;
+        Debug.Log($"BENCH spawnDone enemies={enemies} frames={spawnFrames} maxFrameWhileSpawning_ms={spawnMaxDt * 1000:F1} materialsBefore={materialsBefore} materialsAfter={materialsAfter}");
 
         allocRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "GC Allocated In Frame");
         gcCollections = GC.CollectionCount(0);
@@ -368,6 +389,53 @@ public static class PerfBench
         step = 7;
     }
 
+    // ---- behavior: fixed game time, so results do not depend on how fast frames run ----
+    private static double behaviorStart = -1;
+    private static int aliveAtStart, livesAtStart, goldAtStart;
+    private const double BehaviorSeconds = 5.0;
+
+    private static void Behavior()
+    {
+        if (behaviorStart < 0)
+        {
+            behaviorStart = Time.timeAsDouble;
+            aliveAtStart = EnemyManager.Instance.Count;
+            livesAtStart = GameManager.Instance.GetCurrentLives();
+            goldAtStart = GameManager.Instance.GetCurrentGold();
+            return;
+        }
+        if (Time.timeAsDouble - behaviorStart < BehaviorSeconds) return;
+
+        int alive = EnemyManager.Instance.Count;
+        int leaked = livesAtStart - GameManager.Instance.GetCurrentLives();
+        int killed = aliveAtStart - alive - leaked;
+        int projectilesActive = 0;
+        foreach (var p in UnityEngine.Object.FindObjectsByType<Projectile>(FindObjectsSortMode.None)) if (p.gameObject.activeSelf) projectilesActive++;
+
+        // ray picking: a ray straight down onto a creep must select it
+        string pick = "no creep";
+        var first = UnityEngine.Object.FindFirstObjectByType<Enemy>();
+        if (first != null)
+        {
+            var picked = EnemyManager.Instance.PickAlongRay(new Ray(first.AimPoint + Vector3.up * 10f, Vector3.down), 0.6f, out float d);
+            pick = picked == first ? $"ok (distance {d:F1})" : (picked == null ? "MISSED" : "picked a different creep (overlapping)");
+        }
+
+        // minimap: count painted pixels in the dots texture
+        int enemyPixels = 0, towerPixels = 0;
+        var dots = GameObject.Find("MinimapDots");
+        if (dots != null && dots.GetComponent<UnityEngine.UI.RawImage>().texture is Texture2D tex)
+        {
+            foreach (var c in tex.GetPixels32()) { if (c.r > 200 && c.b < 50) enemyPixels++; else if (c.b > 200 && c.r < 100) towerPixels++; }
+        }
+
+        Debug.Log($"BENCH behavior gameSeconds={BehaviorSeconds:F0} aliveStart={aliveAtStart} aliveEnd={alive} killed={killed} leaked={leaked} " +
+                  $"goldGained={GameManager.Instance.GetCurrentGold() - goldAtStart} activeProjectiles={projectilesActive} " +
+                  $"pick={pick} minimapEnemyPixels={enemyPixels} minimapTowerPixels={towerPixels}");
+        attrIndex = 0; attrFrames = 0; attrSum = 0;
+        step = 8;
+    }
+
     // ---- attribution: measure average frame time with each system switched off ----
     private static int attrIndex, attrFrames;
     private static double attrSum;
@@ -377,7 +445,7 @@ public static class PerfBench
     {
         if (MinimapManager.Instance != null) MinimapManager.Instance.enabled = minimap;
         foreach (var t in UnityEngine.Object.FindObjectsByType<Tower>(FindObjectsSortMode.None)) t.enabled = towers;
-        foreach (var e in UnityEngine.Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None)) e.enabled = enemies;
+        if (EnemyManager.Instance != null) EnemyManager.Instance.enabled = enemies;
     }
 
     private static void Attribution()
@@ -413,7 +481,8 @@ public static class PerfBench
         {
             Debug.Log($"BENCH spikeAfterPlacement maxFrame_ms={spikeMax * 1000:F1}");
             attrIndex = 0; attrFrames = 0; attrSum = 0;
-            step = 8;
+            step =  9;
+            behaviorStart = -1;
         }
     }
 }

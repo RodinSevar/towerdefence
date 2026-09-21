@@ -15,7 +15,22 @@ public class Enemy : MonoBehaviour, ISelectable
     // Pathfinding state
     private int targetWaypointIndex = 1; // 0 is usually spawn, so head to 1
     
-    private Color baseColor;
+    private Material normalMaterial;
+    private Material tintedMaterial;
+    private bool tinted;
+    private Transform cachedTransform;
+    private Vector3 lastLookDir;
+
+    /// <summary>Index in <see cref="EnemyManager"/>'s list (managed by it).</summary>
+    public int ManagerIndex { get; set; } = -1;
+
+    public bool IsAlive => isAlive;
+
+    /// <summary>Cached world position (updated by Tick), so queries do not touch the Transform.</summary>
+    public Vector3 Position { get; private set; }
+
+    /// <summary>Where towers and projectiles aim: the creep's center, not its feet.</summary>
+    public Vector3 AimPoint => Position + Vector3.up * 0.4f;
 
     private List<StatusEffect> activeEffects = new List<StatusEffect>();
     private Vector3[] myWaypoints;
@@ -28,29 +43,32 @@ public class Enemy : MonoBehaviour, ISelectable
         currentHealth = data.health;
         myWaypoints = waypoints;
 
-        baseColor = color;
         visualRenderer.transform.localScale = Vector3.one * data.visualScale;
-        visualRenderer.material.color = color;
+
+        // Shared coloured materials (one per colour, not one per creep)
+        Material template = visualRenderer.sharedMaterial;
+        normalMaterial = MaterialCache.Get(template, color);
+        tintedMaterial = MaterialCache.Get(template, Color.Lerp(color, Color.cyan, 0.7f));
+        visualRenderer.sharedMaterial = normalMaterial;
 
         formationOffset = GetSpiralOffset(index, 0.8f);
-        transform.position += formationOffset;
-    }
+        cachedTransform = transform;
+        cachedTransform.position += formationOffset;
+        Position = cachedTransform.position;
 
-    private void Start()
-    {
-        selectionRing.GetComponent<Renderer>().material.color = Color.green;
-
+        EnemyManager.Instance.Register(this);
         if (MinimapManager.Instance != null)
         {
-            MinimapManager.Instance.RegisterUnit(transform, true);
+            MinimapManager.Instance.RegisterUnit(cachedTransform, true);
         }
     }
 
-    private void Update()
+    /// <summary>Called once per frame by <see cref="EnemyManager"/>.</summary>
+    public void Tick(float dt)
     {
         if (!isAlive) return;
-        ProcessStatusEffects();
-        MoveAlongPath();
+        ProcessStatusEffects(dt);
+        MoveAlongPath(dt);
     }
 
     public void ApplyStatusEffect(StatusEffect newEffect)
@@ -78,14 +96,16 @@ public class Enemy : MonoBehaviour, ISelectable
         activeEffects.Add(new StatusEffect(newEffect.type, newEffect.duration, newEffect.strength));
     }
 
-    private void ProcessStatusEffects()
+    private void ProcessStatusEffects(float dt)
     {
+        if (activeEffects.Count == 0 && !tinted) return; // nothing to update, and no material writes
+
         bool hasSlow = false;
 
         for (int i = activeEffects.Count - 1; i >= 0; i--)
         {
             StatusEffect effect = activeEffects[i];
-            effect.duration -= Time.deltaTime;
+            effect.duration -= dt;
 
             if (effect.type == StatusEffectType.Slow)
             {
@@ -98,22 +118,15 @@ public class Enemy : MonoBehaviour, ISelectable
             }
         }
 
-        // Visual feedback
-        if (visualRenderer != null)
+        // Visual feedback: only touch the material when the slowed state changes
+        if (visualRenderer != null && hasSlow != tinted)
         {
-            if (hasSlow)
-            {
-                // Tint cyan if slowed
-                visualRenderer.material.color = Color.Lerp(baseColor, Color.cyan, 0.7f);
-            }
-            else
-            {
-                visualRenderer.material.color = baseColor;
-            }
+            tinted = hasSlow;
+            visualRenderer.sharedMaterial = hasSlow ? tintedMaterial : normalMaterial;
         }
     }
 
-    private void MoveAlongPath()
+    private void MoveAlongPath(float dt)
     {
         if (PathManager.Instance == null || myWaypoints == null) return;
 
@@ -127,11 +140,9 @@ public class Enemy : MonoBehaviour, ISelectable
         Vector3 targetNode = myWaypoints[targetWaypointIndex];
         
         // Ignore Y for distance check to prevent overshooting on ramps
-        Vector3 flatPos = new Vector3(transform.position.x, 0, transform.position.z);
-        Vector3 flatTarget = new Vector3(targetNode.x, 0, targetNode.z);
-        
-        float distanceToTarget = Vector3.Distance(flatPos, flatTarget);
-        if (distanceToTarget < 1.0f) // reached major waypoint
+        float dxTarget = Position.x - targetNode.x;
+        float dzTarget = Position.z - targetNode.z;
+        if (dxTarget * dxTarget + dzTarget * dzTarget < 1.0f) // reached major waypoint
         {
             targetWaypointIndex++;
             if (targetWaypointIndex >= myWaypoints.Length)
@@ -142,12 +153,12 @@ public class Enemy : MonoBehaviour, ISelectable
             targetNode = myWaypoints[targetWaypointIndex];
         }
 
-        Vector2 flowDir = PathManager.Instance.GetFlowDirection(transform.position, targetNode);
+        Vector2 flowDir = PathManager.Instance.GetFlowDirection(Position, targetNode);
         if (flowDir == Vector2.zero)
         {
             // If the flow field returns 0, we might be blocked or at the exact destination.
             // Steer directly towards target just in case, or stop.
-            flowDir = new Vector2(targetNode.x - transform.position.x, targetNode.z - transform.position.z).normalized;
+            flowDir = new Vector2(targetNode.x - Position.x, targetNode.z - Position.z).normalized;
         }
 
         Vector3 moveDir = new Vector3(flowDir.x, 0, flowDir.y);
@@ -166,11 +177,13 @@ public class Enemy : MonoBehaviour, ISelectable
         
         currentSpeed *= (1f - maxSlow);
         
-        transform.position += moveDir * currentSpeed * Time.deltaTime;
-        
-        if (moveDir != Vector3.zero)
+        Position += moveDir * currentSpeed * dt;
+        cachedTransform.position = Position;
+
+        if (moveDir != Vector3.zero && moveDir != lastLookDir) // rotation only changes when the heading does
         {
-            transform.rotation = Quaternion.LookRotation(moveDir);
+            lastLookDir = moveDir;
+            cachedTransform.rotation = Quaternion.LookRotation(moveDir);
         }
     }
 
@@ -201,6 +214,7 @@ public class Enemy : MonoBehaviour, ISelectable
         isAlive = false;
         GameManager.Instance.AddGold(data.goldReward);
         GameManager.Instance.UnregisterEnemy(this);
+        if (EnemyManager.Instance != null) EnemyManager.Instance.Unregister(this);
         
         if (MinimapManager.Instance != null)
         {

@@ -1,63 +1,86 @@
+using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// A shot flying toward a creep. Projectiles are pooled: <see cref="Spawn"/> reuses an inactive one instead of
+/// building a new sphere primitive (and material) for every shot.
+/// </summary>
 public class Projectile : MonoBehaviour
 {
+    private static readonly Stack<Projectile> pool = new Stack<Projectile>();
+
     private Enemy target;
     private float speed;
     private float damage;
     private StatusEffect payloadEffect;
-    private bool initialized = false;
+    private Transform tr;
+    private Renderer rend;
 
-    public void Initialize(Enemy targetEnemy, float travelSpeed, float hitDamage, StatusEffect effect = null)
+    public static void Spawn(Vector3 position, float scale, Color color, Enemy targetEnemy, float travelSpeed,
+        float hitDamage, StatusEffect effect)
     {
-        target = targetEnemy;
-        speed = travelSpeed;
-        damage = hitDamage;
-        payloadEffect = effect;
-        initialized = true;
+        Projectile p = null;
+        while (pool.Count > 0 && p == null) p = pool.Pop(); // skip entries destroyed by a scene reload
+        if (p == null) p = Create();
+
+        p.tr.position = position;
+        p.tr.localScale = Vector3.one * scale;
+        p.rend.material.color = color;
+        p.target = targetEnemy;
+        p.speed = travelSpeed;
+        p.damage = hitDamage;
+        p.payloadEffect = effect;
+        p.gameObject.SetActive(true);
+    }
+
+    private static Projectile Create()
+    {
+        GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        go.name = "Projectile";
+        Destroy(go.GetComponent<Collider>()); // no collider: it must not block rays
+        Projectile p = go.AddComponent<Projectile>();
+        p.tr = go.transform;
+        p.rend = go.GetComponent<Renderer>();
+        return p;
     }
 
     private void Update()
     {
-        if (!initialized) return;
-
-        // If target dies while bullet is in flight, self destruct
-        if (target == null)
+        // If the target dies while the shot is in flight, recycle it
+        if (target == null || !target.IsAlive)
         {
-            Destroy(gameObject);
+            Release();
             return;
         }
 
-        // Aim at target's center, not its feet
-        Vector3 targetPos = target.transform.position + Vector3.up * 0.4f;
-        
-        Vector3 direction = (targetPos - transform.position).normalized;
+        Vector3 targetPos = target.AimPoint;
+        Vector3 toTarget = targetPos - tr.position;
         float distanceThisFrame = speed * Time.deltaTime;
 
-        if (Vector3.Distance(transform.position, targetPos) <= distanceThisFrame)
+        if (toTarget.sqrMagnitude <= distanceThisFrame * distanceThisFrame)
         {
             HitTarget();
             return;
         }
 
-        transform.Translate(direction * distanceThisFrame, Space.World);
-        transform.rotation = Quaternion.LookRotation(direction);
+        tr.position += toTarget.normalized * distanceThisFrame;
     }
 
     private void HitTarget()
     {
-        if (target != null)
+        target.TakeDamage(damage);
+        if (payloadEffect != null)
         {
-            target.TakeDamage(damage);
-            
-            if (payloadEffect != null)
-            {
-                target.ApplyStatusEffect(payloadEffect);
-            }
+            target.ApplyStatusEffect(payloadEffect);
         }
-        
-        // Add impact particle effect here later if desired
-        
-        Destroy(gameObject);
+        Release();
+    }
+
+    private void Release()
+    {
+        target = null;
+        payloadEffect = null;
+        gameObject.SetActive(false);
+        pool.Push(this);
     }
 }

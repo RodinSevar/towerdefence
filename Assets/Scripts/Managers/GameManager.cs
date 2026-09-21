@@ -61,8 +61,6 @@ public class GameManager : Singleton<GameManager>
         currentWave = nextWave;
         OnWaveStarted?.Invoke(currentWave);
 
-        // A wave with no creeps is cleared immediately.
-        CheckWaveCleared();
     }
 
     public void AddGold(int amount)
@@ -107,11 +105,18 @@ public class GameManager : Singleton<GameManager>
         CheckWaveCleared();
     }
 
-    /// <summary>A wave is cleared when no creeps are alive (they all spawn at once, as in the original map).</summary>
+    /// <summary>Called by WaveManager once the last creep of a wave has been instantiated.</summary>
+    public void NotifyWaveSpawningComplete()
+    {
+        // Every creep may already be dead, or the wave may have had none.
+        CheckWaveCleared();
+    }
+
+    /// <summary>A wave is cleared when every creep has spawned and none is alive.</summary>
     private void CheckWaveCleared()
     {
         if (isGameOver) return;
-        if (activeEnemies.Count > 0) return;
+        if (activeEnemies.Count > 0 || WaveManager.Instance.IsSpawning) return;
 
         // Original map: bonus grows by 2 each level and is paid on clear.
         levelBonus += levelBonusStep;

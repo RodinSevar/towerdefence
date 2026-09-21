@@ -173,8 +173,8 @@ public static class GameDataBuilder
     {
         var root = new GameObject("Enemy");
         var enemy = root.AddComponent<Enemy>();
-        root.AddComponent<BoxCollider>().size = new Vector3(0.8f, 0.8f, 0.8f); // used for tower targeting and selection
 
+        // No collider on creeps: targeting and mouse picking use EnemyManager, and moving colliders are costly.
         GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Cube);
         visual.name = "EnemyVisual";
         visual.transform.SetParent(root.transform, false);
@@ -196,8 +196,46 @@ public static class GameDataBuilder
         ring.transform.localScale = new Vector3(1.2f, 0.05f, 1.2f);
         ring.transform.localPosition = new Vector3(0, 0.05f, 0);
         Object.DestroyImmediate(ring.GetComponent<Collider>());
+        ring.GetComponent<Renderer>().sharedMaterial = SelectionRingMaterial(); // shared: no per-unit material instance
         ring.SetActive(false);
         return ring;
+    }
+
+    private const string MaterialDir = "Assets/Materials";
+
+    /// <summary>One green material shared by every selection ring (a per-unit material.color would create an instance each).</summary>
+    private static Material SelectionRingMaterial()
+    {
+        string path = $"{MaterialDir}/SelectionRing.mat";
+        var existing = AssetDatabase.LoadAssetAtPath<Material>(path);
+        if (existing != null) return existing;
+
+        Directory.CreateDirectory(MaterialDir);
+        var probe = GameObject.CreatePrimitive(PrimitiveType.Cylinder); // borrow the pipeline's default material
+        var mat = new Material(probe.GetComponent<Renderer>().sharedMaterial) { name = "SelectionRing" };
+        Object.DestroyImmediate(probe);
+        mat.color = Color.green;
+        AssetDatabase.CreateAsset(mat, path);
+        return mat;
+    }
+
+    /// <summary>Deletes and regenerates the Tower and Enemy prefabs (use after changing how they are built).</summary>
+    [MenuItem("Tools/Rebuild Prefabs")]
+    public static void RebuildPrefabsMenu()
+    {
+        AssetDatabase.DeleteAsset($"{PrefabDir}/Tower.prefab");
+        AssetDatabase.DeleteAsset($"{PrefabDir}/Enemy.prefab");
+        Build();
+    }
+
+    /// <summary>Batch entry point: rebuild the prefabs, rewire the scene and save.</summary>
+    public static void RebuildPrefabsAndSaveScene()
+    {
+        EditorSceneManager.OpenScene(ScenePath);
+        RebuildPrefabsMenu();
+        EditorSceneManager.SaveOpenScenes();
+        AssetDatabase.SaveAssets();
+        Debug.Log("GameDataBuilder: prefabs rebuilt.");
     }
 
     // ---------- helpers ----------

@@ -723,7 +723,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61212b7abe0155943a8ae3f627ecc57c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerManager
-  towerPrefab: {fileID: 1900166315306633938, guid: 47d83f44a02ee4d46aafff6256144f3f, type: 3}
+  towerPrefab: {fileID: 8410747679789097910, guid: 47d83f44a02ee4d46aafff6256144f3f, type: 3}
 --- !u!4 &183167221
 Transform:
   m_ObjectHideFlags: 0
@@ -6724,7 +6724,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6175efde77ad0174b9d96d149586e9e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
-  enemyPrefab: {fileID: 1124827398376145153, guid: 806baf9a87abcaf4688651a734caae5f, type: 3}
+  enemyPrefab: {fileID: 7061748117590123725, guid: 806baf9a87abcaf4688651a734caae5f, type: 3}
   waveSet: {fileID: 11400000, guid: 0ed12a14bd549834fb9f3ab52ab49530, type: 2}
   activeSpawners: []
 --- !u!4 &1747237988
