@@ -19,6 +19,21 @@ public class EnemyManager : Singleton<EnemyManager>
     // compacted once at the end of Update, just before the grid is rebuilt. Reshuffling on removal instead would leave the
     // grid's indices pointing at the wrong creep for the rest of the frame.
     private readonly List<Enemy> enemies = new List<Enemy>(2048);
+
+    // ---- path requests ----
+    // In the original game every move order needs a path from the pathfinder, and requests are served from a queue at a
+    // limited rate: a big group ordered to move at once starts in batches, and pauses again at each new order. Creeps
+    // that need a path ask here and stand still until it is granted.
+    [Tooltip("Path requests the pathfinder serves per second (0 = unlimited). A level of ~280 creeps then takes about " +
+             "280 / rate seconds to get moving. Calibrated to the original's \"couple of seconds\" until the engine's real " +
+             "scheduling is known.")]
+    public float pathRequestsPerSecond = 150f;
+
+    private readonly Queue<Enemy> pathQueue = new Queue<Enemy>();
+    private float pathBudget;
+
+    /// <summary>Creeps currently waiting for a path (for diagnostics).</summary>
+    public int PathQueueLength => pathQueue.Count;
     private int liveCount;
     private bool hasHoles;
     private int[] cellHead;      // first creep index in each cell, -1 if empty
@@ -32,6 +47,32 @@ public class EnemyManager : Singleton<EnemyManager>
         cellHead = new int[GridDim * GridDim];
         nextInCell = new int[2048];
         ClearGrid();
+    }
+
+    /// <summary>A creep received a new order and needs a path before it can move.</summary>
+    public void RequestPath(Enemy enemy)
+    {
+        if (pathRequestsPerSecond <= 0f) enemy.GrantPath();
+        else pathQueue.Enqueue(enemy);
+    }
+
+    private void ServePathRequests(float dt)
+    {
+        if (pathQueue.Count == 0)
+        {
+            pathBudget = 0f;
+            return;
+        }
+
+        // The budget accrues with time, so the rate is per game second regardless of frame rate.
+        pathBudget += pathRequestsPerSecond * dt;
+        while (pathBudget >= 1f && pathQueue.Count > 0)
+        {
+            Enemy e = pathQueue.Dequeue();
+            if (e == null || !e.IsAlive) continue; // died while waiting: costs nothing
+            e.GrantPath();
+            pathBudget -= 1f;
+        }
     }
 
     public void Register(Enemy enemy)
@@ -57,6 +98,7 @@ public class EnemyManager : Singleton<EnemyManager>
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver()) return;
 
         float dt = Time.deltaTime;
+        ServePathRequests(dt);
         // Creeps can die while ticking (reaching the end); their slots just become null. Creeps spawned meanwhile are
         // appended and start ticking next frame.
         int count = enemies.Count;

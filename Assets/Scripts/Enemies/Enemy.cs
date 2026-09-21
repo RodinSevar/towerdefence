@@ -15,7 +15,8 @@ public class Enemy : MonoBehaviour, ISelectable
     // Route state (see RouteStep): the current order target and the region whose entry issues the next order
     private RouteStep[] route;
     private int stepIndex;
-    private float holdTimer; // seconds still to wait at the spawn before the first order
+    private bool hasPath;        // granted a path for the current order; without one the creep stands still
+    private bool pathRequested;  // waiting in EnemyManager's path-request queue
     
     private Material normalMaterial;
     private Material tintedMaterial;
@@ -38,10 +39,11 @@ public class Enemy : MonoBehaviour, ISelectable
     private Vector3 formationOffset;
 
     /// <summary>
-    /// Sets up a freshly instantiated creep. Call right after Instantiate. The creep waits <paramref name="initialOrderDelay"/>
-    /// seconds at its spawn, then follows the spawner's route.
+    /// Sets up a freshly instantiated creep. Call right after Instantiate. Like every order in the original game, the
+    /// first move order needs a path from the pathfinder, so the creep stands still until EnemyManager's request queue
+    /// grants it one (see EnemyManager.pathRequestsPerSecond).
     /// </summary>
-    public void Init(EnemyData enemyData, Spawner spawner, int index, float initialOrderDelay)
+    public void Init(EnemyData enemyData, Spawner spawner, int index)
     {
         Color color = spawner.playerColor;
         Origin = spawner;
@@ -49,7 +51,6 @@ public class Enemy : MonoBehaviour, ISelectable
         currentHealth = data.health;
         route = spawner.steps;
         stepIndex = 0;
-        holdTimer = initialOrderDelay;
 
         visualRenderer.transform.localScale = Vector3.one * data.visualScale;
 
@@ -65,10 +66,26 @@ public class Enemy : MonoBehaviour, ISelectable
         Position = cachedTransform.position;
 
         EnemyManager.Instance.Register(this);
+        RequestPath();
         if (MinimapManager.Instance != null)
         {
             MinimapManager.Instance.RegisterUnit(cachedTransform, true);
         }
+    }
+
+    /// <summary>Called by EnemyManager when the pathfinder has produced this creep's path.</summary>
+    public void GrantPath()
+    {
+        hasPath = true;
+        pathRequested = false;
+    }
+
+    private void RequestPath()
+    {
+        hasPath = false;
+        if (pathRequested) return;
+        pathRequested = true;
+        EnemyManager.Instance.RequestPath(this);
     }
 
     /// <summary>Called once per frame by <see cref="EnemyManager"/>.</summary>
@@ -138,12 +155,8 @@ public class Enemy : MonoBehaviour, ISelectable
     {
         if (PathManager.Instance == null || route == null) return;
 
-        // Waiting at the spawn before the first order
-        if (holdTimer > 0f)
-        {
-            holdTimer -= dt;
-            return;
-        }
+        // No path yet for the current order: stand still until the pathfinder gets to this creep
+        if (!hasPath) return;
 
         if (stepIndex >= route.Length)
         {
@@ -160,6 +173,8 @@ public class Enemy : MonoBehaviour, ISelectable
                 return;
             }
             stepIndex++;
+            RequestPath(); // a new order needs a new path; the creep pauses until it is granted
+            return;
         }
 
         Vector3 targetNode = route[stepIndex].target;

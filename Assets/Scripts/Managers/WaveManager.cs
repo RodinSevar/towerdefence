@@ -6,10 +6,6 @@ public class WaveManager : Singleton<WaveManager>
     [SerializeField] private Enemy enemyPrefab;
     [SerializeField] private WaveSet waveSet;
 
-    [Tooltip("Seconds creeps wait at their spawn before their first move order. The original map's script issues the order " +
-             "immediately (0); a short hold gives the wave a moment to appear before it starts walking.")]
-    [SerializeField] private float initialOrderDelay = 3f;
-
     [Tooltip("Creeps instantiated per frame. The map spawns a level at once; spreading it over a few frames avoids a hitch.")]
     [SerializeField] private int spawnsPerFrame = 200;
 
@@ -108,7 +104,7 @@ public class WaveManager : Singleton<WaveManager>
         if (spawner.steps == null || spawner.steps.Length == 0) return;
 
         Enemy enemy = Instantiate(enemyPrefab, spawner.waypoints[0], Quaternion.identity);
-        enemy.Init(data, spawner, index, initialOrderDelay);
+        enemy.Init(data, spawner, index);
 
         GameManager.Instance.RegisterEnemy(enemy);
     }

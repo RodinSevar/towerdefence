@@ -166,8 +166,9 @@ public static class PerfBench
     private static Dictionary<Spawner, int> routeMaxStep;
     private static Dictionary<Enemy, Vector3> routeSpawnPos;
     private static float routeStartTime;
-    private static bool routeSpawned, routeHoldChecked;
-    private static double routeHoldMoved;
+    private static bool routeSpawned;
+    private static Dictionary<Enemy, float> routeFirstMove; // game time (since the wave started) each creep first moved
+    private static int routeMaxQueue;
 
     private static void RouteCheck()
     {
@@ -178,6 +179,8 @@ public static class PerfBench
                           $"steps={string.Join(" > ", System.Array.ConvertAll(s.steps, x => x.name))}");
             routeMaxStep = new Dictionary<Spawner, int>();
             routeSpawnPos = new Dictionary<Enemy, Vector3>();
+            routeFirstMove = new Dictionary<Enemy, float>();
+            routeMaxQueue = 0;
             routeLivesStart = GameManager.Instance.GetCurrentLives();
             Time.timeScale = 20f;
             WaveManager.Instance.StartWave(1);
@@ -198,18 +201,23 @@ public static class PerfBench
             if (e.StepIndex > best) routeMaxStep[e.Origin] = e.StepIndex;
         }
 
-        // hold: for the first second of game time nothing may have moved yet
         double gameTime = Time.time - routeStartTime;
-        if (!routeHoldChecked && gameTime > 1.0)
-        {
-            foreach (var e in alive) routeHoldMoved = Mathf.Max((float)routeHoldMoved, (e.Position - routeSpawnPos[e]).magnitude);
-            routeHoldChecked = true;
-            Debug.Log($"BENCH routeHold gameSeconds={gameTime:F1} creeps={alive.Length} maxDistanceMoved={routeHoldMoved:F2}");
-        }
+        routeMaxQueue = Mathf.Max(routeMaxQueue, EnemyManager.Instance.PathQueueLength);
+        foreach (var e in alive)
+            if (!routeFirstMove.ContainsKey(e) && (e.Position - routeSpawnPos[e]).sqrMagnitude > 0.0025f)
+                routeFirstMove[e] = (float)gameTime;
 
         if (alive.Length > 0 && gameTime < 400.0) return;
 
         int leaked = routeLivesStart - GameManager.Instance.GetCurrentLives();
+        if (routeFirstMove.Count > 0)
+        {
+            var starts = new List<float>(routeFirstMove.Values);
+            starts.Sort();
+            int movedBy1 = starts.FindAll(t => t <= 1f).Count, movedBy2 = starts.FindAll(t => t <= 2f).Count;
+            Debug.Log($"BENCH routeStagger creeps={starts.Count} firstMove_s={starts[0]:F2} median_s={starts[starts.Count / 2]:F2} lastMove_s={starts[starts.Count - 1]:F2} " +
+                      $"movedBy1s={movedBy1} movedBy2s={movedBy2} peakQueue={routeMaxQueue} rate={EnemyManager.Instance.pathRequestsPerSecond}/s");
+        }
         Debug.Log($"BENCH routeResult gameSeconds={gameTime:F0} spawned={routeCreeps} leaked={leaked} stillAlive={alive.Length}");
         foreach (var s in WaveManager.Instance.activeSpawners)
         {

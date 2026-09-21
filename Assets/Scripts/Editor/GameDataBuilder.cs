@@ -53,6 +53,8 @@ public static class GameDataBuilder
         var towerManager = FindOrCreate<TowerManager>("TowerManager");
         Wire(towerManager, "towerPrefab", towerPrefab);
 
+        FindOrCreate<EnemyManager>("EnemyManager"); // in the scene so pathRequestsPerSecond can be tuned in the Inspector
+
         var raceManager = FindOrCreate<RaceManager>("RaceManager");
         WireArray(raceManager, "races", races);
 
