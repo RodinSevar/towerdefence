@@ -99,7 +99,6 @@ public static class GameDataBuilder
                 {
                     enemy = i < 2 ? basic : strong,
                     enemyCount = 5 + i * 3,
-                    spawnInterval = 0.5f - i * 0.05f,
                 };
             }
         });

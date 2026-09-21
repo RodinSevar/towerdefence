@@ -16,7 +16,8 @@
 - [ ] Tower/enemy icons (`TowerData.icon`) and the command-card swap to Sell/Upgrade when a tower is selected (WC3 style).
 - [x] `TowerManager`: shared `CanPlaceAt`, click-per-attempt (shift+drag still paints), ghost material works under URP
 - [x] Wave/game flow: a wave is cleared only when spawning is finished AND no creeps are alive (fixes early next-wave / early win); no win after game over; `HashSet` for active creeps; `timeScale` reset on load; missing spawners/enemy now log an error and don't silently skip.
-- [ ] Match the real map's wave rules (from `mpq_files/war3map.j`, triggers `Next Level`, `Core Funtion`, `Set Levels`, `Gold and Tips`): next level starts when all creeps are dead, after a 30s countdown (60s before level 1); ALL creeps of a level spawn at once at every spawn region (20 each, some levels 15; `yellow_right` gets 1); each cleared level pays a growing bonus (+2 per level); ~50 levels. Ours: 5s delay, one creep per spawner per interval, 5 placeholder waves. Long term: generate the `WaveSet` from `Set Levels` and creep stats from `war3map.w3u`.
+- [x] Wave rules match the real map: 60s before level 1 then 30s after each clear, all creeps of a level spawn at once at every spawner, +2 growing level bonus paid on clear, start gold 60.
+- [ ] Import the real ~50 levels from `war3map.j` (`Set Levels`) into a `WaveSet`, and creep stats from `war3map.w3u`. Also: `yellow_right` spawns only 1 creep per level; show a "Level N in..." countdown in the HUD.
 - [ ] **`Tower.Update`:** `Physics.OverlapSphere` + `GetComponent<Enemy>()` per tower per targeting tick. Fine now; consider a
       shared enemy registry and distance checks if creep counts grow.
 - [ ] **`PathManager` grid size** hard-coded 200x200 (vs GridManager 256 / 196). Fold into the pathing rewrite: expose

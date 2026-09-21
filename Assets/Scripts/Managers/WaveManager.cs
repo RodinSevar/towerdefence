@@ -9,15 +9,9 @@ public class WaveManager : Singleton<WaveManager>
     private WaveSet.Wave[] waves => waveSet != null ? waveSet.waves : System.Array.Empty<WaveSet.Wave>();
 
     private int currentWave = 0;
-    private int enemiesSpawnedInWave = 0;
-    private float spawnTimer = 0f;
-    private bool isSpawning = false;
 
     // Spawners register themselves in Spawner.Start
     public List<Spawner> activeSpawners = new List<Spawner>();
-
-    /// <summary>True while the current wave still has creeps left to spawn.</summary>
-    public bool IsSpawning => isSpawning;
 
     public void RegisterSpawner(Spawner spawner)
     {
@@ -30,30 +24,10 @@ public class WaveManager : Singleton<WaveManager>
         activeSpawners.Remove(spawner);
     }
 
-    private void Update()
-    {
-        if (!isSpawning) return;
-
-        WaveSet.Wave wave = waves[currentWave - 1];
-
-        spawnTimer += Time.deltaTime;
-        if (spawnTimer < wave.spawnInterval) return;
-        spawnTimer = 0f;
-
-        foreach (var spawner in activeSpawners)
-        {
-            SpawnEnemy(wave.enemy, spawner, enemiesSpawnedInWave);
-        }
-        enemiesSpawnedInWave++;
-
-        if (enemiesSpawnedInWave >= wave.enemyCount)
-        {
-            isSpawning = false;
-            GameManager.Instance.NotifyWaveSpawningComplete();
-        }
-    }
-
-    /// <summary>Begins spawning the given wave (1-based). Returns false if it could not start.</summary>
+    /// <summary>
+    /// Spawns the given wave (1-based). As in the original map, every creep of the wave appears at once,
+    /// enemyCount at each spawner. Returns false if it could not start.
+    /// </summary>
     public bool StartWave(int waveNumber)
     {
         if (waveNumber < 1 || waveNumber > waves.Length)
@@ -75,9 +49,13 @@ public class WaveManager : Singleton<WaveManager>
         }
 
         currentWave = waveNumber;
-        enemiesSpawnedInWave = 0;
-        spawnTimer = wave.spawnInterval; // Spawn first enemy immediately
-        isSpawning = true;
+        foreach (var spawner in activeSpawners)
+        {
+            for (int i = 0; i < wave.enemyCount; i++)
+            {
+                SpawnEnemy(wave.enemy, spawner, i);
+            }
+        }
         return true;
     }
 

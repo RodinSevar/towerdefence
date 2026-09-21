@@ -9,7 +9,6 @@ public class WaveSet : ScriptableObject
     {
         public EnemyData enemy;
         public int enemyCount = 10;
-        public float spawnInterval = 0.5f;
     }
 
     public Wave[] waves;

@@ -5,9 +5,15 @@ public class GameManager : Singleton<GameManager>
 {
     [Header("Game Settings")]
     public int initialLives = 20;
-    public int initialGold = 500;
-    [Tooltip("Seconds between a wave being cleared and the next one starting (also before wave 1)")]
-    public float waveDelay = 5f;
+    public int initialGold = 60; // as in the original map
+    [Tooltip("Countdown before wave 1")]
+    public float firstWaveDelay = 60f;
+    [Tooltip("Countdown between a wave being cleared and the next one starting")]
+    public float waveDelay = 30f;
+
+    [Header("Level bonus (paid each time a wave is cleared)")]
+    public int levelBonus = 10;
+    public int levelBonusStep = 2;
 
     private int currentLives;
     private int currentGold;
@@ -35,7 +41,7 @@ public class GameManager : Singleton<GameManager>
         OnLivesChanged?.Invoke(currentLives);
 
         // Start the first wave after a delay
-        Invoke(nameof(StartNextWave), waveDelay);
+        Invoke(nameof(StartNextWave), firstWaveDelay);
     }
 
     public void StartNextWave()
@@ -47,6 +53,9 @@ public class GameManager : Singleton<GameManager>
 
         currentWave = nextWave;
         OnWaveStarted?.Invoke(currentWave);
+
+        // A wave with no creeps is cleared immediately.
+        CheckWaveCleared();
     }
 
     public void AddGold(int amount)
@@ -77,18 +86,16 @@ public class GameManager : Singleton<GameManager>
         CheckWaveCleared();
     }
 
-    /// <summary>Called by WaveManager once the last creep of a wave has spawned.</summary>
-    public void NotifyWaveSpawningComplete()
-    {
-        // Every creep may already be dead (e.g. killed between spawn ticks).
-        CheckWaveCleared();
-    }
-
-    /// <summary>A wave is cleared only when nothing is left to spawn AND nothing is alive.</summary>
+    /// <summary>A wave is cleared when no creeps are alive (they all spawn at once, as in the original map).</summary>
     private void CheckWaveCleared()
     {
         if (isGameOver) return;
-        if (activeEnemies.Count > 0 || WaveManager.Instance.IsSpawning) return;
+        if (activeEnemies.Count > 0) return;
+
+        // Original map: bonus grows by 2 each level and is paid on clear.
+        levelBonus += levelBonusStep;
+        AddGold(levelBonus);
+        Debug.Log($"Level {currentWave} cleared: +{levelBonus} gold");
 
         if (currentWave < WaveManager.Instance.GetTotalWaves())
         {
