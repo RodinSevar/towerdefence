@@ -32,6 +32,10 @@
 - [ ] Scene tags ("Ground", "SpawnPoint") should be set up in the project.
 - [ ] Review `mpq_files/` (raw map extract): keep, but note in README what is used vs. reference only.
 
+## Known visual problems (future)
+- [ ] **Terrain walls are sometimes transparent.** Likely cause (not yet verified): `MapGenerator` only generates a wall by comparing each cell with its left and lower neighbour, and `DrawWall` uses a fixed triangle winding (`flip` only distinguishes left vs down), so a wall between a high and a low cell faces the right way only when the *current* cell is the low one. When the current cell is the higher one the wall is back-face culled (invisible from the low side). Fix: choose the winding from which side is higher, or emit both sides / use a double-sided material. Also check ramp cells (blue) where corner heights differ.
+- [ ] **Terrain is derived from the pathing map, not the real terrain.** `MapLayout.png` was made from the original's pathing/texture data (`WPMImporter`), so cliffs and ramps are blocky and noisy, with only 3 height levels. `mpq_files/war3map.w3e` holds the real terrain (per-corner ground height, cliff levels, ramp flags, tile textures); rebuild the mesh from that instead, and keep the pathing map only for buildability.
+
 ## Kept on purpose
 The `Tools/` menu importers in `Assets/Scripts/Editor` (`WPMImporter`, `W3RImporter`, `JassWaypointParser`,
 `WintermaulSpawnerGenerator`, `ApplySpawnerCoords`) and `spawner_coords.txt` / `region_dump.txt`. They are hand-run tools that
