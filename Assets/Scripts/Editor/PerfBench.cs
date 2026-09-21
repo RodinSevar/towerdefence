@@ -255,7 +255,7 @@ public static class PerfBench
                 var nb = new Vector2Int(cur.x + dx, cur.y + dy);
                 if (!LegacyValid(nb, cur)) continue;
                 if (dx != 0 && dy != 0 && (!LegacyValid(new Vector2Int(nb.x, cur.y), cur) || !LegacyValid(new Vector2Int(cur.x, nb.y), cur))) continue;
-                if (nb.x < -100 || nb.x >= 100 || nb.y < -100 || nb.y >= 100) continue;
+                if (!GridManager.Instance.IsPlayable(nb)) continue;
                 if (seen.Add(nb)) q.Enqueue(nb);
             }
         }

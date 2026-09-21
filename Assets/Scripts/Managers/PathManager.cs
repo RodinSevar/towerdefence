@@ -20,6 +20,7 @@ public class PathManager : Singleton<PathManager>
     [SerializeField] private float regenerationBudgetMs = 2f;
 
     private const int Size = GridManager.ArraySize;
+    private const int SizeShift = 9; // log2(Size)
     private const int CellCount = Size * Size;
     private const float MaxStepHeight = 1.2f;
     private const int InfDistance = int.MaxValue;
@@ -283,7 +284,7 @@ public class PathManager : Singleton<PathManager>
     private static int Heuristic(int a, int b)
     {
         int dx = (a & (Size - 1)) - (b & (Size - 1));
-        int dy = (a >> 8) - (b >> 8);
+        int dy = (a >> SizeShift) - (b >> SizeShift);
         if (dx < 0) dx = -dx;
         if (dy < 0) dy = -dy;
         return dx > dy ? OrthCost * dx + (DiagCost - OrthCost) * dy : OrthCost * dy + (DiagCost - OrthCost) * dx;

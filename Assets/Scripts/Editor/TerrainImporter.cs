@@ -130,6 +130,16 @@ public static class TerrainImporter
 
         // Warcraft III pathing bits: 0x02 = not walkable, 0x08 = not buildable. Each 2x2 block of 32-unit pathing cells is
         // one 64-unit cell; the map is authored at that granularity, so the blocks are uniform and OR-ing loses nothing.
+        data.fineX = w; data.fineZ = h;
+        data.pathingFine = new byte[w * h];
+        for (int i = 0; i < w * h; i++)
+        {
+            byte raw = file[16 + i], f = 0;
+            if ((raw & 0x02) != 0) f |= TerrainMapData.PathBlocked;
+            else if ((raw & 0x08) != 0) f |= TerrainMapData.PathNoBuild;
+            data.pathingFine[i] = f;
+        }
+
         data.cellPathing = new byte[data.cellsX * data.cellsZ];
         for (int cz = 0; cz < data.cellsZ; cz++)
         {

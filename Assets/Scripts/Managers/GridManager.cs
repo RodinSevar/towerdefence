@@ -1,26 +1,26 @@
 using UnityEngine;
 
 /// <summary>
-/// The logic grid: 1x1 world-unit cells (64 Warcraft III units, one tower footprint) with occupancy, buildability and
-/// ground height. Cell (x, z) covers world x in [x, x + 1) and z in [z, z + 1), so its centre is (x + 0.5, z + 0.5), and it
+/// The logic grid: 0.5-world-unit cells (32 Warcraft III units, the map's native pathing resolution; creeps move on this grid, towers cover 4x4 of these cells) with occupancy, buildability and
+/// ground height. Cell (x, z) covers world x in [x * cellSize, (x + 1) * cellSize), and the grid
 /// lines up exactly with the terrain mesh and the map's pathing cells. Filled from the imported terrain by TerrainBuilder.
 /// </summary>
 public class GridManager : Singleton<GridManager>
 {
     // Cell coordinates are centred on the origin (may be negative); arrays are indexed 0..ArraySize-1.
-    public const int ArraySize = 256;
+    public const int ArraySize = 512;
     public const int IndexOffset = ArraySize / 2;
     private const float DefaultHeight = 0.5f;
 
     [SerializeField]
-    private float cellSize = 1f;
+    private float cellSize = 0.5f;
 
-    [Tooltip("Playable map size in cells (the imported map is 192 x 192)")]
+    [Tooltip("Playable map size in cells (the imported map is 384 x 384)")]
     [SerializeField]
-    private int gridWidth = 192;
+    private int gridWidth = 384;
 
     [SerializeField]
-    private int gridHeight = 192;
+    private int gridHeight = 384;
 
     // Flat storage, index = (z + IndexOffset) * ArraySize + (x + IndexOffset). Exposed read-only-by-convention
     // (see OccupancyGrid / HeightGrid) so the pathfinder can scan them without a method call per cell.
@@ -60,20 +60,39 @@ public class GridManager : Singleton<GridManager>
     /// </summary>
     public void ApplyTerrain(TerrainMapData data, float[] centerHeights)
     {
-        for (int cz = 0; cz < data.cellsZ; cz++)
+        if (data.pathingFine == null || data.pathingFine.Length != data.fineX * data.fineZ)
         {
-            for (int cx = 0; cx < data.cellsX; cx++)
+            Debug.LogError("Terrain data has no full-resolution pathing. Run Tools > Build Terrain (or Tools > Import WC3 Terrain) to re-import it.");
+            return;
+        }
+        int fx = data.fineX, fz = data.fineZ;
+        for (int z = 0; z < fz; z++)
+        {
+            for (int x = 0; x < fx; x++)
             {
-                var cell = new Vector2Int(cx - data.cellsX / 2, cz - data.cellsZ / 2);
+                var cell = new Vector2Int(x - fx / 2, z - fz / 2);
                 int i = CellIndex(cell);
                 if (i < 0) continue;
 
-                byte flags = data.cellPathing[data.CellIndex(cx, cz)];
+                byte flags = data.pathingFine[z * fx + x];
                 occupiedCells[i] = (flags & TerrainMapData.PathBlocked) != 0;
                 unbuildableCells[i] = (flags & TerrainMapData.PathNoBuild) != 0;
-                cellHeights[i] = centerHeights[data.CellIndex(cx, cz)];
+
+                // Height: bilinear between the coarse (1-unit) cell centres, evaluated at this cell's centre
+                float wx = (x + 0.5f) * cellSize - fx * cellSize / 2f, wz = (z + 0.5f) * cellSize - fz * cellSize / 2f;
+                cellHeights[i] = CoarseHeight(data, centerHeights, wx, wz);
             }
         }
+    }
+
+    private static float CoarseHeight(TerrainMapData data, float[] heights, float wx, float wz)
+    {
+        float u = wx + data.cellsX / 2f - 0.5f, v = wz + data.cellsZ / 2f - 0.5f;
+        int x0 = Mathf.Clamp(Mathf.FloorToInt(u), 0, data.cellsX - 2), z0 = Mathf.Clamp(Mathf.FloorToInt(v), 0, data.cellsZ - 2);
+        float tx = Mathf.Clamp01(u - x0), tz = Mathf.Clamp01(v - z0);
+        float h00 = heights[data.CellIndex(x0, z0)], h10 = heights[data.CellIndex(x0 + 1, z0)];
+        float h01 = heights[data.CellIndex(x0, z0 + 1)], h11 = heights[data.CellIndex(x0 + 1, z0 + 1)];
+        return Mathf.Lerp(Mathf.Lerp(h00, h10, tx), Mathf.Lerp(h01, h11, tx), tz);
     }
 
     /// <summary>Array index for a centred cell coordinate, or -1 if it lies outside the array.</summary>
@@ -200,16 +219,21 @@ public class GridManager : Singleton<GridManager>
         if (i >= 0) unbuildableCells[i] = true;
     }
 
-    // ---- Tower footprint: towers cover 2x2 cells (128 Warcraft III units), centred on a cell corner ----
+    // ---- Tower footprint: towers cover 4x4 cells (128 Warcraft III units) and centre on a 1-world-unit lattice ----
 
-    public const int Footprint = 2;
+    public const int Footprint = 4;
+    private const int SnapCells = 2; // tower centres snap to whole world units
+
+    /// <summary>Width of a tower footprint in world units.</summary>
+    public float FootprintWorldSize => Footprint * cellSize;
 
     /// <summary>Bottom-left cell of the footprint whose centre (a cell corner) is nearest to <paramref name="worldPos"/>.</summary>
     public Vector2Int FootprintOrigin(Vector3 worldPos)
     {
+        float snap = SnapCells * cellSize;
         return new Vector2Int(
-            Mathf.RoundToInt(worldPos.x / cellSize) - Footprint / 2,
-            Mathf.RoundToInt(worldPos.z / cellSize) - Footprint / 2);
+            Mathf.RoundToInt(worldPos.x / snap) * SnapCells - Footprint / 2,
+            Mathf.RoundToInt(worldPos.z / snap) * SnapCells - Footprint / 2);
     }
 
     /// <summary>Centre of the footprint at <paramref name="origin"/>, at the highest ground under it.</summary>

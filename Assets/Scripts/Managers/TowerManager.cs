@@ -91,7 +91,7 @@ public class TowerManager : Singleton<TowerManager>
         previewFloor = GameObject.CreatePrimitive(PrimitiveType.Quad);
         Destroy(previewFloor.GetComponent<Collider>());
         previewFloor.transform.rotation = Quaternion.Euler(90, 0, 0);
-        float size = GridManager.Instance.GetCellSize() * GridManager.Footprint;
+        float size = GridManager.Instance.FootprintWorldSize;
         previewFloor.transform.localScale = new Vector3(size, size, 1);
         
         floorRenderer = previewFloor.GetComponent<Renderer>();

@@ -160,7 +160,7 @@ public class Tower : MonoBehaviour, ISelectable
             ? new StatusEffect(level.effectType, level.effectDuration, level.effectStrength) : null;
         if (visual == null || level == null) return;
 
-        visual.localScale = Vector3.one * (level.visualScale * GridManager.Footprint); // visuals were authored for one cell
+        visual.localScale = Vector3.one * (level.visualScale * GridManager.Instance.FootprintWorldSize); // visuals were authored for one unit
         visual.localPosition = Vector3.zero;
         var visualRenderer = visual.GetComponent<Renderer>();
         if (visualTemplate == null) visualTemplate = visualRenderer.sharedMaterial;

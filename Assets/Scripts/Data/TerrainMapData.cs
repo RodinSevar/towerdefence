@@ -36,6 +36,10 @@ public class TerrainMapData : ScriptableObject
     [Tooltip("bit 0 = not walkable, bit 1 = walkable but not buildable")]
     public byte[] cellPathing;
 
+    [Tooltip("Same flags at the map's native 32-unit resolution (2x2 per cell): fineX x fineZ")]
+    public byte[] pathingFine;
+    public int fineX = 384, fineZ = 384;
+
     public const byte FlagRamp = 1, FlagBlight = 2, FlagWater = 4, FlagBoundary = 8;
     public const byte PathBlocked = 1, PathNoBuild = 2;
 
