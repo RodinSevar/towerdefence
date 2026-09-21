@@ -1,118 +1,91 @@
-using UnityEngine;
+using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// The tower build menu (WC3-style command card). Shows one button per entry in
+/// <see cref="TowerManager.BuildableTowers"/>, padded with empty slots up to <see cref="SlotCount"/>.
+/// </summary>
 public class TowerSelectionUI : MonoBehaviour
 {
+    private const int SlotCount = 12; // 4 columns x 3 rows
+
+    private static readonly Color NormalColor = new Color(0.3f, 0.3f, 0.3f);
+    private static readonly Color SelectedColor = new Color(0.8f, 0.8f, 0.2f);
+    private static readonly Color EmptySlotColor = new Color(0.1f, 0.1f, 0.1f, 0.6f);
+
     [SerializeField]
     private Transform towersContainer;
 
-    [SerializeField]
-    private GameObject towerButtonPrefab;
-
-    private Tower[] towerPrefabs;
-    private System.Collections.Generic.Dictionary<Tower, Button> buttonMap = new System.Collections.Generic.Dictionary<Tower, Button>();
+    private readonly Dictionary<TowerData, Button> buttonMap = new Dictionary<TowerData, Button>();
 
     private void Start()
     {
-        // Get container if not assigned
         if (towersContainer == null)
             towersContainer = transform;
 
-        // Create tower prefabs
-        towerPrefabs = new Tower[3];
-        
-        // Gun Tower
-        GameObject gunTowerObj = new GameObject("GunTower");
-        gunTowerObj.SetActive(false);
-        Tower gunTower = gunTowerObj.AddComponent<Tower>();
-        gunTower.SetTowerType(Tower.TowerType.Gun);
-        towerPrefabs[0] = gunTower;
+        TowerData[] towers = TowerManager.Instance.BuildableTowers ?? new TowerData[0];
+        if (towers.Length > SlotCount)
+            Debug.LogWarning($"{towers.Length} buildable towers but the menu only has {SlotCount} slots.");
 
-        // Laser Tower
-        GameObject laserTowerObj = new GameObject("LaserTower");
-        laserTowerObj.SetActive(false);
-        Tower laserTower = laserTowerObj.AddComponent<Tower>();
-        laserTower.SetTowerType(Tower.TowerType.Laser);
-        towerPrefabs[1] = laserTower;
-
-        // Ice Tower
-        GameObject iceTowerObj = new GameObject("IceTower");
-        iceTowerObj.SetActive(false);
-        Tower iceTower = iceTowerObj.AddComponent<Tower>();
-        iceTower.SetTowerType(Tower.TowerType.Ice);
-        towerPrefabs[2] = iceTower;
-
-        CreateTowerButtons();
+        for (int i = 0; i < SlotCount; i++)
+        {
+            if (i < towers.Length && towers[i] != null)
+                CreateTowerButton(towers[i]);
+            else
+                CreateEmptySlot();
+        }
     }
 
-    private void CreateTowerButtons()
+    private void CreateEmptySlot()
     {
-        foreach (Tower tower in towerPrefabs)
-        {
-            GameObject buttonObj = new GameObject("TowerButton");
-            buttonObj.transform.SetParent(towersContainer, false);
+        var slot = new GameObject("EmptySlot", typeof(RectTransform), typeof(Image));
+        slot.transform.SetParent(towersContainer, false);
+        var image = slot.GetComponent<Image>();
+        image.color = EmptySlotColor;
+        image.raycastTarget = false;
+    }
 
-            Image buttonImage = buttonObj.AddComponent<Image>();
-            buttonImage.color = new Color(0.3f, 0.3f, 0.3f);
+    private void CreateTowerButton(TowerData tower)
+    {
+        var buttonObj = new GameObject("TowerButton_" + tower.displayName, typeof(RectTransform));
+        buttonObj.transform.SetParent(towersContainer, false);
 
-            Button button = buttonObj.AddComponent<Button>();
-            ColorBlock colors = button.colors;
-            colors.normalColor = new Color(0.3f, 0.3f, 0.3f);
-            colors.highlightedColor = new Color(0.5f, 0.5f, 0.5f);
-            colors.pressedColor = new Color(0.1f, 0.1f, 0.1f);
-            button.colors = colors;
+        Image buttonImage = buttonObj.AddComponent<Image>();
+        buttonImage.color = NormalColor;
+        if (tower.icon != null) buttonImage.sprite = tower.icon;
 
-            LayoutElement layoutElement = buttonObj.AddComponent<LayoutElement>();
-            layoutElement.preferredHeight = 60;
-            layoutElement.preferredWidth = 130;
+        Button button = buttonObj.AddComponent<Button>();
+        button.targetGraphic = buttonImage;
 
-            GameObject buttonTextObj = new GameObject("Text");
-            buttonTextObj.transform.SetParent(buttonObj.transform, false);
-            TextMeshProUGUI buttonText = buttonTextObj.AddComponent<TextMeshProUGUI>();
-            // Remove the word "Tower" so it fits in the small square buttons
-            string shortName = tower.GetDisplayName().Replace(" Tower", "");
-            buttonText.text = $"{shortName}\n${tower.GetCost()}";
-            buttonText.fontSize = 12; // Shrunk to fit 40x40 square
-            buttonText.alignment = TextAlignmentOptions.Center;
-            buttonText.color = Color.white;
+        var textObj = new GameObject("Text", typeof(RectTransform));
+        textObj.transform.SetParent(buttonObj.transform, false);
+        TextMeshProUGUI text = textObj.AddComponent<TextMeshProUGUI>();
+        text.text = $"{tower.displayName.Replace(" Tower", "")}\n${tower.BaseCost}";
+        text.fontSize = 12;
+        text.alignment = TextAlignmentOptions.Center;
+        text.color = Color.white;
+        text.raycastTarget = false;
 
-            RectTransform textRect = buttonTextObj.GetComponent<RectTransform>();
-            textRect.anchorMin = Vector2.zero;
-            textRect.anchorMax = Vector2.one;
-            textRect.offsetMin = Vector2.zero;
-            textRect.offsetMax = Vector2.zero;
+        RectTransform textRect = text.rectTransform;
+        textRect.anchorMin = Vector2.zero;
+        textRect.anchorMax = Vector2.one;
+        textRect.offsetMin = Vector2.zero;
+        textRect.offsetMax = Vector2.zero;
 
-            RectTransform buttonRect = buttonObj.GetComponent<RectTransform>();
-            buttonRect.sizeDelta = new Vector2(130, 60);
-
-            button.onClick.AddListener(() => SelectTower(tower));
-            buttonMap[tower] = button;
-        }
+        button.onClick.AddListener(() => TowerManager.Instance.SelectTower(tower));
+        buttonMap[tower] = button;
     }
 
     private void Update()
     {
-        if (TowerManager.Instance == null) return;
-        
-        Tower selected = TowerManager.Instance.GetSelectedTowerPrefab();
+        TowerData selected = TowerManager.Instance.GetSelectedTower();
         foreach (var kvp in buttonMap)
         {
             ColorBlock colors = kvp.Value.colors;
-            if (kvp.Key == selected)
-            {
-                colors.normalColor = new Color(0.8f, 0.8f, 0.2f); // Yellow highlight
-            }
-            else
-            {
-                colors.normalColor = new Color(0.3f, 0.3f, 0.3f); // Default
-            }
+            colors.normalColor = kvp.Key == selected ? SelectedColor : NormalColor;
             kvp.Value.colors = colors;
         }
-    }
-
-    private void SelectTower(Tower tower)
-    {
-        TowerManager.Instance.SelectTowerType(tower);
     }
 }

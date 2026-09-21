@@ -5,7 +5,12 @@ using System.Collections.Generic;
 public class TowerManager : Singleton<TowerManager>
 {
     private List<Tower> activeTowers = new List<Tower>();
-    private Tower selectedTowerPrefab = null;
+    [Header("Tower setup")]
+    [SerializeField] private Tower towerPrefab;
+    [Tooltip("Towers offered on the build menu, in order (the menu has 12 slots)")]
+    [SerializeField] private TowerData[] buildableTowers;
+
+    private TowerData selectedTower = null;
     private bool isPlacingTower = false;
     
     private GameObject previewGhost;
@@ -56,9 +61,11 @@ public class TowerManager : Singleton<TowerManager>
         activeTowers.Remove(tower);
     }
 
-    public void SelectTowerType(Tower towerPrefab)
+    public TowerData[] BuildableTowers => buildableTowers;
+
+    public void SelectTower(TowerData tower)
     {
-        selectedTowerPrefab = towerPrefab;
+        selectedTower = tower;
         isPlacingTower = true;
         CreatePreviewObjects();
     }
@@ -66,9 +73,10 @@ public class TowerManager : Singleton<TowerManager>
     private void CreatePreviewObjects()
     {
         DestroyPreviewObjects();
-        if (selectedTowerPrefab == null) return;
+        if (selectedTower == null) return;
         
-        previewGhost = Instantiate(selectedTowerPrefab.gameObject);
+        previewGhost = Instantiate(towerPrefab.gameObject);
+        previewGhost.GetComponent<Tower>().Init(selectedTower); // applies level-1 visuals before we strip the scripts
         
         // Clean up ghost
         foreach (var comp in previewGhost.GetComponentsInChildren<MonoBehaviour>()) Destroy(comp);
@@ -124,7 +132,7 @@ public class TowerManager : Singleton<TowerManager>
                 if (cell != lastHoveredCell)
                 {
                     lastHoveredCell = cell;
-                    lastHoverIsValid = CanPlaceAt(cell, snappedPos, selectedTowerPrefab.GetCost(), false, out _);
+                    lastHoverIsValid = CanPlaceAt(cell, snappedPos, selectedTower.BaseCost, false, out _);
 
                     Color ghostColor = lastHoverIsValid ? new Color(0, 1, 0, 0.4f) : new Color(1, 0, 0, 0.4f);
                     Color floorColor = lastHoverIsValid ? new Color(0, 1, 0, 0.8f) : new Color(1, 0, 0, 0.8f);
@@ -172,7 +180,7 @@ public class TowerManager : Singleton<TowerManager>
 
     private void TryPlaceTower()
     {
-        if (selectedTowerPrefab == null) return;
+        if (selectedTower == null) return;
 
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
         
@@ -185,7 +193,7 @@ public class TowerManager : Singleton<TowerManager>
                 Vector3 snappedPos = GridManager.Instance.SnapToGrid(hit.point);
                 
                 Vector2Int cell = GridManager.Instance.WorldToGridCell(snappedPos);
-                int cost = selectedTowerPrefab.GetCost();
+                int cost = selectedTower.BaseCost;
                 if (!CanPlaceAt(cell, snappedPos, cost, true, out string failReason))
                 {
                     Debug.Log($"Tower placement failed at {cell}: {failReason}");
@@ -195,8 +203,8 @@ public class TowerManager : Singleton<TowerManager>
                 if (GameManager.Instance.TrySpendGold(cost))
                 {
                     GridManager.Instance.OccupyCell(cell);
-                    Tower newTower = Instantiate(selectedTowerPrefab, snappedPos, Quaternion.identity);
-                    newTower.gameObject.SetActive(true);
+                    Tower newTower = Instantiate(towerPrefab, snappedPos, Quaternion.identity);
+                    newTower.Init(selectedTower);
                     
                     RegisterTower(newTower);
                     
@@ -215,11 +223,11 @@ public class TowerManager : Singleton<TowerManager>
     public void CancelPlacement()
     {
         isPlacingTower = false;
-        selectedTowerPrefab = null;
+        selectedTower = null;
         DestroyPreviewObjects();
     }
     
-    public Tower GetSelectedTowerPrefab() => selectedTowerPrefab;
+    public TowerData GetSelectedTower() => selectedTower;
 
     public bool IsPlacingTower() => isPlacingTower;
 }

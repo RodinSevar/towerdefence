@@ -3,91 +3,48 @@ using System.Collections.Generic;
 
 public class Enemy : MonoBehaviour, ISelectable
 {
-    public enum EnemyType { Basic, Strong, Fast }
+    [SerializeField] private EnemyData data;
 
-    [System.Serializable]
-    public class EnemyStats
-    {
-        public float health = 20f;
-        public float speed = 5f;
-        public int goldReward = 10;
-    }
+    [Header("Prefab parts")]
+    [SerializeField] private Renderer visualRenderer;
+    [SerializeField] private GameObject selectionRing;
 
-    [SerializeField]
-    private EnemyStats basicStats = new EnemyStats();
-
-    [SerializeField]
-    private EnemyStats strongStats = new EnemyStats() { health = 50f, speed = 3f, goldReward = 25 };
-
-    [SerializeField]
-    private EnemyStats fastStats = new EnemyStats() { health = 15f, speed = 8f, goldReward = 15 };
-
-    private EnemyType currentType = EnemyType.Basic;
-    private EnemyStats stats;
     private float currentHealth;
     private bool isAlive = true;
 
     // Pathfinding state
     private int targetWaypointIndex = 1; // 0 is usually spawn, so head to 1
     
-    private GameObject selectionRing;
-    private Renderer visualRenderer;
     private Color baseColor;
 
     private List<StatusEffect> activeEffects = new List<StatusEffect>();
     private Vector3[] myWaypoints;
     private Vector3 formationOffset;
 
-    public void Init(Vector3[] waypoints, int index)
+    /// <summary>Sets up a freshly instantiated creep. Call right after Instantiate.</summary>
+    public void Init(EnemyData enemyData, Vector3[] waypoints, int index, Color color)
     {
+        data = enemyData;
+        currentHealth = data.health;
         myWaypoints = waypoints;
+
+        baseColor = color;
+        visualRenderer.transform.localScale = Vector3.one * data.visualScale;
+        visualRenderer.material.color = color;
+
         formationOffset = GetSpiralOffset(index, 0.8f);
         transform.position += formationOffset;
     }
 
-    private void OnEnable()
-    {
-        if (stats == null)
-        {
-            stats = basicStats;
-        }
-    }
-
     private void Start()
     {
-        currentHealth = stats.health;
-        
-        // Create selection ring visual (a slightly larger, flat cylinder at the base)
-        selectionRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        selectionRing.transform.SetParent(transform);
-        selectionRing.transform.localScale = new Vector3(1.2f, 0.05f, 1.2f);
-        selectionRing.transform.localPosition = new Vector3(0, 0.05f, 0);
         selectionRing.GetComponent<Renderer>().material.color = Color.green;
-        Destroy(selectionRing.GetComponent<Collider>());
-        selectionRing.SetActive(false);
-        
-        // Find the visual primitive (the cube) to change its color later
-        Transform visualTransform = transform.Find("EnemyVisual");
-        if (visualTransform != null)
-        {
-            visualRenderer = visualTransform.GetComponent<Renderer>();
-            if (visualRenderer != null)
-            {
-                baseColor = visualRenderer.material.color;
-            }
-        }
-        
+
         if (MinimapManager.Instance != null)
         {
             MinimapManager.Instance.RegisterUnit(transform, true);
         }
     }
-
-    private void OnDestroy()
-    {
-    }
-
-
 
     private void Update()
     {
@@ -195,7 +152,7 @@ public class Enemy : MonoBehaviour, ISelectable
 
         Vector3 moveDir = new Vector3(flowDir.x, 0, flowDir.y);
         
-        float currentSpeed = stats.speed;
+        float currentSpeed = data.speed;
         
         // Apply slow effects
         float maxSlow = 0f;
@@ -240,7 +197,7 @@ public class Enemy : MonoBehaviour, ISelectable
         if (!isAlive) return;
 
         isAlive = false;
-        GameManager.Instance.AddGold(stats.goldReward);
+        GameManager.Instance.AddGold(data.goldReward);
         GameManager.Instance.UnregisterEnemy(this);
         
         if (MinimapManager.Instance != null)
@@ -251,45 +208,18 @@ public class Enemy : MonoBehaviour, ISelectable
         Destroy(gameObject);
     }
 
-    public void SetEnemyType(EnemyType type)
-    {
-        currentType = type;
-
-        switch (type)
-        {
-            case EnemyType.Basic:
-                stats = basicStats;
-                break;
-            case EnemyType.Strong:
-                stats = strongStats;
-                break;
-            case EnemyType.Fast:
-                stats = fastStats;
-                break;
-        }
-    }
-
     public float GetHealth() => currentHealth;
-    public float GetMaxHealth() => stats.health;
-    public EnemyType GetEnemyType() => currentType;
+    public float GetMaxHealth() => data.health;
     public float GetProgress() => myWaypoints != null ? (float)targetWaypointIndex / myWaypoints.Length : 0f;
 
     // ISelectable implementation
-    public string GetDisplayName()
-    {
-        switch (currentType)
-        {
-            case EnemyType.Strong: return "Strong Creep";
-            case EnemyType.Fast: return "Fast Creep";
-            default: return "Basic Creep";
-        }
-    }
+    public string GetDisplayName() => data != null ? data.displayName : "Creep";
 
     public string GetStatsText()
     {
-        return $"Health: {Mathf.CeilToInt(currentHealth)} / {Mathf.CeilToInt(stats.health)}\n" +
-               $"Speed: {stats.speed}\n" +
-               $"Reward: {stats.goldReward}G";
+        return $"Health: {Mathf.CeilToInt(currentHealth)} / {Mathf.CeilToInt(data.health)}\n" +
+               $"Speed: {data.speed}\n" +
+               $"Reward: {data.goldReward}G";
     }
 
     public bool IsSellable() => false;

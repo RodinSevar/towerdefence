@@ -11,13 +11,11 @@
 ## Next (in order)
 - [x] `Singleton<T>` base class for the 7 manager singletons
 - [x] UI now lives in the scene (built once by `Tools > Build UI`, `Assets/Scripts/Editor/UIBuilder.cs`); fields wired via `SerializedObject`, reflection and `GameBoot.SetupUI` removed. Edit the Canvas in the scene directly from now on.
-- [ ] `TowerSelectionUI` still creates its tower buttons and tower objects at runtime; fold into the prefab / `TowerData` item below.
-- [ ] **Towers and enemies as prefabs.** Enemies are assembled in `WaveManager.SpawnEnemy` (`new GameObject` + primitive cube);
-      preview ghost is cloned and stripped of components. Make `Enemy` and `Tower` prefabs (visual, collider, ring);
-      data (stats, levels, colors) in `ScriptableObject`s (`EnemyData`, `TowerData`) instead of switch statements in code.
+- [x] Towers and enemies are prefabs (`Assets/Prefabs`) driven by `TowerData` / `EnemyData` / `WaveSet` assets in `Assets/Data`. `Tools > Build Game Data` creates missing assets/prefabs and wires the managers. Also fixed double tower registration and the sell-refund mismatch.
+- [ ] Projectiles are still built at runtime (`Tower.FireAtTarget` creates a sphere); make a Projectile prefab and pool them.
+- [ ] Tower/enemy icons (`TowerData.icon`) and the command-card swap to Sell/Upgrade when a tower is selected (WC3 style).
 - [x] `TowerManager`: shared `CanPlaceAt`, click-per-attempt (shift+drag still paints), ghost material works under URP
-- [ ] **`WaveManager`:** waves hard-coded in `SetupDefaultWaves` (move to a `WaveData` asset); the no-spawner path silently
-      skips the wave; per-frame `FindObjectsByType` fallback for spawners; use `Destroy`, not `DestroyImmediate`.
+- [ ] **`WaveManager`:** the no-spawner path silently skips the wave; per-frame `FindObjectsByType` fallback for spawners (waves themselves are now a `WaveSet` asset).
 - [ ] **`GameManager` flow:** reset `Time.timeScale` on restart; enemy list uses O(n) `Remove` (use `HashSet`);
       `waveDelay` behaviour (next wave starts when field is empty) is a design decision worth revisiting.
 - [ ] **`Tower.Update`:** `Physics.OverlapSphere` + `GetComponent<Enemy>()` per tower per targeting tick. Fine now; consider a
@@ -25,7 +23,7 @@
 - [ ] **`PathManager` grid size** hard-coded 200x200 (vs GridManager 256 / 196). Fold into the pathing rewrite: expose
       grid dimensions from `GridManager` and use them everywhere.
 - [ ] `MapGenerator` is located via reflection in `GameBoot` (`mapTexture` private field) -> add a public setter or serialize in the scene.
-- [ ] Remove the empty `CreateTagIfNotExists` in `GameBoot`; scene tags ("Ground", "SpawnPoint") should be set up in the project.
+- [ ] Scene tags ("Ground", "SpawnPoint") should be set up in the project.
 - [ ] Review `mpq_files/` (raw map extract): keep, but note in README what is used vs. reference only.
 
 ## Kept on purpose
