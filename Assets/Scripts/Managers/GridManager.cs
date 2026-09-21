@@ -200,5 +200,54 @@ public class GridManager : Singleton<GridManager>
         if (i >= 0) unbuildableCells[i] = true;
     }
 
+    // ---- Tower footprint: towers cover 2x2 cells (128 Warcraft III units), centred on a cell corner ----
+
+    public const int Footprint = 2;
+
+    /// <summary>Bottom-left cell of the footprint whose centre (a cell corner) is nearest to <paramref name="worldPos"/>.</summary>
+    public Vector2Int FootprintOrigin(Vector3 worldPos)
+    {
+        return new Vector2Int(
+            Mathf.RoundToInt(worldPos.x / cellSize) - Footprint / 2,
+            Mathf.RoundToInt(worldPos.z / cellSize) - Footprint / 2);
+    }
+
+    /// <summary>Centre of the footprint at <paramref name="origin"/>, at the highest ground under it.</summary>
+    public Vector3 FootprintCenter(Vector2Int origin)
+    {
+        float h = float.MinValue;
+        for (int dz = 0; dz < Footprint; dz++)
+            for (int dx = 0; dx < Footprint; dx++)
+                h = Mathf.Max(h, GetCellHeight(new Vector2Int(origin.x + dx, origin.y + dz)));
+        return new Vector3((origin.x + Footprint / 2f) * cellSize, h, (origin.y + Footprint / 2f) * cellSize);
+    }
+
+    public Vector3 SnapToFootprint(Vector3 worldPos) => FootprintCenter(FootprintOrigin(worldPos));
+
+    public bool CanBuildFootprint(Vector2Int origin)
+    {
+        for (int dz = 0; dz < Footprint; dz++)
+            for (int dx = 0; dx < Footprint; dx++)
+            {
+                var c = new Vector2Int(origin.x + dx, origin.y + dz);
+                int i = CellIndex(c);
+                if (i < 0 || IsCellOccupied(c) || unbuildableCells[i]) return false;
+            }
+        return true;
+    }
+
+    public void OccupyFootprint(Vector2Int origin) => SetFootprint(origin, true);
+    public void FreeFootprint(Vector2Int origin) => SetFootprint(origin, false);
+
+    private void SetFootprint(Vector2Int origin, bool occupied)
+    {
+        for (int dz = 0; dz < Footprint; dz++)
+            for (int dx = 0; dx < Footprint; dx++)
+            {
+                int i = CellIndex(new Vector2Int(origin.x + dx, origin.y + dz));
+                if (i >= 0) occupiedCells[i] = occupied;
+            }
+    }
+
     public float GetCellSize() => cellSize;
 }

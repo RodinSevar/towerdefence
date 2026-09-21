@@ -91,7 +91,7 @@ public class TowerManager : Singleton<TowerManager>
         previewFloor = GameObject.CreatePrimitive(PrimitiveType.Quad);
         Destroy(previewFloor.GetComponent<Collider>());
         previewFloor.transform.rotation = Quaternion.Euler(90, 0, 0);
-        float size = GridManager.Instance.GetCellSize();
+        float size = GridManager.Instance.GetCellSize() * GridManager.Footprint;
         previewFloor.transform.localScale = new Vector3(size, size, 1);
         
         floorRenderer = previewFloor.GetComponent<Renderer>();
@@ -124,11 +124,11 @@ public class TowerManager : Singleton<TowerManager>
                 previewGhost.SetActive(true);
                 previewFloor.SetActive(true);
 
-                Vector3 snappedPos = GridManager.Instance.SnapToGrid(hit.point);
+                Vector3 snappedPos = GridManager.Instance.SnapToFootprint(hit.point);
                 previewGhost.transform.position = snappedPos;
                 previewFloor.transform.position = snappedPos + new Vector3(0, 0.05f, 0);
 
-                Vector2Int cell = GridManager.Instance.WorldToGridCell(snappedPos);
+                Vector2Int cell = GridManager.Instance.FootprintOrigin(snappedPos);
                 if (cell != lastHoveredCell)
                 {
                     lastHoveredCell = cell;
@@ -164,13 +164,13 @@ public class TowerManager : Singleton<TowerManager>
     private bool CanPlaceAt(Vector2Int cell, Vector3 worldPos, TowerData tower, out string failReason)
     {
         failReason = null;
-        if (!GridManager.Instance.CanBuildAt(worldPos)) { failReason = "occupied or unbuildable"; return false; }
+        if (!GridManager.Instance.CanBuildFootprint(cell)) { failReason = "occupied or unbuildable"; return false; }
         if (GameManager.Instance.GetCurrentGold() < tower.BaseCost) { failReason = "not enough gold"; return false; }
         if (GameManager.Instance.GetCurrentLumber() < tower.lumberCost) { failReason = "not enough lumber"; return false; }
 
-        GridManager.Instance.OccupyCell(cell);
+        GridManager.Instance.OccupyFootprint(cell);
         bool pathOk = PathManager.Instance.ValidateFullMaze();
-        GridManager.Instance.FreeCell(cell);
+        GridManager.Instance.FreeFootprint(cell);
 
         if (!pathOk) failReason = "would block the path for at least one spawner";
         return pathOk;
@@ -182,8 +182,8 @@ public class TowerManager : Singleton<TowerManager>
     /// </summary>
     public bool TryPlaceTowerAt(TowerData tower, Vector3 worldPos)
     {
-        Vector3 snappedPos = GridManager.Instance.SnapToGrid(worldPos);
-        Vector2Int cell = GridManager.Instance.WorldToGridCell(snappedPos);
+        Vector3 snappedPos = GridManager.Instance.SnapToFootprint(worldPos);
+        Vector2Int cell = GridManager.Instance.FootprintOrigin(snappedPos);
         if (!CanPlaceAt(cell, snappedPos, tower, out string failReason))
         {
             Debug.Log($"Tower placement failed at {cell}: {failReason}");
@@ -197,7 +197,7 @@ public class TowerManager : Singleton<TowerManager>
             return false;
         }
 
-        GridManager.Instance.OccupyCell(cell);
+        GridManager.Instance.OccupyFootprint(cell);
         Tower newTower = Instantiate(towerPrefab, snappedPos, Quaternion.identity);
         newTower.Init(tower);
         RegisterTower(newTower);
@@ -219,7 +219,7 @@ public class TowerManager : Singleton<TowerManager>
             if (hit.collider.CompareTag("Ground") || hit.collider.GetComponent<TerrainBuilder>() != null)
             {
                 // Snap to grid
-                Vector3 snappedPos = GridManager.Instance.SnapToGrid(hit.point);
+                Vector3 snappedPos = GridManager.Instance.SnapToFootprint(hit.point);
                 
                 if (TryPlaceTowerAt(selectedTower, snappedPos) && !Keyboard.current.shiftKey.isPressed)
                 {

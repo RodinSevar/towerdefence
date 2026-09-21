@@ -299,11 +299,11 @@ public static class PerfBench
         // 1) random towers near the paths
         for (int i = 0; i < 40; i++)
         {
-            var cell = g.WorldToGridCell(RandomNearPath());
-            if (g.IsCellOccupied(cell) || !g.CanBuildAt(g.GetWorldPosition(cell))) continue;
-            g.OccupyCell(cell);
+            var cell = g.FootprintOrigin(RandomNearPath());
+            if (!g.CanBuildFootprint(cell)) continue;
+            g.OccupyFootprint(cell);
             Compare($"random tower at {cell}");
-            if (PathManager.Instance.ValidateFullMaze()) changed.Add(cell); else g.FreeCell(cell);
+            if (PathManager.Instance.ValidateFullMaze()) changed.Add(cell); else g.FreeFootprint(cell);
         }
 
         // 2) targeted layouts around a waypoint: full enclosure, one free side, one free diagonal (corner squeeze)
@@ -324,7 +324,7 @@ public static class PerfBench
         WithRing(c => c != new Vector2Int(T.x - 1, T.y), "target with one free orthogonal side");
         WithRing(c => c != new Vector2Int(T.x + 1, T.y + 1), "target with only a free diagonal (corner squeeze)");
 
-        foreach (var c in changed) g.FreeCell(c); // restore the layout
+        foreach (var c in changed) g.FreeFootprint(c); // restore the layout
         Debug.Log($"BENCH pathEquivalence trials={trials} agree={agree} newStricterThanLegacy={newStricter} newLooserThanLegacy={newLooser}");
         step = 13;
     }

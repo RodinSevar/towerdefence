@@ -39,3 +39,5 @@
 
 ## Kept on purpose
 The `Tools/` menu importers in `Assets/Scripts/Editor` (`W3RImporter`, `WaveImporter`, `TowerImporter`, `RouteImporter`) and `region_dump.txt`. They are hand-run tools that turn the extracted WC3 map files into scene data. `RouteImporter` replaced the old guessed spawner generator and its patch-up tools.
+- [ ] Creeps overlap each other; the original has unit collision sizes (belongs with the pathing work).
+- [ ] Placement preview: colour each of the 2x2 footprint squares separately (green buildable, red not) instead of one tint, so the player can see which sub-square blocks the build and whether a gap exists (as in the original). Placement stays blocked if any square is bad.

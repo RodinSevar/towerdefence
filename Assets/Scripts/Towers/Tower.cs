@@ -160,7 +160,7 @@ public class Tower : MonoBehaviour, ISelectable
             ? new StatusEffect(level.effectType, level.effectDuration, level.effectStrength) : null;
         if (visual == null || level == null) return;
 
-        visual.localScale = Vector3.one * level.visualScale;
+        visual.localScale = Vector3.one * (level.visualScale * GridManager.Footprint); // visuals were authored for one cell
         visual.localPosition = Vector3.zero;
         var visualRenderer = visual.GetComponent<Renderer>();
         if (visualTemplate == null) visualTemplate = visualRenderer.sharedMaterial;
@@ -238,8 +238,7 @@ public class Tower : MonoBehaviour, ISelectable
         // Free up the grid cell
         if (GridManager.Instance != null)
         {
-            Vector2Int cell = GridManager.Instance.WorldToGridCell(transform.position);
-            GridManager.Instance.FreeCell(cell);
+            GridManager.Instance.FreeFootprint(GridManager.Instance.FootprintOrigin(transform.position));
         }
 
         // Unregister from the manager
