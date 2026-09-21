@@ -15,6 +15,7 @@ public class PlayerState
     public int lumber;
     public readonly HashSet<RaceData> ownedRaces = new HashSet<RaceData>();
     public RaceData activeRace;
+    public bool active = true; // false once the player has left a network game
 
     /// <summary>Raised after any change to this player's gold, lumber or races.</summary>
     public event Action<PlayerState> Changed;
@@ -122,15 +123,39 @@ public class PlayerManager : Singleton<PlayerManager>
     }
 
     /// <summary>Gives every player the same amount (level bonus, lumber bonus).</summary>
-    public void AddGoldToAll(int amount) { foreach (var p in Players) p.AddGold(amount); }
-    public void AddLumberToAll(int amount) { foreach (var p in Players) p.AddLumber(amount); }
+    public void AddGoldToAll(int amount) { foreach (var p in Players) if (p.active) p.AddGold(amount); }
+    public void AddLumberToAll(int amount) { foreach (var p in Players) if (p.active) p.AddLumber(amount); }
+
+    public bool IsActive(int id) { var p = Get(id); return p != null && p.active; }
+
+    /// <summary>
+    /// A player dropped out of a network game: their gold, lumber and towers go to <paramref name="heirId"/>, and they take no
+    /// further part (no bonuses, their commands are ignored).
+    /// </summary>
+    public void HandleLeave(int leaverId, int heirId)
+    {
+        var leaver = Get(leaverId);
+        var heir = Get(heirId);
+        if (leaver == null || heir == null || !leaver.active || leaverId == heirId) return;
+
+        heir.AddGold(leaver.gold);
+        heir.AddLumber(leaver.lumber);
+        leaver.gold = 0;
+        leaver.lumber = 0;
+        leaver.active = false;
+        leaver.NotifyChanged();
+        if (TowerManager.Instance != null) TowerManager.Instance.TransferTowers(leaverId, heirId);
+        Debug.Log($"{leaver.name} left; everything goes to {heir.name}.");
+    }
+
+    public void SetName(int id, string playerName) { var p = Get(id); if (p != null) p.name = playerName; }
 
     /// <summary>Moves gold between players. Returns false if the sender cannot afford it.</summary>
     public bool TransferGold(int fromId, int toId, int amount)
     {
         var from = Get(fromId);
         var to = Get(toId);
-        if (from == null || to == null || fromId == toId || amount <= 0) return false;
+        if (from == null || to == null || !from.active || !to.active || fromId == toId || amount <= 0) return false;
         if (!from.TrySpendGold(amount)) return false;
         to.AddGold(amount);
         return true;

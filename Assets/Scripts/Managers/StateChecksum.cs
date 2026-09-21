@@ -27,6 +27,7 @@ public static class StateChecksum
             foreach (var p in PlayerManager.Instance.Players)
             {
                 Add(ref h, p.id);
+                Add(ref h, p.active ? 1 : 0);
                 Add(ref h, p.gold);
                 Add(ref h, p.lumber);
                 Add(ref h, p.ownedRaces.Count);

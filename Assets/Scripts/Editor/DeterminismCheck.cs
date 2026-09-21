@@ -84,7 +84,8 @@ public static class DeterminismCheck
         var g = GridManager.Instance;
         var spawners = WaveManager.Instance.activeSpawners;
         var tower = RaceManager.Instance.Races[0].towers[1];
-        int start = Simulation.CurrentTick + 5;
+        int start = 60; // absolute ticks: how many ticks ran before this script started depends on startup timing
+        Debug.Log($"DET scriptStart tick={Simulation.CurrentTick}");
         for (int i = 0; i < 70; i++)
         {
             var s = spawners[rng.Next(spawners.Count)];
@@ -103,6 +104,6 @@ public static class DeterminismCheck
         // a large wave (level 45), starting once the towers are up
         typeof(GameManager).GetField("currentWave", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
             .SetValue(GameManager.Instance, 44);
-        GameManager.Instance.ScheduleNextWave(4f);
+        GameManager.Instance.ScheduleNextWave((300 - Simulation.CurrentTick) * Simulation.TickDt); // starts at tick 300
     }
 }

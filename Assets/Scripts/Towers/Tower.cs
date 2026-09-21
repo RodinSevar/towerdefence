@@ -27,6 +27,8 @@ public class Tower : MonoBehaviour, ISelectable
     /// <summary>The player who built the tower (-1 for previews).</summary>
     public int Owner { get; private set; } = -1;
 
+    public void SetOwner(int playerId) => Owner = playerId;
+
     private Enemy targetEnemy = null;
     private float fireTimer = 0f;
 

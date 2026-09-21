@@ -28,22 +28,36 @@ public class Simulation : Singleton<Simulation>
     /// <summary>Raised after every <see cref="ChecksumInterval"/> ticks with the tick number and the state hash.</summary>
     public static event System.Action<int, uint> OnChecksum;
 
+    /// <summary>False holds the game at its current tick (menu, lobby, desync).</summary>
+    public static bool Running = true;
+
+    /// <summary>True while a network game waits for other players' commands before it can go on.</summary>
+    public static bool Stalled { get; private set; }
+
     private float accumulator;
 
     protected override void OnSingletonAwake()
     {
         CurrentTick = 0;
+        Running = true;
+        Stalled = false;
         CommandQueue.Clear();
     }
 
     private void Update()
     {
+        if (!Running) return;
+
         // UnityEngine.Time.deltaTime is 0 while the game is paused (timeScale 0) and scaled by game speed.
         accumulator += UnityEngine.Time.deltaTime;
         int ran = 0;
+        Stalled = false;
         while (accumulator >= TickDt && ran < maxTicksPerFrame)
         {
+            // In a network game a tick may only run once every player's commands for its turn are known
+            if (NetworkGame.Active && !NetworkGame.Session.CanRunTick(CurrentTick + 1)) { Stalled = true; break; }
             Step();
+            if (NetworkGame.Active) NetworkGame.Session.AfterTick(CurrentTick);
             accumulator -= TickDt;
             ran++;
         }

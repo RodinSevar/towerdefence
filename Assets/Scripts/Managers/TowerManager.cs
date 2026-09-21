@@ -210,7 +210,7 @@ public class TowerManager : Singleton<TowerManager>
     {
         failReason = null;
         var player = PlayerManager.Instance.Get(playerId);
-        if (player == null) { failReason = "no such player"; return false; }
+        if (player == null || !player.active) { failReason = "no such player"; return false; }
         if (!GridManager.Instance.CanBuildFootprint(cell)) { failReason = "occupied or unbuildable"; return false; }
         if (player.gold < tower.BaseCost) { failReason = "not enough gold"; return false; }
         if (player.lumber < tower.lumberCost) { failReason = "not enough lumber"; return false; }
@@ -258,6 +258,13 @@ public class TowerManager : Singleton<TowerManager>
     {
         Vector2Int origin = GridManager.Instance.FootprintOrigin(worldPos);
         return ExecutePlace(PlayerManager.Instance.LocalPlayerId, tower, origin, out _);
+    }
+
+    /// <summary>Hands every tower of one player to another (a player left the game).</summary>
+    public void TransferTowers(int fromId, int toId)
+    {
+        foreach (var t in activeTowers)
+            if (t.Owner == fromId) t.SetOwner(toId);
     }
 
     public void ExecuteSell(int playerId, int towerInstanceId)

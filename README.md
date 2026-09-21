@@ -101,3 +101,19 @@ different `-timescale` values (with Unity closed) and the DET lines must match e
 Unity -batchmode -nographics -projectPath . -executeMethod DeterminismCheck.Run -logFile det_a.log -timescale 20
 Unity -batchmode -nographics -projectPath . -executeMethod DeterminismCheck.Run -logFile det_b.log -timescale 6
 ```
+
+## LAN multiplayer
+Up to 9 players over TCP (host + direct IP). Start the game and pick **Play offline**, **Host a LAN game** or **Join**; the host sees
+who has joined and presses **Start game**. Unused slots stay empty. The game is lockstep: `LockstepSession` (in `Assets/Scripts/Network`)
+turns every player's commands into one bundle per 0.1 s turn, every machine runs the same commands on the same tick, and machines
+compare state checksums (a mismatch stops the game with a message). A machine waits for the others when a bundle is late.
+If a player drops out, everything they own (gold, lumber, towers) goes to the lowest-numbered remaining player.
+
+`NetCheck` tests the protocol over real loopback TCP (identical execution, desync detection, drop hand-over, stall behaviour):
+
+```
+Unity -batchmode -nographics -projectPath . -executeMethod NetCheck.Run -quit -logFile net.log
+```
+
+To try it by hand you need two running copies of the game (a built player plus the editor, or two builds); Unity cannot open the same
+project twice.

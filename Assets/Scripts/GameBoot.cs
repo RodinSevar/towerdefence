@@ -113,6 +113,14 @@ public class GameBoot : MonoBehaviour
         if (FindAnyObjectByType<PlayerManager>() == null)
             new GameObject("PlayerManager").AddComponent<PlayerManager>();
 
+        // LAN menu and lockstep glue (holds the game until a mode is chosen)
+        if (FindAnyObjectByType<NetworkGame>() == null)
+        {
+            var netObj = new GameObject("Network");
+            netObj.AddComponent<NetworkGame>();
+            netObj.AddComponent<NetworkLobbyUI>();
+        }
+
         // The fixed-rate simulation clock drives all game logic
         if (FindAnyObjectByType<Simulation>() == null)
             new GameObject("Simulation").AddComponent<Simulation>();
