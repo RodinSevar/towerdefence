@@ -15,9 +15,8 @@
 - [ ] Projectiles are still built at runtime (`Tower.FireAtTarget` creates a sphere); make a Projectile prefab and pool them.
 - [ ] Tower/enemy icons (`TowerData.icon`) and the command-card swap to Sell/Upgrade when a tower is selected (WC3 style).
 - [x] `TowerManager`: shared `CanPlaceAt`, click-per-attempt (shift+drag still paints), ghost material works under URP
-- [ ] **`WaveManager`:** the no-spawner path silently skips the wave; per-frame `FindObjectsByType` fallback for spawners (waves themselves are now a `WaveSet` asset).
-- [ ] **`GameManager` flow:** reset `Time.timeScale` on restart; enemy list uses O(n) `Remove` (use `HashSet`);
-      `waveDelay` behaviour (next wave starts when field is empty) is a design decision worth revisiting.
+- [x] Wave/game flow: a wave is cleared only when spawning is finished AND no creeps are alive (fixes early next-wave / early win); no win after game over; `HashSet` for active creeps; `timeScale` reset on load; missing spawners/enemy now log an error and don't silently skip.
+- [ ] Design decision: waves currently start `waveDelay` seconds after the previous wave is *cleared*. Wintermaul-style timed waves (next wave on a fixed timer, creeps stack up) would be a `WaveStartMode` option on `GameManager`.
 - [ ] **`Tower.Update`:** `Physics.OverlapSphere` + `GetComponent<Enemy>()` per tower per targeting tick. Fine now; consider a
       shared enemy registry and distance checks if creep counts grow.
 - [ ] **`PathManager` grid size** hard-coded 200x200 (vs GridManager 256 / 196). Fold into the pathing rewrite: expose

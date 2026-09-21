@@ -11,8 +11,13 @@ public class WaveManager : Singleton<WaveManager>
     private int currentWave = 0;
     private int enemiesSpawnedInWave = 0;
     private float spawnTimer = 0f;
+    private bool isSpawning = false;
 
+    // Spawners register themselves in Spawner.Start
     public List<Spawner> activeSpawners = new List<Spawner>();
+
+    /// <summary>True while the current wave still has creeps left to spawn.</summary>
+    public bool IsSpawning => isSpawning;
 
     public void RegisterSpawner(Spawner spawner)
     {
@@ -27,49 +32,53 @@ public class WaveManager : Singleton<WaveManager>
 
     private void Update()
     {
-        if (currentWave == 0 || currentWave > waves.Length) return;
+        if (!isSpawning) return;
 
         WaveSet.Wave wave = waves[currentWave - 1];
 
-        if (enemiesSpawnedInWave < wave.enemyCount)
-        {
-            if (activeSpawners.Count == 0)
-            {
-                activeSpawners.AddRange(FindObjectsByType<Spawner>(FindObjectsSortMode.None));
-            }
+        spawnTimer += Time.deltaTime;
+        if (spawnTimer < wave.spawnInterval) return;
+        spawnTimer = 0f;
 
-            if (activeSpawners.Count == 0)
-            {
-                Debug.LogWarning("No active spawners found! Cannot spawn enemies.");
-                enemiesSpawnedInWave = wave.enemyCount;
-            }
-            else
-            {
-                spawnTimer += Time.deltaTime;
-                if (spawnTimer >= wave.spawnInterval)
-                {
-                    spawnTimer = 0f;
-                    foreach (var spawner in activeSpawners)
-                    {
-                        SpawnEnemy(wave.enemy, spawner, enemiesSpawnedInWave);
-                    }
-                    enemiesSpawnedInWave++;
-                }
-            }
+        foreach (var spawner in activeSpawners)
+        {
+            SpawnEnemy(wave.enemy, spawner, enemiesSpawnedInWave);
+        }
+        enemiesSpawnedInWave++;
+
+        if (enemiesSpawnedInWave >= wave.enemyCount)
+        {
+            isSpawning = false;
+            GameManager.Instance.NotifyWaveSpawningComplete();
         }
     }
 
-    public void StartWave(int waveNumber)
+    /// <summary>Begins spawning the given wave (1-based). Returns false if it could not start.</summary>
+    public bool StartWave(int waveNumber)
     {
-        if (waveNumber > waves.Length)
+        if (waveNumber < 1 || waveNumber > waves.Length)
         {
-            Debug.LogWarning("Wave number exceeds configured waves!");
-            return;
+            Debug.LogError($"Wave {waveNumber} is not configured (WaveSet has {waves.Length} waves).");
+            return false;
+        }
+
+        WaveSet.Wave wave = waves[waveNumber - 1];
+        if (wave.enemy == null)
+        {
+            Debug.LogError($"Wave {waveNumber} has no enemy assigned in the WaveSet.");
+            return false;
+        }
+        if (activeSpawners.Count == 0)
+        {
+            Debug.LogError("No spawners registered; cannot start the wave. Is a Spawner in the scene?");
+            return false;
         }
 
         currentWave = waveNumber;
         enemiesSpawnedInWave = 0;
-        spawnTimer = waves[waveNumber - 1].spawnInterval; // Spawn first enemy immediately
+        spawnTimer = wave.spawnInterval; // Spawn first enemy immediately
+        isSpawning = true;
+        return true;
     }
 
     private void SpawnEnemy(EnemyData data, Spawner spawner, int index)
