@@ -12,8 +12,10 @@ public class Enemy : MonoBehaviour, ISelectable
     private float currentHealth;
     private bool isAlive = true;
 
-    // Pathfinding state
-    private int targetWaypointIndex = 1; // 0 is usually spawn, so head to 1
+    // Route state (see RouteStep): the current order target and the region whose entry issues the next order
+    private RouteStep[] route;
+    private int stepIndex;
+    private float holdTimer; // seconds still to wait at the spawn before the first order
     
     private Material normalMaterial;
     private Material tintedMaterial;
@@ -33,15 +35,21 @@ public class Enemy : MonoBehaviour, ISelectable
     public Vector3 AimPoint => Position + Vector3.up * 0.4f;
 
     private List<StatusEffect> activeEffects = new List<StatusEffect>();
-    private Vector3[] myWaypoints;
     private Vector3 formationOffset;
 
-    /// <summary>Sets up a freshly instantiated creep. Call right after Instantiate.</summary>
-    public void Init(EnemyData enemyData, Vector3[] waypoints, int index, Color color)
+    /// <summary>
+    /// Sets up a freshly instantiated creep. Call right after Instantiate. The creep waits <paramref name="initialOrderDelay"/>
+    /// seconds at its spawn, then follows the spawner's route.
+    /// </summary>
+    public void Init(EnemyData enemyData, Spawner spawner, int index, float initialOrderDelay)
     {
+        Color color = spawner.playerColor;
+        Origin = spawner;
         data = enemyData;
         currentHealth = data.health;
-        myWaypoints = waypoints;
+        route = spawner.steps;
+        stepIndex = 0;
+        holdTimer = initialOrderDelay;
 
         visualRenderer.transform.localScale = Vector3.one * data.visualScale;
 
@@ -128,31 +136,33 @@ public class Enemy : MonoBehaviour, ISelectable
 
     private void MoveAlongPath(float dt)
     {
-        if (PathManager.Instance == null || myWaypoints == null) return;
+        if (PathManager.Instance == null || route == null) return;
 
-        // Reached final waypoint
-        if (targetWaypointIndex >= myWaypoints.Length)
+        // Waiting at the spawn before the first order
+        if (holdTimer > 0f)
+        {
+            holdTimer -= dt;
+            return;
+        }
+
+        if (stepIndex >= route.Length)
         {
             ReachedEnd();
             return;
         }
 
-        Vector3 targetNode = myWaypoints[targetWaypointIndex];
-        
-        // Ignore Y for distance check to prevent overshooting on ramps
-        float dxTarget = Position.x - targetNode.x;
-        float dzTarget = Position.z - targetNode.z;
-        if (dxTarget * dxTarget + dzTarget * dzTarget < 1.0f) // reached major waypoint
+        // Entering the current step's region issues the next order (or, at the last step, ends the route)
+        if (route[stepIndex].Contains(Position))
         {
-            targetWaypointIndex++;
-            if (targetWaypointIndex >= myWaypoints.Length)
+            if (route[stepIndex].isExit || stepIndex + 1 >= route.Length)
             {
                 ReachedEnd();
                 return;
             }
-            targetNode = myWaypoints[targetWaypointIndex];
+            stepIndex++;
         }
 
+        Vector3 targetNode = route[stepIndex].target;
         Vector2 flowDir = PathManager.Instance.GetFlowDirection(Position, targetNode);
         if (flowDir == Vector2.zero)
         {
@@ -226,7 +236,13 @@ public class Enemy : MonoBehaviour, ISelectable
 
     public float GetHealth() => currentHealth;
     public float GetMaxHealth() => data.health;
-    public float GetProgress() => myWaypoints != null ? (float)targetWaypointIndex / myWaypoints.Length : 0f;
+    public float GetProgress() => route != null && route.Length > 0 ? (float)stepIndex / route.Length : 0f;
+
+    /// <summary>Index of the route step the creep is currently heading for (for diagnostics).</summary>
+    public int StepIndex => stepIndex;
+
+    /// <summary>The spawner this creep came from (for diagnostics).</summary>
+    public Spawner Origin { get; private set; }
 
     // ISelectable implementation
     public string GetDisplayName() => data != null ? data.displayName : "Creep";

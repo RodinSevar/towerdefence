@@ -77,9 +77,7 @@ Formulas used: damage = base + dice x (sides + 1) / 2 (average roll, no randomne
   60 s countdown; whether it triggers at game start (and whether a level-0 bonus is paid) is unconfirmed.
 - **Level bonus** starts at 10 and grows by 2 per level, paid on clear; the "last defender gets half" bonus is not
   implemented (single player).
-- **Spawners**: the map creates the level's creeps at 15 regions; `yellow_right` gets exactly 1 creep. Our spawners all
-  get the full count. Some levels also change lives (-10, -19, +20, +80 in the triggers); not implemented.
-- **Level 30 and 50 bosses** and special messages/events (levels 15, 20, 30, 32) are not implemented.
+- **Spawners and routes** are now generated from the map's triggers (`Tools > Import WC3 Routes`): 15 spawn regions, 6 unit groups, each group's chain of region-triggered move orders ending at the Load region; `yellow_right` spawns a fixed 1 creep. Two things are NOT from the map: (1) the map creates the gray player's creeps at `Left Move 2` but never gives them a group or an order, so they would idle; we route them straight to the exit; (2) creeps wait `WaveManager.initialOrderDelay` (3 s) at their spawn before the first order, while the map issues the first order immediately. Some levels also change lives (-10, -19, +20, +80 in the triggers); not implemented.
 - **Kill bounty** is paid as the average roll; the real game rolls dice per kill.
 
 ## Performance benchmark

@@ -15,11 +15,17 @@ public class EnemyManager : Singleton<EnemyManager>
     private const float WorldHalfExtent = 104f;
     private static readonly int GridDim = Mathf.CeilToInt(WorldHalfExtent * 2f / CellSize);
 
+    // Slots are stable for the whole frame: a creep that dies leaves a null slot (skipped by every query) and the list is
+    // compacted once at the end of Update, just before the grid is rebuilt. Reshuffling on removal instead would leave the
+    // grid's indices pointing at the wrong creep for the rest of the frame.
     private readonly List<Enemy> enemies = new List<Enemy>(2048);
+    private int liveCount;
+    private bool hasHoles;
     private int[] cellHead;      // first creep index in each cell, -1 if empty
     private int[] nextInCell;    // next creep index in the same cell (linked list), parallel to `enemies`
 
-    public int Count => enemies.Count;
+    /// <summary>Number of live creeps.</summary>
+    public int Count => liveCount;
 
     protected override void OnSingletonAwake()
     {
@@ -32,6 +38,7 @@ public class EnemyManager : Singleton<EnemyManager>
     {
         enemy.ManagerIndex = enemies.Count;
         enemies.Add(enemy);
+        liveCount++;
     }
 
     public void Unregister(Enemy enemy)
@@ -39,13 +46,10 @@ public class EnemyManager : Singleton<EnemyManager>
         int i = enemy.ManagerIndex;
         if (i < 0 || i >= enemies.Count || enemies[i] != enemy) return;
 
-        // Swap-remove keeps this O(1)
-        int last = enemies.Count - 1;
-        Enemy moved = enemies[last];
-        enemies[i] = moved;
-        moved.ManagerIndex = i;
-        enemies.RemoveAt(last);
+        enemies[i] = null; // tombstone; compacted at the end of Update
         enemy.ManagerIndex = -1;
+        liveCount--;
+        hasHoles = true;
     }
 
     private void Update()
@@ -53,15 +57,36 @@ public class EnemyManager : Singleton<EnemyManager>
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver()) return;
 
         float dt = Time.deltaTime;
-        // Iterate backwards: creeps can remove themselves (reaching the end) while ticking.
-        for (int i = enemies.Count - 1; i >= 0; i--)
+        // Creeps can die while ticking (reaching the end); their slots just become null. Creeps spawned meanwhile are
+        // appended and start ticking next frame.
+        int count = enemies.Count;
+        for (int i = 0; i < count; i++)
         {
-            if (i < enemies.Count) enemies[i].Tick(dt);
+            Enemy e = enemies[i];
+            if (e != null) e.Tick(dt);
         }
+
+        Compact();
         RebuildGrid();
     }
 
     // ------------------------------------------------------------------------------------------------ spatial queries
+
+    private void Compact()
+    {
+        if (!hasHoles) return;
+        int write = 0;
+        for (int read = 0; read < enemies.Count; read++)
+        {
+            Enemy e = enemies[read];
+            if (e == null) continue;
+            enemies[write] = e;
+            e.ManagerIndex = write;
+            write++;
+        }
+        enemies.RemoveRange(write, enemies.Count - write);
+        hasHoles = false;
+    }
 
     private void ClearGrid()
     {
@@ -81,7 +106,9 @@ public class EnemyManager : Singleton<EnemyManager>
 
         for (int i = 0; i < enemies.Count; i++)
         {
-            Vector3 p = enemies[i].Position;
+            Enemy e = enemies[i];
+            if (e == null) { nextInCell[i] = -1; continue; }
+            Vector3 p = e.Position;
             int cell = CellCoord(p.z) * GridDim + CellCoord(p.x);
             nextInCell[i] = cellHead[cell];
             cellHead[cell] = i;
@@ -103,6 +130,7 @@ public class EnemyManager : Singleton<EnemyManager>
                 for (int i = cellHead[cz * GridDim + cx]; i >= 0; i = nextInCell[i])
                 {
                     Enemy e = enemies[i];
+                    if (e == null) continue; // died earlier this frame
                     float sqr = (e.Position - position).sqrMagnitude;
                     if (sqr < bestSqr)
                     {
@@ -126,6 +154,7 @@ public class EnemyManager : Singleton<EnemyManager>
         float radiusSqr = radius * radius;
         for (int i = 0; i < enemies.Count; i++)
         {
+            if (enemies[i] == null) continue;
             Vector3 toEnemy = enemies[i].AimPoint - ray.origin;
             float along = Vector3.Dot(toEnemy, ray.direction);
             if (along < 0f || along >= distance) continue;

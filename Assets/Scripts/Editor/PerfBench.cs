@@ -99,6 +99,7 @@ public static class PerfBench
             case 8: Attribution(); break;
             case 9: Behavior(); break;
             case 12: WaitSpawn(); break;
+            case 13: RouteCheck(); break;
         }
     }
 
@@ -158,6 +159,68 @@ public static class PerfBench
         }
         Debug.Log($"BENCH terrainWalls triangles={walls} facingOutward={outward} facingIntoGround={inward} undecided={undecided}");
         step = 11;
+    }
+
+    // ---- routes: every spawner walks the map's route to the exit ----
+    private static int routeFrame, routeCreeps, routeLivesStart;
+    private static Dictionary<Spawner, int> routeMaxStep;
+    private static Dictionary<Enemy, Vector3> routeSpawnPos;
+    private static float routeStartTime;
+    private static bool routeSpawned, routeHoldChecked;
+    private static double routeHoldMoved;
+
+    private static void RouteCheck()
+    {
+        if (!routeSpawned)
+        {
+            foreach (var s in WaveManager.Instance.activeSpawners)
+                Debug.Log($"BENCH route spawner='{s.name}' player='{s.transform.parent.name}' group={s.routeName} amount={(s.amountOverride < 0 ? "wave" : s.amountOverride.ToString())} " +
+                          $"steps={string.Join(" > ", System.Array.ConvertAll(s.steps, x => x.name))}");
+            routeMaxStep = new Dictionary<Spawner, int>();
+            routeSpawnPos = new Dictionary<Enemy, Vector3>();
+            routeLivesStart = GameManager.Instance.GetCurrentLives();
+            Time.timeScale = 20f;
+            WaveManager.Instance.StartWave(1);
+            routeStartTime = Time.time;
+            routeSpawned = true;
+            routeFrame = 0;
+            return;
+        }
+        if (WaveManager.Instance.IsSpawning) return;
+        routeFrame++;
+
+        var alive = UnityEngine.Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None);
+        if (routeFrame == 1) routeCreeps = alive.Length;
+        foreach (var e in alive)
+        {
+            if (!routeSpawnPos.ContainsKey(e)) routeSpawnPos[e] = e.Position;
+            routeMaxStep.TryGetValue(e.Origin, out int best);
+            if (e.StepIndex > best) routeMaxStep[e.Origin] = e.StepIndex;
+        }
+
+        // hold: for the first second of game time nothing may have moved yet
+        double gameTime = Time.time - routeStartTime;
+        if (!routeHoldChecked && gameTime > 1.0)
+        {
+            foreach (var e in alive) routeHoldMoved = Mathf.Max((float)routeHoldMoved, (e.Position - routeSpawnPos[e]).magnitude);
+            routeHoldChecked = true;
+            Debug.Log($"BENCH routeHold gameSeconds={gameTime:F1} creeps={alive.Length} maxDistanceMoved={routeHoldMoved:F2}");
+        }
+
+        if (alive.Length > 0 && gameTime < 400.0) return;
+
+        int leaked = routeLivesStart - GameManager.Instance.GetCurrentLives();
+        Debug.Log($"BENCH routeResult gameSeconds={gameTime:F0} spawned={routeCreeps} leaked={leaked} stillAlive={alive.Length}");
+        foreach (var s in WaveManager.Instance.activeSpawners)
+        {
+            routeMaxStep.TryGetValue(s, out int step);
+            Debug.Log($"BENCH routeReached spawner='{s.name}' furthestStep={step + 1}/{s.steps.Length} ({s.steps[Mathf.Min(step, s.steps.Length - 1)].name})");
+        }
+        foreach (var e in alive) Debug.Log($"BENCH routeStuck spawner='{e.Origin.name}' step={e.StepIndex} at={e.Position}");
+
+        Time.timeScale = 1f;
+        GameManager.Instance.CancelInvoke(); // the cleared wave schedules the next one; the bench drives waves itself
+        step = 1;
     }
 
     // ---- equivalence with the original reachability rules (kept here only as a test reference) ----
@@ -255,7 +318,7 @@ public static class PerfBench
 
         foreach (var c in changed) g.FreeCell(c); // restore the layout
         Debug.Log($"BENCH pathEquivalence trials={trials} agree={agree} newStricterThanLegacy={newStricter} newLooserThanLegacy={newLooser}");
-        step = 1;
+        step = 13;
     }
 
     private static void PathCosts()

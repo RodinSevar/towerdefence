@@ -14,6 +14,7 @@
 - [x] UI now lives in the scene (built once by `Tools > Build UI`, `Assets/Scripts/Editor/UIBuilder.cs`); fields wired via `SerializedObject`, reflection and `GameBoot.SetupUI` removed. Edit the Canvas in the scene directly from now on.
 - [x] Towers and enemies are prefabs (`Assets/Prefabs`) driven by `TowerData` / `EnemyData` / `WaveSet` assets in `Assets/Data`. `Tools > Build Game Data` creates missing assets/prefabs and wires the managers. Also fixed double tower registration and the sell-refund mismatch.
 - [x] Projectiles are pooled (`Projectile.Spawn`); a real Projectile prefab is still optional polish.
+- [x] Spawners and routes come from the map's triggers (15 spawners, 6 groups, region-triggered orders), creeps follow `RouteStep`s and turn at region entry; `yellow_right` = 1 creep; creeps hold `initialOrderDelay` (3 s, not in the map) at the spawn before their first order. Open: the map gives gray's creeps no orders (we route them to the exit); `Prevent Attack` (a creep that attacks is redirected to the exit after 1 s) is not implemented.
 - [x] Performance pass (measured with `PerfBench`, level 45 = 1800 creeps + 80 towers): placement 61 ms -> 4 ms (worst frame after placing 118 -> 4 ms), average frame 14.8 -> 1.2 ms, GC 216 -> 6 KB/frame, spawn hitch 47 ms -> 5 ms, creep material leak fixed. Path system rewritten (flat grid, greedy validation, budgeted flow-field refresh), `EnemyManager` (one tick loop + spatial grid; creeps have no colliders), minimap drawn into one texture.
 - [ ] Tower/enemy icons (`TowerData.icon`) and the command-card swap to Sell/Upgrade when a tower is selected (WC3 style).
 - [x] `TowerManager`: shared `CanPlaceAt`, click-per-attempt (shift+drag still paints), ghost material works under URP
@@ -36,6 +37,4 @@
 - [ ] **Terrain is derived from the pathing map, not the real terrain.** `MapLayout.png` was made from the original's pathing/texture data (`WPMImporter`), so cliffs and ramps are blocky and noisy, with only 3 height levels. `mpq_files/war3map.w3e` holds the real terrain (per-corner ground height, cliff levels, ramp flags, tile textures); rebuild the mesh from that instead, and keep the pathing map only for buildability.
 
 ## Kept on purpose
-The `Tools/` menu importers in `Assets/Scripts/Editor` (`WPMImporter`, `W3RImporter`, `JassWaypointParser`,
-`WintermaulSpawnerGenerator`, `ApplySpawnerCoords`) and `spawner_coords.txt` / `region_dump.txt`. They are hand-run tools that
-turn the extracted WC3 map files into scene data. Re-evaluate once the spawners are final.
+The `Tools/` menu importers in `Assets/Scripts/Editor` (`WPMImporter`, `W3RImporter`, `WaveImporter`, `TowerImporter`, `RouteImporter`) and `region_dump.txt`. They are hand-run tools that turn the extracted WC3 map files into scene data. `RouteImporter` replaced the old guessed spawner generator and its patch-up tools.

@@ -256,7 +256,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 786327}
   m_CullTransparentMesh: 1
---- !u!1 &9809957
+--- !u!1 &9517036
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -264,48 +264,129 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 9809958}
-  - component: {fileID: 9809959}
+  - component: {fileID: 9517037}
+  - component: {fileID: 9517038}
   m_Layer: 0
-  m_Name: Spawn R
+  m_Name: orange lower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &9809958
+--- !u!4 &9517037
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9809957}
+  m_GameObject: {fileID: 9517036}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -77, y: 0, z: -40}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -77.75, y: 0.5, z: -12.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 987868586}
+  m_Father: {fileID: 1430902866}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &9809959
+--- !u!114 &9517038
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9809957}
+  m_GameObject: {fileID: 9517036}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  waypoints:
-  - {x: -12.5, y: 1, z: -22}
-  - {x: -64.75, y: 0.5, z: -32.25}
-  - {x: -4, y: 0, z: -80}
-  indexOffset: 20
-  playerColor: {r: 0, g: 1, b: 0, a: 1}
+  playerColor: {r: 1, g: 0.5, b: 0, a: 1}
+  amountOverride: -1
+  routeName: Attackers_Bottom_left
+  steps:
+  - name: Bottom Left 1 Order
+    target: {x: -64.75, y: 0.5, z: -32.25}
+    regionMin: {x: -68, y: -43}
+    regionMax: {x: -50, y: -25.5}
+    isExit: 0
+  - name: Left Move 1 Order
+    target: {x: -56, y: 0.5, z: -59.25}
+    regionMin: {x: -59, y: -61.5}
+    regionMax: {x: -53, y: -57}
+    isExit: 0
+  - name: Left Move 2
+    target: {x: -4, y: 0.5, z: -46}
+    regionMin: {x: -7.5, y: -48.5}
+    regionMax: {x: -0.5, y: -43.5}
+    isExit: 0
+  - name: Load
+    target: {x: -3.75, y: 0.5, z: -79.75}
+    regionMin: {x: -7.5, y: -81.5}
+    regionMax: {x: 0, y: -78}
+    isExit: 1
+--- !u!1 &21871272
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 21871273}
+  - component: {fileID: 21871274}
+  m_Layer: 0
+  m_Name: Right Spawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &21871273
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 21871272}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 64.5, y: 0.5, z: 74.25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1431590070}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &21871274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 21871272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Spawner
+  playerColor: {r: 0, g: 0.8, b: 0.8, a: 1}
+  amountOverride: -1
+  routeName: Attackers_RightSide
+  steps:
+  - name: Right Move 1 Order
+    target: {x: 55.75, y: 0.5, z: -59}
+    regionMin: {x: 52.5, y: -61.5}
+    regionMax: {x: 59, y: -56.5}
+    isExit: 0
+  - name: Right Move 2
+    target: {x: 12, y: 0.5, z: -41.5}
+    regionMin: {x: 8.5, y: -44}
+    regionMax: {x: 15.5, y: -39}
+    isExit: 0
+  - name: Load
+    target: {x: -3.75, y: 0.5, z: -79.75}
+    regionMin: {x: -7.5, y: -81.5}
+    regionMax: {x: 0, y: -78}
+    isExit: 1
 --- !u!1 &65751130
 GameObject:
   m_ObjectHideFlags: 0
@@ -519,7 +600,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 96901056}
   m_CullTransparentMesh: 1
---- !u!1 &126218724
+--- !u!1 &154205050
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -527,80 +608,37 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 126218725}
-  - component: {fileID: 126218726}
+  - component: {fileID: 154205051}
   m_Layer: 0
-  m_Name: Spawn L
+  m_Name: Spawners
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &126218725
+--- !u!4 &154205051
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 126218724}
+  m_GameObject: {fileID: 154205050}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -83, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1132864705}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &126218726
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 126218724}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  waypoints:
-  - {x: -77.75, y: 1, z: -5.5}
-  - {x: -64.75, y: 0.5, z: -32.25}
-  - {x: -4, y: 0, z: -80}
-  indexOffset: 0
-  playerColor: {r: 1, g: 0.5, b: 0, a: 1}
---- !u!1 &128739286
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 128739287}
-  m_Layer: 0
-  m_Name: Top Right (Teal)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &128739287
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 128739286}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 797878547}
-  - {fileID: 1439287845}
-  m_Father: {fileID: 509130723}
+  - {fileID: 501784504}
+  - {fileID: 2038919474}
+  - {fileID: 1431590070}
+  - {fileID: 1669680917}
+  - {fileID: 1907555483}
+  - {fileID: 1430902866}
+  - {fileID: 1541537903}
+  - {fileID: 1723948173}
+  - {fileID: 1224385523}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &154541268
 MonoBehaviour:
@@ -739,7 +777,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &207114391
+--- !u!1 &232458957
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -747,31 +785,129 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 207114392}
+  - component: {fileID: 232458958}
+  - component: {fileID: 232458959}
   m_Layer: 0
-  m_Name: Bottom Middle (Gray)
+  m_Name: purp lower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &207114392
+--- !u!4 &232458958
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 207114391}
+  m_GameObject: {fileID: 232458957}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 77.5, y: 0.5, z: -9.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1459231213}
-  - {fileID: 823699883}
-  m_Father: {fileID: 509130723}
+  m_Children: []
+  m_Father: {fileID: 1541537903}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &232458959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232458957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Spawner
+  playerColor: {r: 0.6, g: 0, b: 0.8, a: 1}
+  amountOverride: -1
+  routeName: Attackers_Bottom_Right
+  steps:
+  - name: Bottom Right 1 Order
+    target: {x: 63.75, y: 0.5, z: -30.25}
+    regionMin: {x: 50, y: -35.5}
+    regionMax: {x: 67, y: -24.5}
+    isExit: 0
+  - name: Right Move 1 Order
+    target: {x: 55.75, y: 0.5, z: -59}
+    regionMin: {x: 52.5, y: -61.5}
+    regionMax: {x: 59, y: -56.5}
+    isExit: 0
+  - name: Right Move 2
+    target: {x: 12, y: 0.5, z: -41.5}
+    regionMin: {x: 8.5, y: -44}
+    regionMax: {x: 15.5, y: -39}
+    isExit: 0
+  - name: Load
+    target: {x: -3.75, y: 0.5, z: -79.75}
+    regionMin: {x: -7.5, y: -81.5}
+    regionMax: {x: 0, y: -78}
+    isExit: 1
+--- !u!1 &234976072
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 234976073}
+  - component: {fileID: 234976074}
+  m_Layer: 0
+  m_Name: Left Spawn 2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &234976073
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 234976072}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -65.25, y: 0.5, z: 74.25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 501784504}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &234976074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 234976072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Spawner
+  playerColor: {r: 1, g: 0, b: 0, a: 1}
+  amountOverride: -1
+  routeName: Attackers_LeftSide
+  steps:
+  - name: Left Move 1 Order
+    target: {x: -56, y: 0.5, z: -59.25}
+    regionMin: {x: -59, y: -61.5}
+    regionMax: {x: -53, y: -57}
+    isExit: 0
+  - name: Left Move 2
+    target: {x: -4, y: 0.5, z: -46}
+    regionMin: {x: -7.5, y: -48.5}
+    regionMax: {x: -0.5, y: -43.5}
+    isExit: 0
+  - name: Load
+    target: {x: -3.75, y: 0.5, z: -79.75}
+    regionMin: {x: -7.5, y: -81.5}
+    regionMax: {x: 0, y: -78}
+    isExit: 1
 --- !u!1 &250898741
 GameObject:
   m_ObjectHideFlags: 0
@@ -970,6 +1106,69 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 257615151}
   m_CullTransparentMesh: 1
+--- !u!1 &278399248
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 278399249}
+  - component: {fileID: 278399250}
+  m_Layer: 0
+  m_Name: Left Spawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &278399249
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 278399248}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -55.5, y: 0.5, z: 74.25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 501784504}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &278399250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 278399248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Spawner
+  playerColor: {r: 1, g: 0, b: 0, a: 1}
+  amountOverride: -1
+  routeName: Attackers_LeftSide
+  steps:
+  - name: Left Move 1 Order
+    target: {x: -56, y: 0.5, z: -59.25}
+    regionMin: {x: -59, y: -61.5}
+    regionMax: {x: -53, y: -57}
+    isExit: 0
+  - name: Left Move 2
+    target: {x: -4, y: 0.5, z: -46}
+    regionMin: {x: -7.5, y: -48.5}
+    regionMax: {x: -0.5, y: -43.5}
+    isExit: 0
+  - name: Load
+    target: {x: -3.75, y: 0.5, z: -79.75}
+    regionMin: {x: -7.5, y: -81.5}
+    regionMax: {x: 0, y: -78}
+    isExit: 1
 --- !u!1 &284872359
 GameObject:
   m_ObjectHideFlags: 0
@@ -1045,7 +1244,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 284872359}
   m_CullTransparentMesh: 1
---- !u!1 &302586712
+--- !u!1 &306746604
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1053,31 +1252,71 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 302586713}
+  - component: {fileID: 306746605}
+  - component: {fileID: 306746606}
   m_Layer: 0
-  m_Name: Bottom Right (Pink)
+  m_Name: yellow left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &302586713
+--- !u!4 &306746605
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 302586712}
+  m_GameObject: {fileID: 306746604}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -20, y: 0.5, z: 15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 477979943}
-  - {fileID: 1801773003}
-  m_Father: {fileID: 509130723}
+  m_Children: []
+  m_Father: {fileID: 1723948173}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &306746606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 306746604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Spawner
+  playerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  amountOverride: -1
+  routeName: Attackers_Middle_LeftSide
+  steps:
+  - name: Middle Move Order
+    target: {x: -4, y: 0.5, z: -9.75}
+    regionMin: {x: -12, y: -13.5}
+    regionMax: {x: 4, y: -5}
+    isExit: 0
+  - name: Left Move 0 Order
+    target: {x: -66, y: 0.5, z: -8}
+    regionMin: {x: -70, y: -14}
+    regionMax: {x: -61, y: -1.5}
+    isExit: 0
+  - name: Left Move 1 Order
+    target: {x: -56, y: 0.5, z: -59.25}
+    regionMin: {x: -59, y: -61.5}
+    regionMax: {x: -53, y: -57}
+    isExit: 0
+  - name: Left Move 2
+    target: {x: -4, y: 0.5, z: -46}
+    regionMin: {x: -7.5, y: -48.5}
+    regionMax: {x: -0.5, y: -43.5}
+    isExit: 0
+  - name: Load
+    target: {x: -3.75, y: 0.5, z: -79.75}
+    regionMin: {x: -7.5, y: -81.5}
+    regionMax: {x: 0, y: -78}
+    isExit: 1
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -1215,7 +1454,7 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!1 &367032123
+--- !u!1 &359862733
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1223,31 +1462,71 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 367032124}
+  - component: {fileID: 359862734}
+  - component: {fileID: 359862735}
   m_Layer: 0
-  m_Name: Middle Right (Purple)
+  m_Name: Middle Left Spawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &367032124
+--- !u!4 &359862734
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 367032123}
+  m_GameObject: {fileID: 359862733}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -9, y: 0.5, z: 74}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1305551559}
-  - {fileID: 1617474167}
-  m_Father: {fileID: 509130723}
+  m_Children: []
+  m_Father: {fileID: 2038919474}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &359862735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 359862733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Spawner
+  playerColor: {r: 0, g: 0, b: 1, a: 1}
+  amountOverride: -1
+  routeName: Attackers_Middle_LeftSide
+  steps:
+  - name: Middle Move Order
+    target: {x: -4, y: 0.5, z: -9.75}
+    regionMin: {x: -12, y: -13.5}
+    regionMax: {x: 4, y: -5}
+    isExit: 0
+  - name: Left Move 0 Order
+    target: {x: -66, y: 0.5, z: -8}
+    regionMin: {x: -70, y: -14}
+    regionMax: {x: -61, y: -1.5}
+    isExit: 0
+  - name: Left Move 1 Order
+    target: {x: -56, y: 0.5, z: -59.25}
+    regionMin: {x: -59, y: -61.5}
+    regionMax: {x: -53, y: -57}
+    isExit: 0
+  - name: Left Move 2
+    target: {x: -4, y: 0.5, z: -46}
+    regionMin: {x: -7.5, y: -48.5}
+    regionMax: {x: -0.5, y: -43.5}
+    isExit: 0
+  - name: Load
+    target: {x: -3.75, y: 0.5, z: -79.75}
+    regionMin: {x: -7.5, y: -81.5}
+    regionMax: {x: 0, y: -78}
+    isExit: 1
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -1633,7 +1912,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 432663177}
   m_CullTransparentMesh: 1
---- !u!1 &477979942
+--- !u!1 &481117992
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1641,48 +1920,71 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 477979943}
-  - component: {fileID: 477979944}
+  - component: {fileID: 481117993}
+  - component: {fileID: 481117994}
   m_Layer: 0
-  m_Name: Spawn L
+  m_Name: yellow right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &477979943
+--- !u!4 &481117993
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 477979942}
+  m_GameObject: {fileID: 481117992}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 77, y: 0, z: -40}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 12, y: 0.5, z: 15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 302586713}
+  m_Father: {fileID: 1723948173}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &477979944
+--- !u!114 &481117994
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 477979942}
+  m_GameObject: {fileID: 481117992}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  waypoints:
-  - {x: 5.75, y: 1, z: -22}
-  - {x: 63.75, y: 0.5, z: -30.25}
-  - {x: -4, y: 0, z: -80}
-  indexOffset: 0
-  playerColor: {r: 1, g: 0.4, b: 0.7, a: 1}
+  playerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  amountOverride: 1
+  routeName: Attackers_Middle_RightSide
+  steps:
+  - name: Middle Move Order
+    target: {x: -4, y: 0.5, z: -9.75}
+    regionMin: {x: -12, y: -13.5}
+    regionMax: {x: 4, y: -5}
+    isExit: 0
+  - name: Right Move 0 Order
+    target: {x: 66, y: 0.5, z: -4}
+    regionMin: {x: 61, y: -10}
+    regionMax: {x: 70, y: 2}
+    isExit: 0
+  - name: Right Move 1 Order
+    target: {x: 55.75, y: 0.5, z: -59}
+    regionMin: {x: 52.5, y: -61.5}
+    regionMax: {x: 59, y: -56.5}
+    isExit: 0
+  - name: Right Move 2
+    target: {x: 12, y: 0.5, z: -41.5}
+    regionMin: {x: 8.5, y: -44}
+    regionMax: {x: 15.5, y: -39}
+    isExit: 0
+  - name: Load
+    target: {x: -3.75, y: 0.5, z: -79.75}
+    regionMin: {x: -7.5, y: -81.5}
+    regionMax: {x: 0, y: -78}
+    isExit: 1
 --- !u!1 &483029186
 GameObject:
   m_ObjectHideFlags: 0
@@ -1824,7 +2126,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 483029186}
   m_CullTransparentMesh: 1
---- !u!1 &509130722
+--- !u!1 &484465892
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1832,38 +2134,172 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 509130723}
+  - component: {fileID: 484465893}
+  - component: {fileID: 484465894}
   m_Layer: 0
-  m_Name: Spawners
+  m_Name: Middle Right Spawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &509130723
+--- !u!4 &484465893
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 509130722}
+  m_GameObject: {fileID: 484465892}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1, y: 0.5, z: 74}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2038919474}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &484465894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 484465892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Spawner
+  playerColor: {r: 0, g: 0, b: 1, a: 1}
+  amountOverride: -1
+  routeName: Attackers_Middle_RightSide
+  steps:
+  - name: Middle Move Order
+    target: {x: -4, y: 0.5, z: -9.75}
+    regionMin: {x: -12, y: -13.5}
+    regionMax: {x: 4, y: -5}
+    isExit: 0
+  - name: Right Move 0 Order
+    target: {x: 66, y: 0.5, z: -4}
+    regionMin: {x: 61, y: -10}
+    regionMax: {x: 70, y: 2}
+    isExit: 0
+  - name: Right Move 1 Order
+    target: {x: 55.75, y: 0.5, z: -59}
+    regionMin: {x: 52.5, y: -61.5}
+    regionMax: {x: 59, y: -56.5}
+    isExit: 0
+  - name: Right Move 2
+    target: {x: 12, y: 0.5, z: -41.5}
+    regionMin: {x: 8.5, y: -44}
+    regionMax: {x: 15.5, y: -39}
+    isExit: 0
+  - name: Load
+    target: {x: -3.75, y: 0.5, z: -79.75}
+    regionMin: {x: -7.5, y: -81.5}
+    regionMax: {x: 0, y: -78}
+    isExit: 1
+--- !u!1 &501784503
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 501784504}
+  m_Layer: 0
+  m_Name: Top Left (Red)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &501784504
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 501784503}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1358375431}
-  - {fileID: 887188803}
-  - {fileID: 128739287}
-  - {fileID: 1132864705}
-  - {fileID: 367032124}
-  - {fileID: 987868586}
-  - {fileID: 302586713}
-  - {fileID: 628555548}
-  - {fileID: 207114392}
-  m_Father: {fileID: 0}
+  - {fileID: 278399249}
+  - {fileID: 234976073}
+  m_Father: {fileID: 154205051}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &518210534
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 518210535}
+  - component: {fileID: 518210536}
+  m_Layer: 0
+  m_Name: Bottom Right Spawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &518210535
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 518210534}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.25, y: 0.5, z: -22}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1907555483}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &518210536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 518210534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Spawner
+  playerColor: {r: 1, g: 0.4, b: 0.7, a: 1}
+  amountOverride: -1
+  routeName: Attackers_Bottom_Right
+  steps:
+  - name: Bottom Right 1 Order
+    target: {x: 63.75, y: 0.5, z: -30.25}
+    regionMin: {x: 50, y: -35.5}
+    regionMax: {x: 67, y: -24.5}
+    isExit: 0
+  - name: Right Move 1 Order
+    target: {x: 55.75, y: 0.5, z: -59}
+    regionMin: {x: 52.5, y: -61.5}
+    regionMax: {x: 59, y: -56.5}
+    isExit: 0
+  - name: Right Move 2
+    target: {x: 12, y: 0.5, z: -41.5}
+    regionMin: {x: 8.5, y: -44}
+    regionMax: {x: 15.5, y: -39}
+    isExit: 0
+  - name: Load
+    target: {x: -3.75, y: 0.5, z: -79.75}
+    regionMin: {x: -7.5, y: -81.5}
+    regionMax: {x: 0, y: -78}
+    isExit: 1
 --- !u!1 &541136633
 GameObject:
   m_ObjectHideFlags: 0
@@ -2154,106 +2590,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 582314903}
   m_CullTransparentMesh: 1
---- !u!1 &584785099
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 584785100}
-  - component: {fileID: 584785101}
-  m_Layer: 0
-  m_Name: Spawn R
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &584785100
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 584785099}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -77, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1132864705}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &584785101
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 584785099}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  waypoints:
-  - {x: -77.75, y: 1, z: -12.5}
-  - {x: -64.75, y: 0.5, z: -32.25}
-  - {x: -4, y: 0, z: -80}
-  indexOffset: 0
-  playerColor: {r: 1, g: 0.5, b: 0, a: 1}
---- !u!1 &600160246
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 600160247}
-  - component: {fileID: 600160248}
-  m_Layer: 0
-  m_Name: Spawn L
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &600160247
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 600160246}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -10, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 628555548}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &600160248
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 600160246}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  waypoints:
-  - {x: -20, y: 1, z: 15}
-  - {x: -4, y: 0.5, z: -9.75}
-  - {x: -4, y: 0, z: -80}
-  indexOffset: 0
-  playerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &621596340
 GameObject:
   m_ObjectHideFlags: 0
@@ -2375,39 +2711,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 621596340}
   m_CullTransparentMesh: 1
---- !u!1 &628555547
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 628555548}
-  m_Layer: 0
-  m_Name: Center (Yellow)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &628555548
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 628555547}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 600160247}
-  - {fileID: 1474564442}
-  m_Father: {fileID: 509130723}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &670275701
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2674,106 +2977,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 786061105}
   m_CullTransparentMesh: 1
---- !u!1 &797878546
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 797878547}
-  - component: {fileID: 797878548}
-  m_Layer: 0
-  m_Name: Spawn L
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &797878547
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 797878546}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 77, y: 0, z: 80}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 128739287}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &797878548
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 797878546}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  waypoints:
-  - {x: 54.75, y: 1, z: 74.25}
-  - {x: 55.75, y: 0.5, z: -59}
-  - {x: -4, y: 0, z: -80}
-  indexOffset: 0
-  playerColor: {r: 0, g: 0.8, b: 0.8, a: 1}
---- !u!1 &823699882
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 823699883}
-  - component: {fileID: 823699884}
-  m_Layer: 0
-  m_Name: Spawn R
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &823699883
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 823699882}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 15, y: 0, z: -60}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 207114392}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &823699884
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 823699882}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  waypoints:
-  - {x: -4, y: 1, z: -46}
-  - {x: -3.75, y: 0.5, z: -79.75}
-  - {x: -4, y: 0, z: -80}
-  indexOffset: 20
-  playerColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -2988,7 +3191,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
   m_Asset: {fileID: 1721832013}
   m_ActionId: 32b35790-4ed0-4e9a-aa41-69ac6d629449
---- !u!1 &887188802
+--- !u!1 &925569698
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2996,31 +3199,66 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 887188803}
+  - component: {fileID: 925569699}
+  - component: {fileID: 925569700}
   m_Layer: 0
-  m_Name: Top Middle (Blue)
+  m_Name: orange upper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &887188803
+--- !u!4 &925569699
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 887188802}
+  m_GameObject: {fileID: 925569698}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -77.75, y: 0.5, z: -5.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1862111159}
-  - {fileID: 1979642824}
-  m_Father: {fileID: 509130723}
+  m_Children: []
+  m_Father: {fileID: 1430902866}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &925569700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 925569698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Spawner
+  playerColor: {r: 1, g: 0.5, b: 0, a: 1}
+  amountOverride: -1
+  routeName: Attackers_Bottom_left
+  steps:
+  - name: Bottom Left 1 Order
+    target: {x: -64.75, y: 0.5, z: -32.25}
+    regionMin: {x: -68, y: -43}
+    regionMax: {x: -50, y: -25.5}
+    isExit: 0
+  - name: Left Move 1 Order
+    target: {x: -56, y: 0.5, z: -59.25}
+    regionMin: {x: -59, y: -61.5}
+    regionMax: {x: -53, y: -57}
+    isExit: 0
+  - name: Left Move 2
+    target: {x: -4, y: 0.5, z: -46}
+    regionMin: {x: -7.5, y: -48.5}
+    regionMax: {x: -0.5, y: -43.5}
+    isExit: 0
+  - name: Load
+    target: {x: -3.75, y: 0.5, z: -79.75}
+    regionMin: {x: -7.5, y: -81.5}
+    regionMax: {x: 0, y: -78}
+    isExit: 1
 --- !u!1 &926382481
 GameObject:
   m_ObjectHideFlags: 0
@@ -3477,39 +3715,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 944699474}
   m_CullTransparentMesh: 1
---- !u!1 &987868585
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 987868586}
-  m_Layer: 0
-  m_Name: Bottom Left (Green)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &987868586
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 987868585}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1296213363}
-  - {fileID: 9809958}
-  m_Father: {fileID: 509130723}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &988341747
 GameObject:
   m_ObjectHideFlags: 0
@@ -3994,39 +4199,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1132864704
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1132864705}
-  m_Layer: 0
-  m_Name: Middle Left (Orange)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1132864705
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1132864704}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 126218725}
-  - {fileID: 584785100}
-  m_Father: {fileID: 509130723}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1162710600
 GameObject:
   m_ObjectHideFlags: 0
@@ -4345,6 +4517,38 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1211409194}
   m_CullTransparentMesh: 1
+--- !u!1 &1224385522
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1224385523}
+  m_Layer: 0
+  m_Name: Bottom Middle (Gray)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1224385523
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1224385522}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1581602575}
+  m_Father: {fileID: 154205051}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1284430317
 GameObject:
   m_ObjectHideFlags: 0
@@ -4565,106 +4769,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1291967528}
   m_CullTransparentMesh: 1
---- !u!1 &1296213362
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1296213363}
-  - component: {fileID: 1296213364}
-  m_Layer: 0
-  m_Name: Spawn L
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1296213363
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1296213362}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -83, y: 0, z: -40}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 987868586}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1296213364
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1296213362}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  waypoints:
-  - {x: -12.5, y: 1, z: -22}
-  - {x: -64.75, y: 0.5, z: -32.25}
-  - {x: -4, y: 0, z: -80}
-  indexOffset: 0
-  playerColor: {r: 0, g: 1, b: 0, a: 1}
---- !u!1 &1305551558
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1305551559}
-  - component: {fileID: 1305551560}
-  m_Layer: 0
-  m_Name: Spawn L
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1305551559
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1305551558}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 77, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 367032124}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1305551560
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1305551558}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  waypoints:
-  - {x: 77.5, y: 1, z: -1.75}
-  - {x: 63.75, y: 0.5, z: -30.25}
-  - {x: -4, y: 0, z: -80}
-  indexOffset: 0
-  playerColor: {r: 0.6, g: 0, b: 0.8, a: 1}
 --- !u!1 &1328994020
 GameObject:
   m_ObjectHideFlags: 0
@@ -4953,7 +5057,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
   m_Asset: {fileID: 1721832013}
   m_ActionId: 0489e84a-4833-4c40-bfae-cea84b696689
---- !u!1 &1352085215
+--- !u!1 &1430902865
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4961,82 +5065,32 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1352085216}
-  - component: {fileID: 1352085217}
+  - component: {fileID: 1430902866}
   m_Layer: 0
-  m_Name: Spawn R
+  m_Name: Middle Left (Orange)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1352085216
+--- !u!4 &1430902866
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1352085215}
+  m_GameObject: {fileID: 1430902865}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -77, y: 0, z: 80}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1358375431}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1352085217
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1352085215}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  waypoints:
-  - {x: -55.5, y: 1, z: 74.25}
-  - {x: -56, y: 0.5, z: -59.25}
-  - {x: -4, y: 0, z: -80}
-  indexOffset: 0
-  playerColor: {r: 1, g: 0, b: 0, a: 1}
---- !u!1 &1358375430
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1358375431}
-  m_Layer: 0
-  m_Name: Top Left (Red)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1358375431
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1358375430}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1383440322}
-  - {fileID: 1352085216}
-  m_Father: {fileID: 509130723}
+  - {fileID: 9517037}
+  - {fileID: 925569699}
+  m_Father: {fileID: 154205051}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1383440321
+--- !u!1 &1431590069
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5044,198 +5098,31 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1383440322}
-  - component: {fileID: 1383440323}
+  - component: {fileID: 1431590070}
   m_Layer: 0
-  m_Name: Spawn L
+  m_Name: Top Right (Teal)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1383440322
+--- !u!4 &1431590070
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1383440321}
+  m_GameObject: {fileID: 1431590069}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -83, y: 0, z: 80}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1358375431}
+  m_Children:
+  - {fileID: 21871273}
+  - {fileID: 1736297714}
+  m_Father: {fileID: 154205051}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1383440323
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1383440321}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  waypoints:
-  - {x: -65.25, y: 1, z: 74.25}
-  - {x: -56, y: 0.5, z: -59.25}
-  - {x: -4, y: 0, z: -80}
-  indexOffset: 0
-  playerColor: {r: 1, g: 0, b: 0, a: 1}
---- !u!1 &1439287844
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1439287845}
-  - component: {fileID: 1439287846}
-  m_Layer: 0
-  m_Name: Spawn R
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1439287845
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1439287844}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 83, y: 0, z: 80}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 128739287}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1439287846
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1439287844}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  waypoints:
-  - {x: 64.5, y: 1, z: 74.25}
-  - {x: 55.75, y: 0.5, z: -59}
-  - {x: -4, y: 0, z: -80}
-  indexOffset: 0
-  playerColor: {r: 0, g: 0.8, b: 0.8, a: 1}
---- !u!1 &1459231212
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1459231213}
-  - component: {fileID: 1459231214}
-  m_Layer: 0
-  m_Name: Spawn L
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1459231213
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1459231212}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -15, y: 0, z: -60}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 207114392}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1459231214
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1459231212}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  waypoints:
-  - {x: -4, y: 1, z: -46}
-  - {x: -3.75, y: 0.5, z: -79.75}
-  - {x: -4, y: 0, z: -80}
-  indexOffset: 0
-  playerColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
---- !u!1 &1474564441
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1474564442}
-  - component: {fileID: 1474564443}
-  m_Layer: 0
-  m_Name: Spawn R
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1474564442
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1474564441}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 10, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 628555548}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1474564443
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1474564441}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  waypoints:
-  - {x: 12, y: 1, z: 15}
-  - {x: -4, y: 0.5, z: -9.75}
-  - {x: -4, y: 0, z: -80}
-  indexOffset: 0
-  playerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!114 &1475444742
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5387,6 +5274,92 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1517188428}
   m_CullTransparentMesh: 1
+--- !u!1 &1541537902
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1541537903}
+  m_Layer: 0
+  m_Name: Middle Right (Purple)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1541537903
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1541537902}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 232458958}
+  - {fileID: 2075760278}
+  m_Father: {fileID: 154205051}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1581602574
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1581602575}
+  - component: {fileID: 1581602576}
+  m_Layer: 0
+  m_Name: Left Move 2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1581602575
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1581602574}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -4, y: 0.5, z: -46}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1224385523}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1581602576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1581602574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Spawner
+  playerColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  amountOverride: -1
+  routeName: (no group in the map; direct to exit)
+  steps:
+  - name: Load
+    target: {x: -3.75, y: 0.5, z: -79.75}
+    regionMin: {x: -7.5, y: -81.5}
+    regionMax: {x: 0, y: -78}
+    isExit: 1
 --- !u!1 &1616167222
 GameObject:
   m_ObjectHideFlags: 0
@@ -5464,56 +5437,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1616167222}
   m_CullTransparentMesh: 1
---- !u!1 &1617474166
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1617474167}
-  - component: {fileID: 1617474168}
-  m_Layer: 0
-  m_Name: Spawn R
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1617474167
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1617474166}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 83, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 367032124}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1617474168
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1617474166}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  waypoints:
-  - {x: 77.5, y: 1, z: -9.25}
-  - {x: 63.75, y: 0.5, z: -30.25}
-  - {x: -4, y: 0, z: -80}
-  indexOffset: 0
-  playerColor: {r: 0.6, g: 0, b: 0.8, a: 1}
 --- !u!1 &1625623292
 GameObject:
   m_ObjectHideFlags: 0
@@ -5906,6 +5829,38 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1661547652}
   m_CullTransparentMesh: 1
+--- !u!1 &1669680916
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1669680917}
+  m_Layer: 0
+  m_Name: Bottom Left (Green)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1669680917
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1669680916}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2014681880}
+  m_Father: {fileID: 154205051}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1685855817
 GameObject:
   m_ObjectHideFlags: 0
@@ -6695,6 +6650,102 @@ MonoBehaviour:
     - m_ControlPath: <XRController>
       m_Flags: 0
   m_IsProjectWide: 0
+--- !u!1 &1723948172
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1723948173}
+  m_Layer: 0
+  m_Name: Center (Yellow)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1723948173
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1723948172}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 306746605}
+  - {fileID: 481117993}
+  m_Father: {fileID: 154205051}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1736297713
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1736297714}
+  - component: {fileID: 1736297715}
+  m_Layer: 0
+  m_Name: Right Spawn 2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1736297714
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1736297713}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 54.75, y: 0.5, z: 74.25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1431590070}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1736297715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1736297713}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Spawner
+  playerColor: {r: 0, g: 0.8, b: 0.8, a: 1}
+  amountOverride: -1
+  routeName: Attackers_RightSide
+  steps:
+  - name: Right Move 1 Order
+    target: {x: 55.75, y: 0.5, z: -59}
+    regionMin: {x: 52.5, y: -61.5}
+    regionMax: {x: 59, y: -56.5}
+    isExit: 0
+  - name: Right Move 2
+    target: {x: 12, y: 0.5, z: -41.5}
+    regionMin: {x: 8.5, y: -44}
+    regionMax: {x: 15.5, y: -39}
+    isExit: 0
+  - name: Load
+    target: {x: -3.75, y: 0.5, z: -79.75}
+    regionMin: {x: -7.5, y: -81.5}
+    regionMax: {x: 0, y: -78}
+    isExit: 1
 --- !u!1 &1747237986
 GameObject:
   m_ObjectHideFlags: 0
@@ -6726,6 +6777,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
   enemyPrefab: {fileID: 7061748117590123725, guid: 806baf9a87abcaf4688651a734caae5f, type: 3}
   waveSet: {fileID: 11400000, guid: 0ed12a14bd549834fb9f3ab52ab49530, type: 2}
+  initialOrderDelay: 3
+  spawnsPerFrame: 200
   activeSpawners: []
 --- !u!4 &1747237988
 Transform:
@@ -6957,56 +7010,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1791965143}
   m_CullTransparentMesh: 1
---- !u!1 &1801773002
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1801773003}
-  - component: {fileID: 1801773004}
-  m_Layer: 0
-  m_Name: Spawn R
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1801773003
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1801773002}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 83, y: 0, z: -40}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 302586713}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1801773004
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1801773002}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  waypoints:
-  - {x: 5.75, y: 1, z: -22}
-  - {x: 63.75, y: 0.5, z: -30.25}
-  - {x: -4, y: 0, z: -80}
-  indexOffset: 20
-  playerColor: {r: 1, g: 0.4, b: 0.7, a: 1}
 --- !u!1 &1814288220
 GameObject:
   m_ObjectHideFlags: 0
@@ -7279,56 +7282,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
   m_Asset: {fileID: 1721832013}
   m_ActionId: c95b2375-e6d9-4b88-9c4c-c5e76515df4b
---- !u!1 &1862111158
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1862111159}
-  - component: {fileID: 1862111160}
-  m_Layer: 0
-  m_Name: Spawn L
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1862111159
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1862111158}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3, y: 0, z: 80}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 887188803}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1862111160
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1862111158}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  waypoints:
-  - {x: -9, y: 1, z: 74}
-  - {x: -4, y: 0.5, z: -9.75}
-  - {x: -4, y: 0, z: -80}
-  indexOffset: 0
-  playerColor: {r: 0, g: 0, b: 1, a: 1}
 --- !u!1 &1865283848
 GameObject:
   m_ObjectHideFlags: 0
@@ -7666,6 +7619,38 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1894369169}
   m_CullTransparentMesh: 1
+--- !u!1 &1907555482
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1907555483}
+  m_Layer: 0
+  m_Name: Bottom Right (Pink)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1907555483
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1907555482}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 518210535}
+  m_Father: {fileID: 154205051}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1927303677
 GameObject:
   m_ObjectHideFlags: 0
@@ -7741,56 +7726,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1927303677}
   m_CullTransparentMesh: 1
---- !u!1 &1979642823
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1979642824}
-  - component: {fileID: 1979642825}
-  m_Layer: 0
-  m_Name: Spawn R
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1979642824
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1979642823}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3, y: 0, z: 80}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 887188803}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1979642825
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1979642823}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  waypoints:
-  - {x: 1, y: 1, z: 74}
-  - {x: -4, y: 0.5, z: -9.75}
-  - {x: -4, y: 0, z: -80}
-  indexOffset: 0
-  playerColor: {r: 0, g: 0, b: 1, a: 1}
 --- !u!1 &1994334450
 GameObject:
   m_ObjectHideFlags: 0
@@ -7905,6 +7840,74 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1994334450}
   m_CullTransparentMesh: 1
+--- !u!1 &2014681879
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2014681880}
+  - component: {fileID: 2014681881}
+  m_Layer: 0
+  m_Name: Bottom Left Spawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2014681880
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2014681879}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -12.5, y: 0.5, z: -22}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1669680917}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2014681881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2014681879}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Spawner
+  playerColor: {r: 0, g: 1, b: 0, a: 1}
+  amountOverride: -1
+  routeName: Attackers_Bottom_left
+  steps:
+  - name: Bottom Left 1 Order
+    target: {x: -64.75, y: 0.5, z: -32.25}
+    regionMin: {x: -68, y: -43}
+    regionMax: {x: -50, y: -25.5}
+    isExit: 0
+  - name: Left Move 1 Order
+    target: {x: -56, y: 0.5, z: -59.25}
+    regionMin: {x: -59, y: -61.5}
+    regionMax: {x: -53, y: -57}
+    isExit: 0
+  - name: Left Move 2
+    target: {x: -4, y: 0.5, z: -46}
+    regionMin: {x: -7.5, y: -48.5}
+    regionMax: {x: -0.5, y: -43.5}
+    isExit: 0
+  - name: Load
+    target: {x: -3.75, y: 0.5, z: -79.75}
+    regionMin: {x: -7.5, y: -81.5}
+    regionMax: {x: 0, y: -78}
+    isExit: 1
 --- !u!1 &2017380240
 GameObject:
   m_ObjectHideFlags: 0
@@ -8026,6 +8029,107 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2017380240}
   m_CullTransparentMesh: 1
+--- !u!1 &2038919473
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2038919474}
+  m_Layer: 0
+  m_Name: Top Middle (Blue)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2038919474
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2038919473}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 359862734}
+  - {fileID: 484465893}
+  m_Father: {fileID: 154205051}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2075760277
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2075760278}
+  - component: {fileID: 2075760279}
+  m_Layer: 0
+  m_Name: purp upper
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2075760278
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2075760277}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 77.5, y: 0.5, z: -1.75}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1541537903}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2075760279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2075760277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1d0e67a49126b34db5a106f9aecda66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Spawner
+  playerColor: {r: 0.6, g: 0, b: 0.8, a: 1}
+  amountOverride: -1
+  routeName: Attackers_Bottom_Right
+  steps:
+  - name: Bottom Right 1 Order
+    target: {x: 63.75, y: 0.5, z: -30.25}
+    regionMin: {x: 50, y: -35.5}
+    regionMax: {x: 67, y: -24.5}
+    isExit: 0
+  - name: Right Move 1 Order
+    target: {x: 55.75, y: 0.5, z: -59}
+    regionMin: {x: 52.5, y: -61.5}
+    regionMax: {x: 59, y: -56.5}
+    isExit: 0
+  - name: Right Move 2
+    target: {x: 12, y: 0.5, z: -41.5}
+    regionMin: {x: 8.5, y: -44}
+    regionMax: {x: 15.5, y: -39}
+    isExit: 0
+  - name: Load
+    target: {x: -3.75, y: 0.5, z: -79.75}
+    regionMin: {x: -7.5, y: -81.5}
+    regionMax: {x: 0, y: -78}
+    isExit: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -8034,10 +8138,10 @@ SceneRoots:
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 1162710601}
-  - {fileID: 509130723}
   - {fileID: 183167221}
   - {fileID: 1747237988}
   - {fileID: 765014249}
   - {fileID: 1284430318}
   - {fileID: 1121365453}
   - {fileID: 929066484}
+  - {fileID: 154205051}
