@@ -1,9 +1,13 @@
 using UnityEngine;
-using System.Collections.Generic;
 
+/// <summary>
+/// The logic grid: 1x1 world-unit cells (64 Warcraft III units, one tower footprint) with occupancy, buildability and
+/// ground height. Cell (x, z) covers world x in [x, x + 1) and z in [z, z + 1), so its centre is (x + 0.5, z + 0.5), and it
+/// lines up exactly with the terrain mesh and the map's pathing cells. Filled from the imported terrain by TerrainBuilder.
+/// </summary>
 public class GridManager : Singleton<GridManager>
 {
-    // Cell coordinates are centered on the origin (may be negative); arrays are indexed 0..ArraySize-1.
+    // Cell coordinates are centred on the origin (may be negative); arrays are indexed 0..ArraySize-1.
     public const int ArraySize = 256;
     public const int IndexOffset = ArraySize / 2;
     private const float DefaultHeight = 0.5f;
@@ -11,13 +15,14 @@ public class GridManager : Singleton<GridManager>
     [SerializeField]
     private float cellSize = 1f;
 
+    [Tooltip("Playable map size in cells (the imported map is 192 x 192)")]
     [SerializeField]
-    private int gridWidth = 196;
+    private int gridWidth = 192;
 
     [SerializeField]
-    private int gridHeight = 196;
+    private int gridHeight = 192;
 
-    // Flat storage, index = (y + IndexOffset) * ArraySize + (x + IndexOffset). Exposed read-only-by-convention
+    // Flat storage, index = (z + IndexOffset) * ArraySize + (x + IndexOffset). Exposed read-only-by-convention
     // (see OccupancyGrid / HeightGrid) so the pathfinder can scan them without a method call per cell.
     private bool[] occupiedCells;
     private bool[] unbuildableCells;
@@ -26,8 +31,12 @@ public class GridManager : Singleton<GridManager>
     /// <summary>Tower/cliff occupancy, indexed by <see cref="CellIndex"/>. Do not write; use OccupyCell/FreeCell.</summary>
     public bool[] OccupancyGrid => occupiedCells;
 
-    /// <summary>Cell surface heights, indexed by <see cref="CellIndex"/>. Do not write; use SetCellHeight.</summary>
+    /// <summary>Cell ground heights (at the cell centre), indexed by <see cref="CellIndex"/>. Do not write; use SetCellHeight.</summary>
     public float[] HeightGrid => cellHeights;
+
+    /// <summary>Lowest and highest playable cell coordinates.</summary>
+    public Vector2Int MinCell => new Vector2Int(-gridWidth / 2, -gridHeight / 2);
+    public Vector2Int MaxCell => new Vector2Int(gridWidth / 2 - 1, gridHeight / 2 - 1);
 
     protected override void OnSingletonAwake()
     {
@@ -45,7 +54,29 @@ public class GridManager : Singleton<GridManager>
             cellHeights[i] = DefaultHeight;
     }
 
-    /// <summary>Array index for a centered cell coordinate, or -1 if it lies outside the array.</summary>
+    /// <summary>
+    /// Loads the imported terrain: blocked cells become occupied, walkable-but-unbuildable cells become unbuildable, and
+    /// <paramref name="centerHeights"/> (one per data cell) sets each cell's ground height.
+    /// </summary>
+    public void ApplyTerrain(TerrainMapData data, float[] centerHeights)
+    {
+        for (int cz = 0; cz < data.cellsZ; cz++)
+        {
+            for (int cx = 0; cx < data.cellsX; cx++)
+            {
+                var cell = new Vector2Int(cx - data.cellsX / 2, cz - data.cellsZ / 2);
+                int i = CellIndex(cell);
+                if (i < 0) continue;
+
+                byte flags = data.cellPathing[data.CellIndex(cx, cz)];
+                occupiedCells[i] = (flags & TerrainMapData.PathBlocked) != 0;
+                unbuildableCells[i] = (flags & TerrainMapData.PathNoBuild) != 0;
+                cellHeights[i] = centerHeights[data.CellIndex(cx, cz)];
+            }
+        }
+    }
+
+    /// <summary>Array index for a centred cell coordinate, or -1 if it lies outside the array.</summary>
     public static int CellIndex(Vector2Int cell)
     {
         int x = cell.x + IndexOffset;
@@ -59,24 +90,22 @@ public class GridManager : Singleton<GridManager>
         return new Vector2Int(index % ArraySize - IndexOffset, index / ArraySize - IndexOffset);
     }
 
-    /// <summary>True if the cell is inside the playable area (the grid is centered on the origin).</summary>
+    /// <summary>True if the cell is inside the playable map.</summary>
     public bool IsPlayable(Vector2Int cell)
     {
-        int halfWidth = gridWidth / 2;
-        int halfHeight = gridHeight / 2;
-        return cell.x >= -halfWidth && cell.x <= halfWidth && cell.y >= -halfHeight && cell.y <= halfHeight;
+        Vector2Int min = MinCell, max = MaxCell;
+        return cell.x >= min.x && cell.x <= max.x && cell.y >= min.y && cell.y <= max.y;
     }
 
     /// <summary>
-    /// Snaps a world position to the nearest grid cell center
+    /// Snaps a world position to the centre of its cell, at ground height.
     /// </summary>
     public Vector3 SnapToGrid(Vector3 worldPos)
     {
-        float x = Mathf.Round(worldPos.x / cellSize) * cellSize;
-        float z = Mathf.Round(worldPos.z / cellSize) * cellSize;
-        Vector2Int cell = WorldToGridCell(new Vector3(x, 0, z));
-        float y = GetCellHeight(cell);
-        return new Vector3(x, y, z);
+        Vector2Int cell = WorldToGridCell(worldPos);
+        var center = new Vector3((cell.x + 0.5f) * cellSize, 0f, (cell.y + 0.5f) * cellSize);
+        center.y = GetCellHeight(cell);
+        return center;
     }
 
     public void SetCellHeight(Vector2Int cell, float height)
@@ -91,19 +120,35 @@ public class GridManager : Singleton<GridManager>
         return i >= 0 ? cellHeights[i] : DefaultHeight;
     }
 
+    /// <summary>Ground height at any world position: bilinear between the four nearest cell centres.</summary>
+    public float SampleHeight(Vector3 worldPos)
+    {
+        float fx = worldPos.x / cellSize - 0.5f;
+        float fz = worldPos.z / cellSize - 0.5f;
+        int x0 = Mathf.FloorToInt(fx), z0 = Mathf.FloorToInt(fz);
+        float tx = fx - x0, tz = fz - z0;
+
+        float h00 = GetCellHeight(new Vector2Int(x0, z0));
+        float h10 = GetCellHeight(new Vector2Int(x0 + 1, z0));
+        float h01 = GetCellHeight(new Vector2Int(x0, z0 + 1));
+        float h11 = GetCellHeight(new Vector2Int(x0 + 1, z0 + 1));
+        return Mathf.Lerp(Mathf.Lerp(h00, h10, tx), Mathf.Lerp(h01, h11, tx), tz);
+    }
+
+    /// <summary>World position of a cell's centre, at ground height.</summary>
     public Vector3 GetWorldPosition(Vector2Int cell)
     {
-        return new Vector3(cell.x * cellSize, GetCellHeight(cell), cell.y * cellSize);
+        return new Vector3((cell.x + 0.5f) * cellSize, GetCellHeight(cell), (cell.y + 0.5f) * cellSize);
     }
 
     /// <summary>
-    /// Converts world position to grid cell coordinates (grid is centered on the origin)
+    /// Converts world position to the cell containing it
     /// </summary>
     public Vector2Int WorldToGridCell(Vector3 worldPos)
     {
         return new Vector2Int(
-            Mathf.RoundToInt(worldPos.x / cellSize),
-            Mathf.RoundToInt(worldPos.z / cellSize));
+            Mathf.FloorToInt(worldPos.x / cellSize),
+            Mathf.FloorToInt(worldPos.z / cellSize));
     }
 
     /// <summary>

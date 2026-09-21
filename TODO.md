@@ -28,15 +28,14 @@
 - [ ] `yellow_right` spawns only 1 creep per level; show a "Level N in..." countdown in the HUD; some levels change lives (see `war3map.j`).
 - [ ] **`PathManager` grid size** hard-coded 200x200 (vs GridManager 256 / 196). Fold into the pathing rewrite: expose
       grid dimensions from `GridManager` and use them everywhere.
-- [ ] `MapGenerator` is located via reflection in `GameBoot` (`mapTexture` private field) -> add a public setter or serialize in the scene.
 - [ ] Scene tags ("Ground", "SpawnPoint") should be set up in the project.
 - [ ] Review `mpq_files/` (raw map extract): keep, but note in README what is used vs. reference only.
 
 ## Known visual problems (future)
 - [x] Terrain walls were 58% back-face culled (5568 of 9578 wall triangles faced into the ground); `DrawWall` now picks the winding from which side is higher. Verified on the real mesh by `PerfBench` (all 9578 face outward).
-- [ ] **Terrain is derived from the pathing map, not the real terrain.** `MapLayout.png` was made from the original's pathing/texture data (`WPMImporter`), so cliffs and ramps are blocky and noisy, with only 3 height levels. `mpq_files/war3map.w3e` holds the real terrain (per-corner ground height, cliff levels, ramp flags, tile textures); rebuild the mesh from that instead, and keep the pathing map only for buildability.
+- [x] **Terrain rebuilt from the real terrain data** (was derived from the pathing map). Known rough edges: some cliff edges show sawtooth wall fins, and 47 of 6251 wall triangles still face into the ground. `MapLayout.png` was made from the original's pathing/texture data (`WPMImporter`), so cliffs and ramps are blocky and noisy, with only 3 height levels. `mpq_files/war3map.w3e` holds the real terrain (per-corner ground height, cliff levels, ramp flags, tile textures); rebuild the mesh from that instead, and keep the pathing map only for buildability.
 - [x] Procedural terrain textures generated (`tools/generate_terrain_textures.py` -> `Assets/Textures/Terrain`): seamless albedo for the map's 7 ground tiles (Ndrt, Glav, Nrck, Ngrs, Nice, Nsnw, Nsnr), 2 cliffs (CNdi, CNsn) and water, plus normal maps. Stand-ins for the tileset textures in the game files. `Glav` is unknown in the original (treated as frozen gravel). Not yet used by the terrain mesh.
 - [ ] Terrain rebuild plan (from `war3map.w3e`; the pathing map is already faithful, verified): true heights and 5 cliff levels, real ramps (456 corners; the old importer wrongly turned unbuildable lane cells into ramps), water at its real level (bottom sea, side edges), ground blended by tile type using the textures above, creeps/towers following ground height, minimap generated from the terrain, ship at the exit.
 
 ## Kept on purpose
-The `Tools/` menu importers in `Assets/Scripts/Editor` (`WPMImporter`, `W3RImporter`, `WaveImporter`, `TowerImporter`, `RouteImporter`) and `region_dump.txt`. They are hand-run tools that turn the extracted WC3 map files into scene data. `RouteImporter` replaced the old guessed spawner generator and its patch-up tools.
+The `Tools/` menu importers in `Assets/Scripts/Editor` (`W3RImporter`, `WaveImporter`, `TowerImporter`, `RouteImporter`) and `region_dump.txt`. They are hand-run tools that turn the extracted WC3 map files into scene data. `RouteImporter` replaced the old guessed spawner generator and its patch-up tools.

@@ -10,7 +10,7 @@ using UnityEngine;
 /// </summary>
 public class EnemyManager : Singleton<EnemyManager>
 {
-    // Spatial grid over the playable area (world is roughly -98..98 on x and z)
+    // Spatial grid over the playable area (the map is -96..96 on x and z)
     private const float CellSize = 6f;
     private const float WorldHalfExtent = 104f;
     private static readonly int GridDim = Mathf.CeilToInt(WorldHalfExtent * 2f / CellSize);

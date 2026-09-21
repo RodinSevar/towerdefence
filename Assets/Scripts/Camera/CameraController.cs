@@ -15,9 +15,9 @@ public class CameraController : MonoBehaviour
     public float maxY = 150f;
 
     [Header("Map Boundaries")]
-    // Since our grid is 196x196, half of that is 98
-    public Vector2 panLimitX = new Vector2(-98f, 98f);
-    public Vector2 panLimitZ = new Vector2(-98f, 98f);
+    // The map is 192x192 cells, centred on the origin
+    public Vector2 panLimitX = new Vector2(-96f, 96f);
+    public Vector2 panLimitZ = new Vector2(-96f, 96f);
 
     private void Update()
     {

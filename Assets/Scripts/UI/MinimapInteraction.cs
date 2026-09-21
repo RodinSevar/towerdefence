@@ -5,8 +5,8 @@ public class MinimapInteraction : MonoBehaviour, IPointerDownHandler, IDragHandl
 {
     private RectTransform rectTransform;
     
-    // Based on GridManager (98 world units is the boundary)
-    private float gridHalfSize = 98f;
+    // Based on GridManager (96 world units is the boundary)
+    private float gridHalfSize = 96f;
 
     private void Awake()
     {
@@ -42,7 +42,7 @@ public class MinimapInteraction : MonoBehaviour, IPointerDownHandler, IDragHandl
         normalizedX = Mathf.Clamp01(normalizedX);
         normalizedY = Mathf.Clamp01(normalizedY);
         
-        // Convert to World coordinates (-98 to 98)
+        // Convert to World coordinates (-96 to 96)
         float worldX = Mathf.Lerp(-gridHalfSize, gridHalfSize, normalizedX);
         float worldZ = Mathf.Lerp(-gridHalfSize, gridHalfSize, normalizedY);
         

@@ -63,6 +63,7 @@ public class Enemy : MonoBehaviour, ISelectable
         formationOffset = GetSpiralOffset(index, 0.8f);
         cachedTransform = transform;
         cachedTransform.position += formationOffset;
+        cachedTransform.position = OnGround(cachedTransform.position);
         Position = cachedTransform.position;
 
         EnemyManager.Instance.Register(this);
@@ -151,6 +152,14 @@ public class Enemy : MonoBehaviour, ISelectable
         }
     }
 
+    private const float HoverHeight = 0.5f; // creep pivot above the ground
+
+    private static Vector3 OnGround(Vector3 p)
+    {
+        p.y = GridManager.Instance.SampleHeight(p) + HoverHeight;
+        return p;
+    }
+
     private void MoveAlongPath(float dt)
     {
         if (PathManager.Instance == null || route == null) return;
@@ -203,6 +212,7 @@ public class Enemy : MonoBehaviour, ISelectable
         currentSpeed *= (1f - maxSlow);
         
         Position += moveDir * currentSpeed * dt;
+        Position = OnGround(Position);
         cachedTransform.position = Position;
 
         if (moveDir != Vector3.zero && moveDir != lastLookDir) // rotation only changes when the heading does

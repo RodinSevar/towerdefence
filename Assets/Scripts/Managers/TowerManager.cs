@@ -216,7 +216,7 @@ public class TowerManager : Singleton<TowerManager>
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
             // Check if we hit the ground plane
-            if (hit.collider.CompareTag("Ground") || hit.collider.GetComponent<MapGenerator>() != null)
+            if (hit.collider.CompareTag("Ground") || hit.collider.GetComponent<TerrainBuilder>() != null)
             {
                 // Snap to grid
                 Vector3 snappedPos = GridManager.Instance.SnapToGrid(hit.point);

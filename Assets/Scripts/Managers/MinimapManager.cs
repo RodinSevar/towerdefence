@@ -15,7 +15,7 @@ public class MinimapManager : Singleton<MinimapManager>
     [SerializeField] private RectTransform minimapContainer;
 
     // World range shown by the minimap: -gridHalfSize..gridHalfSize on both axes
-    private float gridHalfSize = 98f;
+    private float gridHalfSize = 96f;
 
     // Dot sizes in minimap UI units (as before): enemies slightly smaller than towers
     private const float EnemyDotUi = 3f, TowerDotUi = 4f;
@@ -40,9 +40,28 @@ public class MinimapManager : Singleton<MinimapManager>
         };
         pixels = new Color32[TextureSize * TextureSize];
 
+        if (TerrainBuilder.Instance != null)
+        {
+            TerrainBuilder.Instance.EnsureBuilt();
+            if (TerrainBuilder.Instance.MinimapTexture != null)
+            {
+                var bg = new GameObject("MinimapTerrain", typeof(RectTransform), typeof(RawImage));
+                bg.transform.SetParent(minimapContainer, false);
+                bg.transform.SetAsFirstSibling();
+                var bgRect = (RectTransform)bg.transform;
+                bgRect.anchorMin = Vector2.zero;
+                bgRect.anchorMax = Vector2.one;
+                bgRect.offsetMin = Vector2.zero;
+                bgRect.offsetMax = Vector2.zero;
+                var bgImage = bg.GetComponent<RawImage>();
+                bgImage.texture = TerrainBuilder.Instance.MinimapTexture;
+                bgImage.raycastTarget = false;
+            }
+        }
+
         var go = new GameObject("MinimapDots", typeof(RectTransform), typeof(RawImage));
         go.transform.SetParent(minimapContainer, false);
-        go.transform.SetAsFirstSibling(); // under the camera-view lines
+        go.transform.SetSiblingIndex(minimapContainer.Find("MinimapTerrain") != null ? 1 : 0); // above the terrain, under the camera-view lines
         var rect = (RectTransform)go.transform;
         rect.anchorMin = Vector2.zero;
         rect.anchorMax = Vector2.one;

@@ -137,8 +137,8 @@ public static class PerfBench
     /// </summary>
     private static void TerrainCheck()
     {
-        var mapGen = UnityEngine.Object.FindFirstObjectByType<MapGenerator>();
-        var mesh = mapGen.GetComponent<MeshFilter>().sharedMesh;
+        TerrainBuilder.Instance.EnsureBuilt();
+        var mesh = TerrainBuilder.Instance.GroundMesh;
         var v = mesh.vertices; var tris = mesh.triangles;
         int walls = 0, outward = 0, inward = 0, undecided = 0;
         for (int i = 0; i < tris.Length; i += 3)

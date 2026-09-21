@@ -70,8 +70,6 @@ public class GameBoot : MonoBehaviour
             Debug.LogError("Error setting up camera: " + e.Message);
         }
 
-        // Ground creation has been moved to MapGenerator in SetupManagers()
-
         // Create spawn point if not exists
         if (GameObject.FindWithTag("SpawnPoint") == null)
         {
@@ -101,30 +99,9 @@ public class GameBoot : MonoBehaviour
             gridObj.AddComponent<GridManager>();
         }
 
-        // Generate Map
-        if (FindAnyObjectByType<MapGenerator>() == null)
-        {
-            GameObject mapObj = new GameObject("MapGenerator");
-            mapObj.tag = "Ground";
-            MapGenerator gen = mapObj.AddComponent<MapGenerator>();
-            
-            // Try to load a custom image map from the Resources folder
-            Texture2D customMap = Resources.Load<Texture2D>("MapLayout");
-            if (customMap != null)
-            {
-                if (customMap.isReadable)
-                {
-                    var field = gen.GetType().GetField("mapTexture", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                    if (field != null) field.SetValue(gen, customMap);
-                }
-                else
-                {
-                    Debug.LogWarning("The MapLayout.png image was found, but it is not readable! You must select the image in Unity and check 'Read/Write' in the Inspector. Falling back to default map generation.");
-                }
-            }
-            
-            gen.GenerateMap();
-        }
+        // The terrain lives in the scene (built by Tools > Build Terrain)
+        if (FindAnyObjectByType<TerrainBuilder>() == null)
+            Debug.LogError("No terrain in the scene. Run Tools > Build Terrain in the editor.");
         
         // Create GameManager if not exists
         if (FindAnyObjectByType<GameManager>() == null)
