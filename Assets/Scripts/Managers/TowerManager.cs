@@ -57,6 +57,7 @@ public class TowerManager : Singleton<TowerManager>
         for (int i = 0; i < activeTowers.Count; i++) activeTowers[i].SimTick(dt);
     }
 
+    public IReadOnlyList<Tower> Towers => activeTowers;
     public int TowerCount => activeTowers.Count;
 
     /// <summary>The tower whose footprint starts at <paramref name="origin"/>, or null (tests).</summary>

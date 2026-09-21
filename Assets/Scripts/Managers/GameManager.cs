@@ -142,5 +142,10 @@ public class GameManager : Singleton<GameManager>
     }
 
     public bool IsGameOver() => isGameOver;
+    public int CurrentWave => currentWave;
+    public int EnemiesAlive => activeEnemies.Count;
+
+    /// <summary>Starts the countdown to the next wave from now (tests and tools).</summary>
+    public void ScheduleNextWave(float seconds) => waveCountdown = seconds;
     public int GetCurrentLives() => currentLives;
 }

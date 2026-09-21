@@ -90,3 +90,14 @@ of game time. Close Unity, then:
 Unity -batchmode -nographics -projectPath . -executeMethod PerfBench.Run -logFile bench.log
 ```
 Numbers are CPU/logic only (no rendering); GPU cost is not measured.
+
+## Determinism check (for multiplayer)
+Game logic runs on a fixed 60 Hz tick (`Simulation`) and player actions are commands (`Commands.cs`), so machines that apply the
+same commands on the same ticks stay identical. `StateChecksum` hashes the whole game state every 30 ticks. `DeterminismCheck`
+replays a scripted game (placements, race unlock, sale, gold trade, a level-45 wave) and logs `DET tick=N hash=H`; run it twice with
+different `-timescale` values (with Unity closed) and the DET lines must match exactly:
+
+```
+Unity -batchmode -nographics -projectPath . -executeMethod DeterminismCheck.Run -logFile det_a.log -timescale 20
+Unity -batchmode -nographics -projectPath . -executeMethod DeterminismCheck.Run -logFile det_b.log -timescale 6
+```

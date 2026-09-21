@@ -203,6 +203,10 @@ public class Tower : MonoBehaviour, ISelectable
         if (firePoint != null) firePoint.position = new Vector3(b.center.x, b.max.y - b.size.y * 0.15f, b.center.z);
     }
 
+    /// <summary>Upgrade level index (0 = first level).</summary>
+    public int Level => currentLevelIndex;
+    public float FireTimer => fireTimer;
+
     public int GetCost() => CurrentLevel != null ? CurrentLevel.cost : 0;
     public float GetDamage() => CurrentLevel != null ? CurrentLevel.damage : 0f;
     public float GetRange() => CurrentLevel != null ? CurrentLevel.range : 0f;

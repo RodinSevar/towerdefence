@@ -22,6 +22,12 @@ public class Simulation : Singleton<Simulation>
     [Tooltip("Ticks run per rendered frame at most; if the game falls further behind it slows down instead of freezing")]
     [SerializeField] private int maxTicksPerFrame = 30;
 
+    /// <summary>How often (in ticks) the state checksum is computed.</summary>
+    public const int ChecksumInterval = 30;
+
+    /// <summary>Raised after every <see cref="ChecksumInterval"/> ticks with the tick number and the state hash.</summary>
+    public static event System.Action<int, uint> OnChecksum;
+
     private float accumulator;
 
     protected override void OnSingletonAwake()
@@ -56,5 +62,7 @@ public class Simulation : Singleton<Simulation>
         if (TowerManager.Instance != null) TowerManager.Instance.SimTick(TickDt);
         Projectile.SimTickAll(TickDt);
         if (GameManager.Instance != null) GameManager.Instance.SimTick(TickDt);
+
+        if (CurrentTick % ChecksumInterval == 0 && OnChecksum != null) OnChecksum(CurrentTick, StateChecksum.Compute());
     }
 }
