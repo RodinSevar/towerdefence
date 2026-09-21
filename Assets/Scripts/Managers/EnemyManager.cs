@@ -112,6 +112,51 @@ public class EnemyManager : Singleton<EnemyManager>
         RebuildGrid();
     }
 
+    /// <summary>Live creeps (may contain nulls for creeps that just died); read-only.</summary>
+    public IReadOnlyList<Enemy> Enemies => enemies;
+
+    /// <summary>
+    /// Rendering pass: brings the Transform of every creep in view up to date. Creeps out of view keep their simulated position but
+    /// their Transform is left alone, which saves thousands of Transform writes per second.
+    /// </summary>
+    private void LateUpdate()
+    {
+        var cam = Camera.main;
+        bool cull = cam != null && TryGetViewRect(cam, out viewRect);
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            Enemy e = enemies[i];
+            if (e == null) continue;
+            if (cull)
+            {
+                Vector3 p = e.Position;
+                if (p.x < viewRect.xMin || p.x > viewRect.xMax || p.z < viewRect.yMin || p.z > viewRect.yMax) continue;
+            }
+            e.SyncTransform();
+        }
+    }
+
+    private Rect viewRect;
+    [SerializeField, Tooltip("World units added around the camera view before a creep counts as off screen")] private float viewPadding = 8f;
+
+    /// <summary>The ground area (x, z) the camera can see, from its four corner rays; false if the camera looks at the sky.</summary>
+    private bool TryGetViewRect(Camera cam, out Rect rect)
+    {
+        rect = default;
+        var ground = new Plane(Vector3.up, new Vector3(0, 2f, 0)); // about creep height above the flat parts
+        float minX = float.MaxValue, maxX = float.MinValue, minZ = float.MaxValue, maxZ = float.MinValue;
+        for (int i = 0; i < 4; i++)
+        {
+            Ray ray = cam.ViewportPointToRay(new Vector3(i & 1, i >> 1, 0));
+            if (!ground.Raycast(ray, out float enter) || enter > 1000f) return false;
+            Vector3 p = ray.GetPoint(enter);
+            minX = Mathf.Min(minX, p.x); maxX = Mathf.Max(maxX, p.x);
+            minZ = Mathf.Min(minZ, p.z); maxZ = Mathf.Max(maxZ, p.z);
+        }
+        rect = Rect.MinMaxRect(minX - viewPadding, minZ - viewPadding, maxX + viewPadding, maxZ + viewPadding);
+        return true;
+    }
+
     // ------------------------------------------------------------------------------------------------ spatial queries
 
     private void Compact()

@@ -52,12 +52,12 @@ public class GameBoot : MonoBehaviour
                 cameraObj = camera.gameObject;
             }
 
-            cameraObj.transform.position = new Vector3(0, 100, -30);
-            cameraObj.transform.rotation = Quaternion.Euler(70, 0, 0);
+            cameraObj.transform.position = new Vector3(0, CameraController.DefaultHeight, -CameraController.DefaultHeight * 0.45f);
+            cameraObj.transform.rotation = Quaternion.Euler(CameraController.DefaultPitch, 0, 0);
             
             // Set camera clipping planes
             camera.nearClipPlane = 0.1f;
-            camera.farClipPlane = 1000f;
+            camera.farClipPlane = 250f; // nothing worth drawing lies further than the map
 
             // Add camera controller
             if (cameraObj.GetComponent<CameraController>() == null)

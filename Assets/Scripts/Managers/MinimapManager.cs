@@ -104,11 +104,38 @@ public class MinimapManager : Singleton<MinimapManager>
 
         System.Array.Clear(pixels, 0, pixels.Length);
         float pixelsPerUi = TextureSize / Mathf.Max(1f, minimapContainer.rect.width);
-        DrawDots(enemies, EnemyColor, Mathf.Max(2, Mathf.RoundToInt(EnemyDotUi * pixelsPerUi)));
+        DrawEnemies(Mathf.Max(2, Mathf.RoundToInt(EnemyDotUi * pixelsPerUi)));
         DrawDots(towers, TowerColor, Mathf.Max(2, Mathf.RoundToInt(TowerDotUi * pixelsPerUi)));
 
         texture.SetPixels32(pixels);
         texture.Apply(false);
+    }
+
+    /// <summary>Creeps come from the simulation (their Transforms are only updated while on screen).</summary>
+    private void DrawEnemies(int size)
+    {
+        if (EnemyManager.Instance == null) return;
+        var list = EnemyManager.Instance.Enemies;
+        for (int i = 0; i < list.Count; i++)
+            if (list[i] != null) DrawDot(list[i].Position, EnemyColor, size);
+    }
+
+    private void DrawDot(Vector3 p, Color32 color, int size)
+    {
+        float scale = TextureSize / (2f * gridHalfSize);
+        int half = size / 2;
+        int cx = Mathf.RoundToInt((p.x + gridHalfSize) * scale) - half;
+        int cy = Mathf.RoundToInt((p.z + gridHalfSize) * scale) - half;
+        for (int y = cy; y < cy + size; y++)
+        {
+            if (y < 0 || y >= TextureSize) continue;
+            int row = y * TextureSize;
+            for (int x = cx; x < cx + size; x++)
+            {
+                if (x < 0 || x >= TextureSize) continue;
+                pixels[row + x] = color;
+            }
+        }
     }
 
     private void DrawDots(List<Transform> units, Color32 color, int size)

@@ -24,6 +24,7 @@ public class Enemy : MonoBehaviour, ISelectable
     private bool tinted;
     private Transform cachedTransform;
     private Vector3 lastLookDir;
+    private bool rotationDirty;
 
     /// <summary>Index in <see cref="EnemyManager"/>'s list (managed by it).</summary>
     public int ManagerIndex { get; set; } = -1;
@@ -69,10 +70,6 @@ public class Enemy : MonoBehaviour, ISelectable
 
         EnemyManager.Instance.Register(this);
         RequestPath();
-        if (MinimapManager.Instance != null)
-        {
-            MinimapManager.Instance.RegisterUnit(cachedTransform, true);
-        }
     }
 
     /// <summary>Called by EnemyManager when the pathfinder has produced this creep's path.</summary>
@@ -214,12 +211,22 @@ public class Enemy : MonoBehaviour, ISelectable
         
         Position += moveDir * currentSpeed * dt;
         Position = OnGround(Position);
-        cachedTransform.position = Position;
-
+        // The Transform is not touched here: it is brought up to date by SyncTransform, and only for creeps on screen.
         if (moveDir != Vector3.zero && moveDir != lastLookDir) // rotation only changes when the heading does
         {
             lastLookDir = moveDir;
-            cachedTransform.rotation = Quaternion.LookRotation(moveDir);
+            rotationDirty = true;
+        }
+    }
+
+    /// <summary>Copies the simulated position and heading to the Transform (called by EnemyManager for creeps in view).</summary>
+    public void SyncTransform()
+    {
+        cachedTransform.position = Position;
+        if (rotationDirty)
+        {
+            cachedTransform.rotation = Quaternion.LookRotation(lastLookDir);
+            rotationDirty = false;
         }
     }
 

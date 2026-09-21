@@ -3,6 +3,10 @@ using UnityEngine.InputSystem;
 
 public class CameraController : MonoBehaviour
 {
+    /// <summary>Start height and pitch. Like the original game, the camera starts at its widest view and can only zoom in.</summary>
+    public const float DefaultHeight = 45f;
+    public const float DefaultPitch = 62f;
+
     [Header("Pan Settings")]
     public float panSpeed = 30f;
     public float edgeScrollThickness = 20f;
@@ -11,8 +15,9 @@ public class CameraController : MonoBehaviour
 
     [Header("Zoom Settings")]
     public float scrollSpeed = 5000f;
-    public float minY = 20f;
-    public float maxY = 150f;
+    public float minY = 14f;
+    [Tooltip("Highest the camera may go (the start height, so it cannot zoom out past the default view)")]
+    public float maxY = DefaultHeight;
 
     [Header("Map Boundaries")]
     // The map is 192x192 cells, centred on the origin
