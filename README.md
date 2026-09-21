@@ -64,15 +64,15 @@ Formulas used: damage = base + dice x (sides + 1) / 2 (average roll, no randomne
 - **Second attacks** (`ua2*`, 10 towers).
 - **Tower build time** (`ubld`, stored) and the constructor unit that builds towers.
 - **Attack/defense types**: towers have attack types (chaos 18, siege 11, normal 14, pierce 8, magic 1, unset 24);
-  creep defense types are set on only 11 of 50 creeps (level 1 is `divine`), the rest are unknown. The damage
+  creep defense types are set on only 11 of 50 creeps (small, normal, fort, and `divine` on level 33's Demon Sheep), the rest are unknown. The damage
   multiplier table is not applied.
 - Creep and tower **models, icons and sounds** (`.mdl`/`.blp`); everything is a primitive shape.
 
 ### Open questions about the original behaviour
 - **Cooldown 0**: 11 towers (the 1500-gold "ultimates") have `ua1c = 0`. We clamp to 0.1 s, which likely makes them far
   stronger than in the real game. Unknown how WC3 treats a 0 cooldown.
-- **Divine armor**: creep level 1 (`ushd`) has defense type `divine`. If the real game applied WC3's divine multipliers,
-  towers of a matching attack type matter a lot. Not modelled.
+- **Divine armor**: level 33 (Demon Sheep, 50 creeps, 1000 HP, bounty 100 each) has defense type `divine`. If the real game
+  applied WC3's divine multipliers, the attack type of the towers hitting it matters a lot. Not modelled.
 - **Countdown at game start**: `Next Level` looks like it fires when all creeps are dead and also starts level 1 with a
   60 s countdown; whether it triggers at game start (and whether a level-0 bonus is paid) is unconfirmed.
 - **Level bonus** starts at 10 and grows by 2 per level, paid on clear; the "last defender gets half" bonus is not
