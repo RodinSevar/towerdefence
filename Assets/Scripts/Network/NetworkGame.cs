@@ -14,6 +14,7 @@ public class NetworkGame : Singleton<NetworkGame>
     public enum Phase { Menu, OfflineLobby, HostLobby, ClientLobby, Playing, Ended }
 
     public const int DefaultPort = 7777;
+    public const string SkipMenuPref = "Wintermaul.SkipMenuOnPlay";
 
     public static LockstepSession Session { get; private set; }
 
@@ -51,7 +52,11 @@ public class NetworkGame : Singleton<NetworkGame>
 
     private void Start()
     {
-        if (showMenuAtStart && !Application.isBatchMode) Simulation.Running = false; // hold the game while the menu is up
+        bool skipMenu = false;
+#if UNITY_EDITOR
+        skipMenu = UnityEditor.EditorPrefs.GetBool(SkipMenuPref, false); // Tools > Skip Menu On Play
+#endif
+        if (showMenuAtStart && !Application.isBatchMode && !skipMenu) Simulation.Running = false; // hold the game while the menu is up
         else Current = Phase.Playing; // no menu (tests): offline, Active stays false because there is no session
     }
 
