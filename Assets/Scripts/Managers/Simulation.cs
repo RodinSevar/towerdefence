@@ -27,6 +27,7 @@ public class Simulation : Singleton<Simulation>
     protected override void OnSingletonAwake()
     {
         CurrentTick = 0;
+        CommandQueue.Clear();
     }
 
     private void Update()
@@ -46,6 +47,7 @@ public class Simulation : Singleton<Simulation>
     private static void Step()
     {
         CurrentTick++;
+        CommandQueue.ExecuteDue(CurrentTick); // player commands first, then the systems
 
         // Fixed order. Later systems see the results of earlier ones within the same tick.
         if (PathManager.Instance != null) PathManager.Instance.SimTick();

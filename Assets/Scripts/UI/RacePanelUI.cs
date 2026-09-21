@@ -45,7 +45,6 @@ public class RacePanelUI : MonoBehaviour
         }
 
         RaceManager.Instance.OnRacesChanged += Refresh;
-        GameManager.Instance.OnLumberChanged += OnLumberChanged;
 
         content.SetActive(false);
         Refresh();
@@ -54,7 +53,6 @@ public class RacePanelUI : MonoBehaviour
     private void OnDestroy()
     {
         if (RaceManager.Instance != null) RaceManager.Instance.OnRacesChanged -= Refresh;
-        if (GameManager.Instance != null) GameManager.Instance.OnLumberChanged -= OnLumberChanged;
     }
 
     private void Update()

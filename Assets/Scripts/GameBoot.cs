@@ -110,6 +110,9 @@ public class GameBoot : MonoBehaviour
             gmObj.AddComponent<GameManager>();
         }
 
+        if (FindAnyObjectByType<PlayerManager>() == null)
+            new GameObject("PlayerManager").AddComponent<PlayerManager>();
+
         // The fixed-rate simulation clock drives all game logic
         if (FindAnyObjectByType<Simulation>() == null)
             new GameObject("Simulation").AddComponent<Simulation>();

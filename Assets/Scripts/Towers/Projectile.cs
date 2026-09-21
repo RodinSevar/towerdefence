@@ -14,12 +14,13 @@ public class Projectile : MonoBehaviour
     private float speed;
     private float damage;
     private StatusEffect payloadEffect;
+    private int owner;
     private Transform tr;
     private Renderer rend;
     private int flyingIndex;
 
     public static void Spawn(Vector3 position, float scale, Color color, Enemy targetEnemy, float travelSpeed,
-        float hitDamage, StatusEffect effect)
+        float hitDamage, StatusEffect effect, int ownerId)
     {
         Projectile p = null;
         while (pool.Count > 0 && p == null) p = pool.Pop(); // skip entries destroyed by a scene reload
@@ -32,6 +33,7 @@ public class Projectile : MonoBehaviour
         p.speed = travelSpeed;
         p.damage = hitDamage;
         p.payloadEffect = effect;
+        p.owner = ownerId;
         p.gameObject.SetActive(true);
         p.flyingIndex = flying.Count;
         flying.Add(p);
@@ -90,7 +92,7 @@ public class Projectile : MonoBehaviour
 
     private void HitTarget()
     {
-        target.TakeDamage(damage);
+        target.TakeDamage(damage, owner);
         if (payloadEffect != null)
         {
             target.ApplyStatusEffect(payloadEffect);

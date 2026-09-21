@@ -33,6 +33,10 @@ public class SelectionUI : MonoBehaviour
             upgradeButton.onClick.AddListener(OnUpgradeClicked);
         }
 
+        // Upgrades are applied on a later tick: refresh the panel when the player's gold changes
+        if (PlayerManager.Instance != null)
+            PlayerManager.Instance.OnLocalPlayerChanged += _ => { if (currentUnit is MonoBehaviour mb && mb != null) HandleUnitSelected(currentUnit); };
+
         // Start hidden
         if (panelObject != null)
         {
@@ -87,7 +91,7 @@ public class SelectionUI : MonoBehaviour
                 // Update upgrade button interactability dynamically (in case gold changes)
                 if (upgradeButton != null && currentUnit.CanUpgrade())
                 {
-                    bool canAfford = GameManager.Instance.GetCurrentGold() >= currentUnit.GetUpgradeCost();
+                    bool canAfford = PlayerManager.Instance.Local.gold >= currentUnit.GetUpgradeCost();
                     upgradeButton.interactable = canAfford;
                 }
             }
@@ -127,7 +131,7 @@ public class SelectionUI : MonoBehaviour
             {
                 int cost = unit.GetUpgradeCost();
                 upgradeButtonText.text = $"Upgrade (-{cost}G)";
-                upgradeButton.interactable = GameManager.Instance.GetCurrentGold() >= cost;
+                upgradeButton.interactable = PlayerManager.Instance.Local.gold >= cost;
             }
         }
 
@@ -150,7 +154,7 @@ public class SelectionUI : MonoBehaviour
     {
         if (currentUnit != null && currentUnit.IsSellable())
         {
-            currentUnit.Sell();
+            if (currentUnit is Tower tower) TowerManager.Instance.RequestSell(tower);
             HandleUnitDeselected();
         }
     }
@@ -159,14 +163,8 @@ public class SelectionUI : MonoBehaviour
     {
         if (currentUnit != null && currentUnit.CanUpgrade())
         {
-            int cost = currentUnit.GetUpgradeCost();
-            if (GameManager.Instance.TrySpendGold(cost))
-            {
-                currentUnit.Upgrade();
-                
-                // Refresh UI immediately
-                HandleUnitSelected(currentUnit);
-            }
+            if (currentUnit is Tower tower && PlayerManager.Instance.Local.gold >= currentUnit.GetUpgradeCost())
+                TowerManager.Instance.RequestUpgrade(tower); // applied on the next ticks; the panel refreshes when gold changes
         }
     }
 }

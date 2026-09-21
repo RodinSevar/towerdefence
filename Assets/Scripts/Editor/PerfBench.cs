@@ -87,6 +87,7 @@ public static class PerfBench
         switch (step)
         {
             case 0: Setup(); break;
+            case 14: CommandCheck(); break;
             case 10: TerrainCheck(); break;
             case 11: PathEquivalence(); break;
             case 1: PathCosts(); break;
@@ -106,13 +107,101 @@ public static class PerfBench
     private static void Setup()
     {
         GameManager.Instance.CancelWaveTimer();          // no automatic wave
-        GameManager.Instance.AddGold(10000000);
+        PlayerManager.Instance.Local.AddGold(10000000);
         // creeps leaking must not end the game (GameOver freezes game time); give the bench effectively unlimited lives
         typeof(GameManager).GetField("currentLives", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
             .SetValue(GameManager.Instance, 1000000);
         var spawners = WaveManager.Instance.activeSpawners;
         Debug.Log($"BENCH env spawners={spawners.Count} towerData={Towers().Length} unityVersion={Application.unityVersion}");
-        step = 10;
+        step =  14;
+    }
+
+
+    // ---- commands and players: per-player gold, ownership, command ordering ----
+    private static int commandPhase, commandTickMark, commandTowersBefore;
+    private static int commandTower0 = -1;
+    private static Vector2Int commandOrigin0, commandOrigin1;
+
+    private static void CommandCheck()
+    {
+        var pm = PlayerManager.Instance;
+        int tick = Simulation.CurrentTick;
+        switch (commandPhase)
+        {
+            case 0:
+            {
+                pm.Configure(3, 0); // three players for this check; player 0 is local
+                foreach (var p in pm.Players) p.gold = 1000; // known starting point
+                var data = Towers()[1];
+                var g = GridManager.Instance;
+                // two free footprints far apart
+                bool found0 = false, found1 = false;
+                for (int i = 0; i < 400 && !(found0 && found1); i++)
+                {
+                    var o = g.FootprintOrigin(RandomNearPath());
+                    if (!g.CanBuildFootprint(o)) continue;
+                    if (!found0) { commandOrigin0 = o; found0 = true; }
+                    else if ((o - commandOrigin0).sqrMagnitude > 100) { commandOrigin1 = o; found1 = true; }
+                }
+                if (!(found0 && found1)) { Debug.Log("BENCH commands FAIL: no free spots"); step = 10; return; }
+
+                commandTowersBefore = TowerManager.Instance.TowerCount;
+                // issued in "wrong" order (player 1 first) to check they are sorted by player
+                CommandQueue.Submit(new PlaceTowerCommand { playerId = 1, towerId = data.wc3Id, originX = commandOrigin1.x, originY = commandOrigin1.y });
+                CommandQueue.Submit(new PlaceTowerCommand { playerId = 0, towerId = data.wc3Id, originX = commandOrigin0.x, originY = commandOrigin0.y });
+                commandTickMark = tick;
+                commandPhase = 1;
+                break;
+            }
+            case 1:
+            {
+                if (tick < commandTickMark + CommandQueue.InputDelayTicks + 1) return;
+                var data = Towers()[1];
+                int built = TowerManager.Instance.TowerCount - commandTowersBefore;
+                bool goldOk = pm.Get(0).gold == 1000 - data.BaseCost && pm.Get(1).gold == 1000 - data.BaseCost && pm.Get(2).gold == 1000;
+                var t0 = TowerManager.Instance.FindAt(commandOrigin0);
+                var t1 = TowerManager.Instance.FindAt(commandOrigin1);
+                bool ownersOk = t0 != null && t1 != null && t0.Owner == 0 && t1.Owner == 1;
+                Debug.Log($"BENCH commands place: built={built}/2 goldOk={goldOk} ownersOk={ownersOk}");
+                commandTower0 = t0 != null ? t0.Id : -1;
+
+                // player 1 tries to sell player 0's tower (must be refused); player 2 trades gold to player 0
+                CommandQueue.Submit(new SellTowerCommand { playerId = 1, towerInstanceId = commandTower0 });
+                CommandQueue.Submit(new TransferGoldCommand { playerId = 2, toPlayerId = 0, amount = 300 });
+                commandTickMark = tick;
+                commandPhase = 2;
+                break;
+            }
+            case 2:
+            {
+                if (tick < commandTickMark + CommandQueue.InputDelayTicks + 1) return;
+                var data = Towers()[1];
+                bool stillThere = TowerManager.Instance.FindAt(commandOrigin0) != null;
+                bool tradeOk = pm.Get(2).gold == 700 && pm.Get(0).gold == 1000 - data.BaseCost + 300;
+                Debug.Log($"BENCH commands refuse+trade: foreignSellRefused={stillThere} tradeOk={tradeOk}");
+
+                CommandQueue.Submit(new SellTowerCommand { playerId = 0, towerInstanceId = commandTower0 });
+                commandTickMark = tick;
+                commandPhase = 3;
+                break;
+            }
+            case 3:
+            {
+                if (tick < commandTickMark + CommandQueue.InputDelayTicks + 1) return;
+                bool sold = TowerManager.Instance.FindAt(commandOrigin0) == null;
+                Debug.Log($"BENCH commands sell: ownSold={sold} refundedGold={pm.Get(0).gold}");
+
+                var t1 = TowerManager.Instance.FindAt(commandOrigin1);
+                if (t1 != null) TowerManager.Instance.ExecuteSell(1, t1.Id);
+
+                // put things back for the rest of the bench
+                pm.Configure(1, 0);
+                pm.Local.AddGold(10000000);
+                Debug.Log("BENCH commands done");
+                step = 10;
+                break;
+            }
+        }
     }
 
     private static TowerData[] Towers() => RaceManager.Instance.Races[0].towers;
@@ -472,7 +561,7 @@ public static class PerfBench
             behaviorStart = Simulation.Time;
             aliveAtStart = EnemyManager.Instance.Count;
             livesAtStart = GameManager.Instance.GetCurrentLives();
-            goldAtStart = GameManager.Instance.GetCurrentGold();
+            goldAtStart = PlayerManager.Instance.Local.gold;
             return;
         }
         if (Simulation.Time - behaviorStart < BehaviorSeconds) return;
@@ -501,7 +590,7 @@ public static class PerfBench
         }
 
         Debug.Log($"BENCH behavior gameSeconds={BehaviorSeconds:F0} aliveStart={aliveAtStart} aliveEnd={alive} killed={killed} leaked={leaked} " +
-                  $"goldGained={GameManager.Instance.GetCurrentGold() - goldAtStart} activeProjectiles={projectilesActive} " +
+                  $"goldGained={PlayerManager.Instance.Local.gold - goldAtStart} activeProjectiles={projectilesActive} " +
                   $"pick={pick} minimapEnemyPixels={enemyPixels} minimapTowerPixels={towerPixels}");
         attrIndex = 0; attrFrames = 0; attrSum = 0;
         step = 8;

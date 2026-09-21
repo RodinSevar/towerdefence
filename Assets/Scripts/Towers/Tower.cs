@@ -20,6 +20,13 @@ public class Tower : MonoBehaviour, ISelectable
     private StatusEffect payloadEffect; // shared by every shot of the current level (creeps copy it on hit)
     private Material visualTemplate; // the prefab's original material, colours are derived from it
     private GameObject modelInstance;
+
+    /// <summary>Instance id, unique per game, assigned when the tower is built (commands refer to towers by it).</summary>
+    public int Id { get; set; }
+
+    /// <summary>The player who built the tower (-1 for previews).</summary>
+    public int Owner { get; private set; } = -1;
+
     private Enemy targetEnemy = null;
     private float fireTimer = 0f;
 
@@ -27,9 +34,10 @@ public class Tower : MonoBehaviour, ISelectable
     private float laserDisplayTimer = 0f;
 
     /// <summary>Assigns the tower's data and applies level-1 visuals. Call right after instantiating.</summary>
-    public void Init(TowerData towerData)
+    public void Init(TowerData towerData, int ownerId = -1)
     {
         data = towerData;
+        Owner = ownerId;
         currentLevelIndex = 0;
         ApplyCurrentLevelVisuals();
     }
@@ -129,7 +137,7 @@ public class Tower : MonoBehaviour, ISelectable
         if (data.attackStyle == TowerAttackStyle.Laser)
         {
             // Laser is instant damage
-            targetEnemy.TakeDamage(level.damage);
+            targetEnemy.TakeDamage(level.damage, Owner);
 
             if (laserLine != null)
             {
@@ -142,7 +150,7 @@ public class Tower : MonoBehaviour, ISelectable
         else
         {
             Projectile.Spawn(firePoint.position, level.projectileScale, level.projectileColor,
-                targetEnemy, level.projectileSpeed, level.damage, payloadEffect);
+                targetEnemy, level.projectileSpeed, level.damage, payloadEffect, Owner);
         }
     }
 
@@ -222,7 +230,7 @@ public class Tower : MonoBehaviour, ISelectable
         return $"Damage: {level.damage:0.#}\nRange: {level.range:0.#}\nFire Rate: {level.fireRate:0.##}/s";
     }
 
-    public bool IsSellable() => true;
+    public bool IsSellable() => Owner < 0 || Owner == PlayerManager.Instance.LocalPlayerId; // only your own towers
 
     /// <summary>Sell value from the map data if defined, else half of everything spent on this tower.</summary>
     public int GetRefundAmount()
@@ -258,10 +266,8 @@ public class Tower : MonoBehaviour, ISelectable
 
     public void Sell()
     {
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.AddGold(GetRefundAmount());
-        }
+        var owner = PlayerManager.Instance != null ? PlayerManager.Instance.Get(Owner) : null;
+        if (owner != null) owner.AddGold(GetRefundAmount());
 
         // Free up the grid cell
         if (GridManager.Instance != null)

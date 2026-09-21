@@ -27,17 +27,16 @@ public class HUD : MonoBehaviour
     private void Start()
     {
         // Subscribe to game events
-        GameManager.Instance.OnGoldChanged += UpdateGoldDisplay;
         GameManager.Instance.OnLivesChanged += UpdateLivesDisplay;
-        GameManager.Instance.OnLumberChanged += UpdateLumberDisplay;
+        PlayerManager.Instance.OnLocalPlayerChanged += p => { UpdateGoldDisplay(p.gold); UpdateLumberDisplay(p.lumber); };
         GameManager.Instance.OnWaveStarted += UpdateWaveDisplay;
         GameManager.Instance.OnGameOver += ShowGameOverScreen;
         GameManager.Instance.OnGameWon += ShowGameWonScreen;
 
         // Initial updates
-        UpdateGoldDisplay(GameManager.Instance.GetCurrentGold());
+        UpdateGoldDisplay(PlayerManager.Instance.Local.gold);
         UpdateLivesDisplay(GameManager.Instance.GetCurrentLives());
-        UpdateLumberDisplay(GameManager.Instance.GetCurrentLumber());
+        UpdateLumberDisplay(PlayerManager.Instance.Local.lumber);
         
         if (restartButton != null)
         {
@@ -97,9 +96,7 @@ public class HUD : MonoBehaviour
     {
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.OnGoldChanged -= UpdateGoldDisplay;
             GameManager.Instance.OnLivesChanged -= UpdateLivesDisplay;
-            GameManager.Instance.OnLumberChanged -= UpdateLumberDisplay;
             GameManager.Instance.OnWaveStarted -= UpdateWaveDisplay;
             GameManager.Instance.OnGameOver -= ShowGameOverScreen;
             GameManager.Instance.OnGameWon -= ShowGameWonScreen;

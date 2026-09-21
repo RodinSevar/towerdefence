@@ -11,6 +11,7 @@ public class Enemy : MonoBehaviour, ISelectable
 
     private float currentHealth;
     private bool isAlive = true;
+    private int killerId = -1;
 
     // Route state (see RouteStep): the current order target and the region whose entry issues the next order
     private RouteStep[] route;
@@ -228,7 +229,8 @@ public class Enemy : MonoBehaviour, ISelectable
         Die();
     }
 
-    public void TakeDamage(float damage)
+    /// <summary>Damages the creep. <paramref name="attackerId"/> is the player whose tower dealt it, who earns the bounty on a kill.</summary>
+    public void TakeDamage(float damage, int attackerId = -1)
     {
         if (!isAlive) return;
 
@@ -238,6 +240,7 @@ public class Enemy : MonoBehaviour, ISelectable
 
         if (currentHealth <= 0)
         {
+            killerId = attackerId;
             Die();
         }
     }
@@ -247,7 +250,8 @@ public class Enemy : MonoBehaviour, ISelectable
         if (!isAlive) return;
 
         isAlive = false;
-        GameManager.Instance.AddGold(data.goldReward);
+        var killer = killerId >= 0 ? PlayerManager.Instance.Get(killerId) : null;
+        if (killer != null) killer.AddGold(data.goldReward);
         GameManager.Instance.UnregisterEnemy(this);
         if (EnemyManager.Instance != null) EnemyManager.Instance.Unregister(this);
         

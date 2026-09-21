@@ -5,6 +5,8 @@ using System.Collections.Generic;
 public class TowerManager : Singleton<TowerManager>
 {
     private List<Tower> activeTowers = new List<Tower>();
+    private readonly Dictionary<int, Tower> towersById = new Dictionary<int, Tower>();
+    private int nextTowerId = 1;
     [Header("Tower setup")]
     [SerializeField] private Tower towerPrefab;
     private TowerData selectedTower = null;
@@ -55,14 +57,26 @@ public class TowerManager : Singleton<TowerManager>
         for (int i = 0; i < activeTowers.Count; i++) activeTowers[i].SimTick(dt);
     }
 
+    public int TowerCount => activeTowers.Count;
+
+    /// <summary>The tower whose footprint starts at <paramref name="origin"/>, or null (tests).</summary>
+    public Tower FindAt(Vector2Int origin)
+    {
+        foreach (var t in activeTowers)
+            if (GridManager.Instance.FootprintOrigin(t.transform.position) == origin) return t;
+        return null;
+    }
+
     public void RegisterTower(Tower tower)
     {
+        towersById[tower.Id] = tower;
         activeTowers.Add(tower);
         OnTowerPlaced?.Invoke(tower);
     }
 
     public void UnregisterTower(Tower tower)
     {
+        towersById.Remove(tower.Id);
         activeTowers.Remove(tower);
     }
 
@@ -145,7 +159,7 @@ public class TowerManager : Singleton<TowerManager>
                 if (cell != lastHoveredCell)
                 {
                     lastHoveredCell = cell;
-                    lastHoverIsValid = CanPlaceAt(cell, snappedPos, selectedTower, out _);
+                    lastHoverIsValid = CanPlaceFor(PlayerManager.Instance.LocalPlayerId, cell, selectedTower, out _);
 
                     Color ghostColor = lastHoverIsValid ? new Color(0, 1, 0, 0.4f) : new Color(1, 0, 0, 0.4f);
                     var good = new Color(0, 1, 0, 0.8f);
@@ -188,15 +202,17 @@ public class TowerManager : Singleton<TowerManager>
     }
 
     /// <summary>
-    /// Whether <paramref name="tower"/> can be placed on <paramref name="cell"/>: cell is buildable,
-    /// the player can afford it, and it would not cut off any spawner.
+    /// Whether <paramref name="playerId"/> can place <paramref name="tower"/> on the footprint at <paramref name="cell"/>: the
+    /// ground is buildable, the player can afford it, and it would not cut off any spawner.
     /// </summary>
-    private bool CanPlaceAt(Vector2Int cell, Vector3 worldPos, TowerData tower, out string failReason)
+    private bool CanPlaceFor(int playerId, Vector2Int cell, TowerData tower, out string failReason)
     {
         failReason = null;
+        var player = PlayerManager.Instance.Get(playerId);
+        if (player == null) { failReason = "no such player"; return false; }
         if (!GridManager.Instance.CanBuildFootprint(cell)) { failReason = "occupied or unbuildable"; return false; }
-        if (GameManager.Instance.GetCurrentGold() < tower.BaseCost) { failReason = "not enough gold"; return false; }
-        if (GameManager.Instance.GetCurrentLumber() < tower.lumberCost) { failReason = "not enough lumber"; return false; }
+        if (player.gold < tower.BaseCost) { failReason = "not enough gold"; return false; }
+        if (player.lumber < tower.lumberCost) { failReason = "not enough lumber"; return false; }
 
         GridManager.Instance.OccupyFootprint(cell);
         bool pathOk = PathManager.Instance.ValidateFullMaze();
@@ -207,29 +223,25 @@ public class TowerManager : Singleton<TowerManager>
     }
 
     /// <summary>
-    /// Places <paramref name="tower"/> at the grid-snapped position if it is affordable, buildable and does not cut off
-    /// any spawner. Returns true if the tower was built. Independent of the build-menu selection and of mouse input.
+    /// Applies a placement command: builds the tower for <paramref name="playerId"/> if it is affordable, buildable and does not
+    /// cut off any spawner. Runs on the simulation tick (see <see cref="PlaceTowerCommand"/>).
     /// </summary>
-    public bool TryPlaceTowerAt(TowerData tower, Vector3 worldPos)
+    public bool ExecutePlace(int playerId, TowerData tower, Vector2Int origin, out string failReason)
     {
-        Vector3 snappedPos = GridManager.Instance.SnapToFootprint(worldPos);
-        Vector2Int cell = GridManager.Instance.FootprintOrigin(snappedPos);
-        if (!CanPlaceAt(cell, snappedPos, tower, out string failReason))
+        if (!CanPlaceFor(playerId, origin, tower, out failReason))
         {
-            Debug.Log($"Tower placement failed at {cell}: {failReason}");
+            if (playerId == PlayerManager.Instance.LocalPlayerId) Debug.Log($"Tower placement failed at {origin}: {failReason}");
             return false;
         }
 
-        if (!GameManager.Instance.TrySpendGold(tower.BaseCost)) return false;
-        if (!GameManager.Instance.TrySpendLumber(tower.lumberCost))
-        {
-            GameManager.Instance.AddGold(tower.BaseCost); // undo the gold spend
-            return false;
-        }
+        var player = PlayerManager.Instance.Get(playerId);
+        player.TrySpendGold(tower.BaseCost);
+        player.TrySpendLumber(tower.lumberCost);
 
-        GridManager.Instance.OccupyFootprint(cell);
-        Tower newTower = Instantiate(towerPrefab, snappedPos, Quaternion.identity);
-        newTower.Init(tower);
+        GridManager.Instance.OccupyFootprint(origin);
+        Tower newTower = Instantiate(towerPrefab, GridManager.Instance.FootprintCenter(origin), Quaternion.identity);
+        newTower.Init(tower, playerId);
+        newTower.Id = nextTowerId++;
         RegisterTower(newTower);
 
         // Notify enemies that the maze has changed
@@ -237,24 +249,65 @@ public class TowerManager : Singleton<TowerManager>
         return true;
     }
 
+    /// <summary>
+    /// Builds a tower for the local player immediately, bypassing the command queue. For tests and tools; the game itself
+    /// places towers with <see cref="PlaceTowerCommand"/>.
+    /// </summary>
+    public bool TryPlaceTowerAt(TowerData tower, Vector3 worldPos)
+    {
+        Vector2Int origin = GridManager.Instance.FootprintOrigin(worldPos);
+        return ExecutePlace(PlayerManager.Instance.LocalPlayerId, tower, origin, out _);
+    }
+
+    public void ExecuteSell(int playerId, int towerInstanceId)
+    {
+        if (!towersById.TryGetValue(towerInstanceId, out Tower tower) || tower == null || tower.Owner != playerId) return;
+        tower.Sell();
+    }
+
+    public void ExecuteUpgrade(int playerId, int towerInstanceId)
+    {
+        if (!towersById.TryGetValue(towerInstanceId, out Tower tower) || tower == null || tower.Owner != playerId) return;
+        if (!tower.CanUpgrade()) return;
+        var player = PlayerManager.Instance.Get(playerId);
+        if (player == null || !player.TrySpendGold(tower.GetUpgradeCost())) return;
+        tower.Upgrade();
+    }
+
+    /// <summary>Asks to sell one of the local player's towers.</summary>
+    public void RequestSell(Tower tower)
+    {
+        CommandQueue.Submit(new SellTowerCommand { playerId = PlayerManager.Instance.LocalPlayerId, towerInstanceId = tower.Id });
+    }
+
+    /// <summary>Asks to upgrade one of the local player's towers.</summary>
+    public void RequestUpgrade(Tower tower)
+    {
+        CommandQueue.Submit(new UpgradeTowerCommand { playerId = PlayerManager.Instance.LocalPlayerId, towerInstanceId = tower.Id });
+    }
+
+    /// <summary>Handles a click while placing: issues a placement command if the spot looks valid to the local player.</summary>
     private void TryPlaceTower()
     {
         if (selectedTower == null) return;
 
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-        
+
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
             // Check if we hit the ground plane
             if (hit.collider.CompareTag("Ground") || hit.collider.GetComponent<TerrainBuilder>() != null)
             {
-                // Snap to grid
-                Vector3 snappedPos = GridManager.Instance.SnapToFootprint(hit.point);
-                
-                if (TryPlaceTowerAt(selectedTower, snappedPos) && !Keyboard.current.shiftKey.isPressed)
+                int localId = PlayerManager.Instance.LocalPlayerId;
+                Vector2Int origin = GridManager.Instance.FootprintOrigin(hit.point);
+                if (!CanPlaceFor(localId, origin, selectedTower, out string failReason))
                 {
-                    CancelPlacement();
+                    Debug.Log($"Tower placement failed at {origin}: {failReason}");
+                    return;
                 }
+
+                CommandQueue.Submit(new PlaceTowerCommand { playerId = localId, towerId = selectedTower.wc3Id, originX = origin.x, originY = origin.y });
+                if (!Keyboard.current.shiftKey.isPressed) CancelPlacement();
             }
         }
     }
