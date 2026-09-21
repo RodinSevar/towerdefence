@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77bb193158e8c554eaf19e36fa5061fa, type: 3}
+  m_Name: hC02
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  displayName: Flare Tower
+  attackStyle: 0
+  description: "Light fire tower, does light damage. 3-8 damage, and light splash
+    damage. \n\n<color=#ffcc00>Attacks land and air units.</color>"
+  icon: {fileID: 0}
+  levels:
+  - cost: 10
+    range: 10.9375
+    fireRate: 1.6666666
+    damage: 10.5
+    visualColor: {r: 1, g: 0.4, b: 0.1, a: 1}
+    visualScale: 0.7093333
+    projectileSpeed: 14.0625
+    projectileColor: {r: 1, g: 0.7, b: 0.55, a: 1}
+    projectileScale: 0.25
+    hasStatusEffect: 0
+    effectType: 0
+    effectDuration: 0
+    effectStrength: 0
+  lumberCost: 0
+  sellValue: 7
+  wc3Id: hC02
+  buildTime: 5
+  abilityIds: []
+  importNotes: 'Not defined or not simulated: damage dice (ua1d), assumed 1; range
+    (ua1r), assumed 700; projectile speed (ua1z), assumed 900; missile splash damage
+    not simulated'

@@ -73,20 +73,24 @@ public static class UIBuilder
         RectTransform hud = Panel("HUD", canvas, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, null);
         var hudComp = hud.gameObject.AddComponent<HUD>();
 
-        // Top-left menu buttons (placeholders, not hooked up yet): x from left edge, y from top edge
-        string[] menuLabels = { "Quests (F9)", "Menu (F10)", "Allies", "Log (F12)" };
+        // Top-left menu buttons: x from left edge, y from top edge. Quests, Menu and Allies are placeholders;
+        // the fourth (where the original has "Log") opens the race selector.
+        string[] menuLabels = { "Quests (F9)", "Menu (F10)", "Allies", "Race (F12)" };
+        Button raceButton = null;
         for (int i = 0; i < menuLabels.Length; i++)
         {
             float x = 3 + i * 109;
-            MakeButton("MenuButton_" + menuLabels[i].Split(' ')[0], hud, menuLabels[i], 12,
+            Button menuButton = MakeButton("MenuButton_" + menuLabels[i].Split(' ')[0], hud, menuLabels[i], 12,
                 new Color(0.10f, 0.12f, 0.22f), new Vector2(0, 1), new Vector2(0, 1),
                 new Vector2(x, -27), new Vector2(x + 105, -3), out _);
+            if (i == 3) raceButton = menuButton;
         }
 
         // Top-right resource slots: gold / (wood slot) lives / (food slot) wave. x from right edge, y from top.
         var goldText = ResourceSlot("GoldSlot", hud, "Gold: 500", new Color(1f, 0.85f, 0.2f), -434, -329);
         var livesText = ResourceSlot("LivesSlot", hud, "Lives: 20", new Color(0.3f, 0.8f, 0.3f), -324, -219);
         var waveText = ResourceSlot("WaveSlot", hud, "Wave: 0 / 5", new Color(0.9f, 0.5f, 0.2f), -214, -109);
+        var lumberText = ResourceSlot("LumberSlot", hud, "Lumber: 1", new Color(0.55f, 0.35f, 0.15f), -104, -4);
 
         // Game over overlay
         RectTransform gameOverPanel = Panel("GameOverPanel", hud, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero,
@@ -101,6 +105,7 @@ public static class UIBuilder
         Wire(hudComp, "goldText", goldText);
         Wire(hudComp, "livesText", livesText);
         Wire(hudComp, "waveText", waveText);
+        Wire(hudComp, "lumberText", lumberText);
         Wire(hudComp, "gameOverText", gameOverText);
         Wire(hudComp, "gameOverPanel", gameOverPanel.gameObject);
         Wire(hudComp, "restartButton", restartButton);
@@ -162,12 +167,56 @@ public static class UIBuilder
         Wire(selectionUI, "upgradeButtonText", upgradeLabel);
         Wire(selectionUI, "panelObject", selected.gameObject);
 
+        BuildRacePanel(canvas, raceButton);
+
         // ---- Minimap manager (needs the minimap container) ----
         var minimapManagerObj = new GameObject("MinimapManager");
         var minimapManager = minimapManagerObj.AddComponent<MinimapManager>();
         Wire(minimapManager, "minimapContainer", minimapBox);
 
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+    }
+
+    /// <summary>Element (race) selector: race list on the left, details and unlock button on the right. Hidden until opened.</summary>
+    private static void BuildRacePanel(Transform canvas, Button toggleButton)
+    {
+        RectTransform root = Panel("RacePanel", canvas, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, null);
+        var panelUI = root.gameObject.AddComponent<RacePanelUI>();
+
+        // 560x380 panel, centered horizontally and sitting above the bottom console
+        RectTransform content = Panel("Content", root, new Vector2(0.5f, 0.6f), new Vector2(0.5f, 0.6f),
+            new Vector2(-280, -190), new Vector2(280, 190), new Color(0.08f, 0.08f, 0.10f, 0.96f));
+
+        Text("Title", content, "Choose an Element", 18, TextAlignmentOptions.Top,
+            new Vector2(0, 1), new Vector2(1, 1), new Vector2(12, -34), new Vector2(-44, -6));
+        Button close = MakeButton("CloseButton", content, "X", 14, new Color(0.6f, 0.2f, 0.2f),
+            new Vector2(1, 1), new Vector2(1, 1), new Vector2(-34, -32), new Vector2(-8, -8), out _);
+
+        RectTransform list = Panel("RaceList", content, new Vector2(0, 0), new Vector2(0, 1),
+            new Vector2(12, 12), new Vector2(212, -40), null);
+        var listLayout = list.gameObject.AddComponent<VerticalLayoutGroup>();
+        listLayout.spacing = 2;
+        listLayout.childControlWidth = true;
+        listLayout.childControlHeight = true;
+        listLayout.childForceExpandWidth = true;
+        listLayout.childForceExpandHeight = false;
+
+        TextMeshProUGUI info = Text("InfoText", content, "", 12, TextAlignmentOptions.TopLeft,
+            new Vector2(0, 0), new Vector2(1, 1), new Vector2(224, 56), new Vector2(-12, -40));
+        info.enableAutoSizing = true;
+        info.fontSizeMin = 8;
+        info.fontSizeMax = 13;
+
+        Button action = MakeButton("ActionButton", content, "Unlock", 14, new Color(0.2f, 0.5f, 0.25f),
+            new Vector2(1, 0), new Vector2(1, 0), new Vector2(-286, 12), new Vector2(-12, 44), out var actionLabel);
+
+        Wire(panelUI, "content", content.gameObject);
+        Wire(panelUI, "raceListContainer", list);
+        Wire(panelUI, "infoText", info);
+        Wire(panelUI, "actionButton", action);
+        Wire(panelUI, "actionButtonText", actionLabel);
+        Wire(panelUI, "closeButton", close);
+        Wire(panelUI, "toggleButton", toggleButton);
     }
 
     // ---------- helpers ----------

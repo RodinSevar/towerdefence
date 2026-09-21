@@ -7,9 +7,6 @@ public class TowerManager : Singleton<TowerManager>
     private List<Tower> activeTowers = new List<Tower>();
     [Header("Tower setup")]
     [SerializeField] private Tower towerPrefab;
-    [Tooltip("Towers offered on the build menu, in order (the menu has 12 slots)")]
-    [SerializeField] private TowerData[] buildableTowers;
-
     private TowerData selectedTower = null;
     private bool isPlacingTower = false;
     
@@ -61,7 +58,8 @@ public class TowerManager : Singleton<TowerManager>
         activeTowers.Remove(tower);
     }
 
-    public TowerData[] BuildableTowers => buildableTowers;
+    /// <summary>Towers on the build menu: those of the active race.</summary>
+    public TowerData[] BuildableTowers => RaceManager.Instance != null ? RaceManager.Instance.ActiveTowers : System.Array.Empty<TowerData>();
 
     public void SelectTower(TowerData tower)
     {
@@ -132,7 +130,7 @@ public class TowerManager : Singleton<TowerManager>
                 if (cell != lastHoveredCell)
                 {
                     lastHoveredCell = cell;
-                    lastHoverIsValid = CanPlaceAt(cell, snappedPos, selectedTower.BaseCost, false, out _);
+                    lastHoverIsValid = CanPlaceAt(cell, snappedPos, selectedTower, false, out _);
 
                     Color ghostColor = lastHoverIsValid ? new Color(0, 1, 0, 0.4f) : new Color(1, 0, 0, 0.4f);
                     Color floorColor = lastHoverIsValid ? new Color(0, 1, 0, 0.8f) : new Color(1, 0, 0, 0.8f);
@@ -158,15 +156,16 @@ public class TowerManager : Singleton<TowerManager>
     }
 
     /// <summary>
-    /// Whether a tower costing <paramref name="cost"/> can be placed on <paramref name="cell"/>: cell is buildable,
+    /// Whether <paramref name="tower"/> can be placed on <paramref name="cell"/>: cell is buildable,
     /// the player can afford it, and it would not cut off any spawner. <paramref name="clearPathCache"/> is true
     /// for a real placement attempt (cache is refreshed around the check), false for hover previews.
     /// </summary>
-    private bool CanPlaceAt(Vector2Int cell, Vector3 worldPos, int cost, bool clearPathCache, out string failReason)
+    private bool CanPlaceAt(Vector2Int cell, Vector3 worldPos, TowerData tower, bool clearPathCache, out string failReason)
     {
         failReason = null;
         if (!GridManager.Instance.CanBuildAt(worldPos)) { failReason = "occupied or unbuildable"; return false; }
-        if (GameManager.Instance.GetCurrentGold() < cost) { failReason = "not enough gold"; return false; }
+        if (GameManager.Instance.GetCurrentGold() < tower.BaseCost) { failReason = "not enough gold"; return false; }
+        if (GameManager.Instance.GetCurrentLumber() < tower.lumberCost) { failReason = "not enough lumber"; return false; }
 
         GridManager.Instance.OccupyCell(cell);
         if (clearPathCache) PathManager.Instance.ClearCache();
@@ -193,14 +192,13 @@ public class TowerManager : Singleton<TowerManager>
                 Vector3 snappedPos = GridManager.Instance.SnapToGrid(hit.point);
                 
                 Vector2Int cell = GridManager.Instance.WorldToGridCell(snappedPos);
-                int cost = selectedTower.BaseCost;
-                if (!CanPlaceAt(cell, snappedPos, cost, true, out string failReason))
+                if (!CanPlaceAt(cell, snappedPos, selectedTower, true, out string failReason))
                 {
                     Debug.Log($"Tower placement failed at {cell}: {failReason}");
                     return;
                 }
 
-                if (GameManager.Instance.TrySpendGold(cost))
+                if (GameManager.Instance.TrySpendGold(selectedTower.BaseCost) && GameManager.Instance.TrySpendLumber(selectedTower.lumberCost))
                 {
                     GridManager.Instance.OccupyCell(cell);
                     Tower newTower = Instantiate(towerPrefab, snappedPos, Quaternion.identity);

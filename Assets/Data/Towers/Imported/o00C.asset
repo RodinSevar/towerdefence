@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77bb193158e8c554eaf19e36fa5061fa, type: 3}
+  m_Name: o00C
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  displayName: Insane Gravity
+  attackStyle: 0
+  description: Awesome tower.  The Insane Gravity casts slow AND reduces the hp of
+    anything that comes near it by 25%.  only slow works on Duke.
+  icon: {fileID: 0}
+  levels:
+  - cost: 400
+    range: 7.8125
+    fireRate: 0.2857143
+    damage: 1
+    visualColor: {r: 0.2, g: 0.3, b: 0.7, a: 1}
+    visualScale: 1.0733334
+    projectileSpeed: 14.0625
+    projectileColor: {r: 0.6, g: 0.65, b: 0.85, a: 1}
+    projectileScale: 0.25
+    hasStatusEffect: 0
+    effectType: 0
+    effectDuration: 0
+    effectStrength: 0
+  lumberCost: 0
+  sellValue: 300
+  wc3Id: o00C
+  buildTime: 50
+  abilityIds:
+  - ACsw
+  - Aslo
+  importNotes: 'Not defined or not simulated: damage dice (ua1d), assumed 1; projectile
+    speed (ua1z), assumed 900; stock abilities not simulated: ACsw,Aslo'

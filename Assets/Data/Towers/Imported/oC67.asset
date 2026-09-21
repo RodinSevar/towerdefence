@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77bb193158e8c554eaf19e36fa5061fa, type: 3}
+  m_Name: oC67
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  displayName: Paralyzer
+  attackStyle: 0
+  description: "At first sight, the Paralyzer looks like one of those crappy towers.
+    It doesn't kill units, but rather leaves them with ten hit points. Doesn't work
+    on bosses. 1-1 damage +Leaves target with 10 hp \n\n<color=#ffcc00>Attacks land
+    and air units.</color>"
+  icon: {fileID: 0}
+  levels:
+  - cost: 350
+    range: 7.8125
+    fireRate: 0.13333334
+    damage: 1
+    visualColor: {r: 0.6, g: 0.55, b: 0.45, a: 1}
+    visualScale: 1.0266666
+    projectileSpeed: 12.5
+    projectileColor: {r: 0.8, g: 0.775, b: 0.725, a: 1}
+    projectileScale: 0.25
+    hasStatusEffect: 0
+    effectType: 0
+    effectDuration: 0
+    effectStrength: 0
+  lumberCost: 0
+  sellValue: 263
+  wc3Id: oC67
+  buildTime: 90
+  abilityIds: []
+  importNotes: 'Not defined or not simulated: damage dice (ua1d), assumed 1'

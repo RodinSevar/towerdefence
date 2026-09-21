@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77bb193158e8c554eaf19e36fa5061fa, type: 3}
+  m_Name: eC93
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  displayName: Crystal Dissolver
+  attackStyle: 0
+  description: The ultimate tower of crystal defense. The Crystal Dissolver has a
+    long range, high damage, and fast speed. It is expensive, but it's worth it.
+  icon: {fileID: 0}
+  levels:
+  - cost: 650
+    range: 10.9375
+    fireRate: 10
+    damage: 701
+    visualColor: {r: 0.35, g: 0.75, b: 1, a: 1}
+    visualScale: 1.3066666
+    projectileSpeed: 28.125
+    projectileColor: {r: 0.675, g: 0.875, b: 1, a: 1}
+    projectileScale: 0.25
+    hasStatusEffect: 0
+    effectType: 0
+    effectDuration: 0
+    effectStrength: 0
+  lumberCost: 0
+  sellValue: 465
+  wc3Id: eC93
+  buildTime: 110
+  abilityIds:
+  - Abds
+  importNotes: 'Not defined or not simulated: stock abilities not simulated: Abds;
+    second attack (ua2*) ignored'

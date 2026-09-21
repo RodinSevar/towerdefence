@@ -15,6 +15,7 @@ public static class GameDataBuilder
     private const string EnemyDataDir = "Assets/Data/Enemies";
     private const string WaveDataDir = "Assets/Data/Waves";
     private const string PrefabDir = "Assets/Prefabs";
+    private const string RaceDir = "Assets/Data/Races";
 
     [MenuItem("Tools/Build Game Data")]
     public static void BuildInOpenScene()
@@ -37,7 +38,45 @@ public static class GameDataBuilder
         foreach (string dir in new[] { TowerDataDir, EnemyDataDir, WaveDataDir, PrefabDir })
             Directory.CreateDirectory(dir);
 
-        // ---- Tower data (values migrated from the old hard-coded arrays in Tower.cs) ----
+        // ---- Races: the imported Wintermaul races if present, else one placeholder race ----
+        RaceData[] races = FindRaces();
+        if (races.Length == 0) races = new[] { CreatePlaceholderRace() };
+
+        // ---- Waves: the imported Wintermaul levels if present, else 5 placeholder waves ----
+        WaveSet waves = AssetDatabase.LoadAssetAtPath<WaveSet>(WaveImporter.WaveSetPath) ?? CreatePlaceholderWaves();
+
+        // ---- Prefabs ----
+        Tower towerPrefab = LoadOrCreatePrefab<Tower>($"{PrefabDir}/Tower.prefab", BuildTowerPrefab);
+        Enemy enemyPrefab = LoadOrCreatePrefab<Enemy>($"{PrefabDir}/Enemy.prefab", BuildEnemyPrefab);
+
+        // ---- Scene wiring ----
+        var towerManager = FindOrCreate<TowerManager>("TowerManager");
+        Wire(towerManager, "towerPrefab", towerPrefab);
+
+        var raceManager = FindOrCreate<RaceManager>("RaceManager");
+        WireArray(raceManager, "races", races);
+
+        var waveManager = FindOrCreate<WaveManager>("WaveManager");
+        Wire(waveManager, "enemyPrefab", enemyPrefab);
+        Wire(waveManager, "waveSet", waves);
+
+        EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+    }
+
+    private static RaceData[] FindRaces()
+    {
+        if (!AssetDatabase.IsValidFolder(RaceDir)) return new RaceData[0];
+        var paths = new System.Collections.Generic.List<string>();
+        foreach (string guid in AssetDatabase.FindAssets("t:RaceData", new[] { RaceDir }))
+            paths.Add(AssetDatabase.GUIDToAssetPath(guid));
+        paths.Sort(System.StringComparer.Ordinal); // imported races are prefixed 00_, 01_, ... in map order
+        return paths.ConvertAll(p => AssetDatabase.LoadAssetAtPath<RaceData>(p)).ToArray();
+    }
+
+    /// <summary>A single race with three simple towers, used until the WC3 import has been run.</summary>
+    private static RaceData CreatePlaceholderRace()
+    {
+        Directory.CreateDirectory(RaceDir);
         TowerData gun = LoadOrCreate<TowerData>($"{TowerDataDir}/Gun.asset", t =>
         {
             t.displayName = "Gun Tower";
@@ -81,23 +120,12 @@ public static class GameDataBuilder
             };
         });
 
-        // ---- Waves: the imported Wintermaul levels if present, else 5 placeholder waves ----
-        WaveSet waves = AssetDatabase.LoadAssetAtPath<WaveSet>(WaveImporter.WaveSetPath) ?? CreatePlaceholderWaves();
-
-        // ---- Prefabs ----
-        Tower towerPrefab = LoadOrCreatePrefab<Tower>($"{PrefabDir}/Tower.prefab", BuildTowerPrefab);
-        Enemy enemyPrefab = LoadOrCreatePrefab<Enemy>($"{PrefabDir}/Enemy.prefab", BuildEnemyPrefab);
-
-        // ---- Scene wiring ----
-        var towerManager = FindOrCreate<TowerManager>("TowerManager");
-        Wire(towerManager, "towerPrefab", towerPrefab);
-        WireArray(towerManager, "buildableTowers", gun, laser, ice);
-
-        var waveManager = FindOrCreate<WaveManager>("WaveManager");
-        Wire(waveManager, "enemyPrefab", enemyPrefab);
-        Wire(waveManager, "waveSet", waves);
-
-        EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+        return LoadOrCreate<RaceData>($"{RaceDir}/00_Placeholder.asset", r =>
+        {
+            r.displayName = "Placeholder";
+            r.lumberCost = 0;
+            r.towers = new[] { gun, laser, ice };
+        });
     }
 
     private static WaveSet CreatePlaceholderWaves()

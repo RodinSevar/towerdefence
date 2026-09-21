@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0912dfa899d499548bead1a0706877b0, type: 3}
+  m_Name: 09_h002
+  m_EditorClassIdentifier: Assembly-CSharp::RaceData
+  displayName: Heaven Portal
+  constructorName: Angel
+  description: Heavenly towers are hard to classify.  average in about everything,
+    try them!
+  lumberCost: 1
+  color: {r: 1, g: 1, b: 0.85, a: 1}
+  towers:
+  - {fileID: 11400000, guid: 80c5c44497dbd514e9de61a63f417a1a, type: 2}
+  - {fileID: 11400000, guid: 1d3cc3e39b1c5a2479317a16fb55c88b, type: 2}
+  - {fileID: 11400000, guid: 06a581f34cf3b8e4d8dae8e421092563, type: 2}
+  - {fileID: 11400000, guid: 1f7c62da503fd1c448e4d6f343195103, type: 2}
+  - {fileID: 11400000, guid: 2cb5f97df5a93184ab1fd8c1d028db90, type: 2}
+  - {fileID: 11400000, guid: 9d653674fa1b4104489c8de293aba382, type: 2}
+  - {fileID: 11400000, guid: 853b73e4c80980d4896bc4cacdcfa5de, type: 2}

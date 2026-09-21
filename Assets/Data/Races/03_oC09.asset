@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0912dfa899d499548bead1a0706877b0, type: 3}
+  m_Name: 03_oC09
+  m_EditorClassIdentifier: Assembly-CSharp::RaceData
+  displayName: Power Plant
+  constructorName: Spark
+  description: The Power Plant trains electricity to do your bidding. Electric Towers
+    have a fast attack and cooldown, but low damage. Electricity does extra damage
+    to light armored units.
+  lumberCost: 1
+  color: {r: 1, g: 0.9, b: 0.2, a: 1}
+  towers:
+  - {fileID: 11400000, guid: b6ad9d5886d41e442876f48513f5754f, type: 2}
+  - {fileID: 11400000, guid: 09d09bf9a0267614da6da46daa2dccd0, type: 2}
+  - {fileID: 11400000, guid: b914601e33a056046b8fdca3f94c0cd4, type: 2}
+  - {fileID: 11400000, guid: 5ae02be0cab2d8d4698f34b9bf1e2062, type: 2}
+  - {fileID: 11400000, guid: 1dbcab0324410bd458c7da3ff931e7b5, type: 2}
+  - {fileID: 11400000, guid: 9a348e71af213d244ae046d2d94e45d6, type: 2}

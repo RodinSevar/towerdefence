@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77bb193158e8c554eaf19e36fa5061fa, type: 3}
+  m_Name: hC92
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  displayName: Black Hole
+  attackStyle: 0
+  description: The Black Hole attacks a group of units, and does 550 damage to each
+    of them. It has a short range, and a high cooldown however. This is the most
+    powerful tower of Gravity defense.
+  icon: {fileID: 0}
+  levels:
+  - cost: 350
+    range: 6.25
+    fireRate: 0.4
+    damage: 2
+    visualColor: {r: 0.55, g: 0.3, b: 0.85, a: 1}
+    visualScale: 1.0266666
+    projectileSpeed: 14.0625
+    projectileColor: {r: 0.775, g: 0.65, b: 0.925, a: 1}
+    projectileScale: 0.25
+    hasStatusEffect: 0
+    effectType: 0
+    effectDuration: 0
+    effectStrength: 0
+  lumberCost: 0
+  sellValue: 263
+  wc3Id: hC92
+  buildTime: 90
+  abilityIds: []
+  importNotes: 'Not defined or not simulated: projectile speed (ua1z), assumed 900'

@@ -6,6 +6,9 @@ public class GameManager : Singleton<GameManager>
     [Header("Game Settings")]
     public int initialLives = 20;
     public int initialGold = 60; // as in the original map
+    public int initialLumber = 1; // as in the original map: one lumber to unlock a race
+    [Tooltip("The original map gives +1 lumber when this level is about to start (a second race)")]
+    public int bonusLumberLevel = 15;
     [Tooltip("Countdown before wave 1")]
     public float firstWaveDelay = 60f;
     [Tooltip("Countdown between a wave being cleared and the next one starting")]
@@ -17,12 +20,14 @@ public class GameManager : Singleton<GameManager>
 
     private int currentLives;
     private int currentGold;
+    private int currentLumber;
     private int currentWave = 0;
     private bool isGameOver = false;
     private readonly HashSet<Enemy> activeEnemies = new HashSet<Enemy>();
 
     public System.Action<int> OnGoldChanged;
     public System.Action<int> OnLivesChanged;
+    public System.Action<int> OnLumberChanged;
     public System.Action<int> OnWaveStarted;
     public System.Action OnGameOver;
     public System.Action OnGameWon;
@@ -36,7 +41,9 @@ public class GameManager : Singleton<GameManager>
     private void Start()
     {
         currentGold = initialGold;
+        currentLumber = initialLumber;
         currentLives = initialLives;
+        OnLumberChanged?.Invoke(currentLumber);
         OnGoldChanged?.Invoke(currentGold);
         OnLivesChanged?.Invoke(currentLives);
 
@@ -62,6 +69,20 @@ public class GameManager : Singleton<GameManager>
     {
         currentGold += amount;
         OnGoldChanged?.Invoke(currentGold);
+    }
+
+    public void AddLumber(int amount)
+    {
+        currentLumber += amount;
+        OnLumberChanged?.Invoke(currentLumber);
+    }
+
+    public bool TrySpendLumber(int amount)
+    {
+        if (currentLumber < amount) return false;
+        currentLumber -= amount;
+        OnLumberChanged?.Invoke(currentLumber);
+        return true;
     }
 
     public bool TrySpendGold(int amount)
@@ -96,6 +117,9 @@ public class GameManager : Singleton<GameManager>
         levelBonus += levelBonusStep;
         AddGold(levelBonus);
         Debug.Log($"Level {currentWave} cleared: +{levelBonus} gold");
+
+        // Original map: +1 lumber when level 15 (bonusLumberLevel) is about to start, unlocking a second race
+        if (currentWave + 1 == bonusLumberLevel) AddLumber(1);
 
         if (currentWave < WaveManager.Instance.GetTotalWaves())
         {
@@ -138,5 +162,6 @@ public class GameManager : Singleton<GameManager>
 
     public bool IsGameOver() => isGameOver;
     public int GetCurrentGold() => currentGold;
+    public int GetCurrentLumber() => currentLumber;
     public int GetCurrentLives() => currentLives;
 }

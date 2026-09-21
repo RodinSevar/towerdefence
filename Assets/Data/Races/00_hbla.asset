@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0912dfa899d499548bead1a0706877b0, type: 3}
+  m_Name: 00_hbla
+  m_EditorClassIdentifier: Assembly-CSharp::RaceData
+  displayName: Crystal Castle
+  constructorName: Crystal Molder
+  description: The Crystal Defense consist of only 2 early game towers. But later
+    in the game, 4 extremely powerful towers become affordable- making Crystal superior
+    to all other towers in late game.
+  lumberCost: 1
+  color: {r: 0.35, g: 0.75, b: 1, a: 1}
+  towers:
+  - {fileID: 11400000, guid: 24e1e110a0d5d15459cbe9f3f4018419, type: 2}
+  - {fileID: 11400000, guid: e8f03c66613c40e4d982665ebf27e628, type: 2}
+  - {fileID: 11400000, guid: 3f32e1e15c3e02042ae8affaca55567d, type: 2}
+  - {fileID: 11400000, guid: 1037f68563fb5d545bdb7c0f0a38886e, type: 2}
+  - {fileID: 11400000, guid: 23724c8410cc4f745a95434d4fbb2513, type: 2}
+  - {fileID: 11400000, guid: 323b3ac56f07e964caae41435feb6fd9, type: 2}
+  - {fileID: 11400000, guid: fbed1af812dfc914fb2bb1c0509e2380, type: 2}

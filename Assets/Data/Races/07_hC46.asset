@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0912dfa899d499548bead1a0706877b0, type: 3}
+  m_Name: 07_hC46
+  m_EditorClassIdentifier: Assembly-CSharp::RaceData
+  displayName: Gravity Generator
+  constructorName: Gravity Lord
+  description: Gravity Towers have special abilities and vary greatly from each other.
+    They could be difficult to use for the first time, but once you form a strategy
+    they can be devastating. Gravity is much better against ground than air.
+  lumberCost: 1
+  color: {r: 0.55, g: 0.3, b: 0.85, a: 1}
+  towers:
+  - {fileID: 11400000, guid: 8ebc869bc17f08b42b4dd81307236e6e, type: 2}
+  - {fileID: 11400000, guid: e931ac36f342f1e4fb0406f81c0d988d, type: 2}
+  - {fileID: 11400000, guid: 4f4a9994a50145e4791a6883769f27f4, type: 2}
+  - {fileID: 11400000, guid: 5f8a665a70aa4234995ac393a3c1bae3, type: 2}
+  - {fileID: 11400000, guid: 2e0a61514d462b34ea82d84885c3a45a, type: 2}
+  - {fileID: 11400000, guid: 8d8179d3cafd0ad43aea1862849adcc4, type: 2}
+  - {fileID: 11400000, guid: afe635c043ff2b1448f6b75c27398ad8, type: 2}

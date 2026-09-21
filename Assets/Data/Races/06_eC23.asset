@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0912dfa899d499548bead1a0706877b0, type: 3}
+  m_Name: 06_eC23
+  m_EditorClassIdentifier: Assembly-CSharp::RaceData
+  displayName: Ice Freezer
+  constructorName: Ice Former
+  description: Creates Ice to fight on your side. Ice Towers slow enemy units, as
+    well as having a nice rate of fire, but somwhat low range. Ice Towers have a
+    high minimum damage. Ice Towers do extra damage to light armor, and reduced to
+    fortified
+  lumberCost: 1
+  color: {r: 0.6, g: 0.9, b: 1, a: 1}
+  towers:
+  - {fileID: 11400000, guid: 7e7c78a61ce660e49b2f1648bfc0067d, type: 2}
+  - {fileID: 11400000, guid: d2b445ae5e7e2e241af5100ba35d1d0b, type: 2}
+  - {fileID: 11400000, guid: fa40ec6ad4e9a7348b2d9e278492abd2, type: 2}
+  - {fileID: 11400000, guid: 06277c9dc0ea6f347aca205136b4eb98, type: 2}
+  - {fileID: 11400000, guid: b5938ccfd2f20c143b50fb212fc59cb6, type: 2}
+  - {fileID: 11400000, guid: 405257fa9e4dafd4986778794ce962f5, type: 2}
+  - {fileID: 11400000, guid: 76fa27c4be5ae8e48acd84990e735c86, type: 2}

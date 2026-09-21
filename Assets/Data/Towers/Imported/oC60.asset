@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77bb193158e8c554eaf19e36fa5061fa, type: 3}
+  m_Name: oC60
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  displayName: Thunder Rod
+  attackStyle: 1
+  description: "A truly helpful Tower for any situation, the Thunder Rod does basically
+    no base damage. It removes 25% of any opponents current health. Doesn't work
+    on bosses. 1-1 damage +25% enemy hp \n\n<color=#ffcc00>Attacks land and air units.</color>"
+  icon: {fileID: 0}
+  levels:
+  - cost: 200
+    range: 5.46875
+    fireRate: 0.5
+    damage: 1
+    visualColor: {r: 1, g: 0.9, b: 0.2, a: 1}
+    visualScale: 0.88666666
+    projectileSpeed: 156.25
+    projectileColor: {r: 1, g: 0.95, b: 0.6, a: 1}
+    projectileScale: 0.25
+    hasStatusEffect: 0
+    effectType: 0
+    effectDuration: 0
+    effectStrength: 0
+  lumberCost: 0
+  sellValue: 150
+  wc3Id: oC60
+  buildTime: 62
+  abilityIds: []
+  importNotes: 'Not defined or not simulated: damage dice (ua1d), assumed 1'

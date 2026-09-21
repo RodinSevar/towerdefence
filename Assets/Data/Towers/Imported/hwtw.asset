@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77bb193158e8c554eaf19e36fa5061fa, type: 3}
+  m_Name: hwtw
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  displayName: Crystal Fury
+  attackStyle: 0
+  description: The Crystal Fury is a fast attacking tower with high damage and critical
+    strike. One of the deadliest towers of crystal defense.
+  icon: {fileID: 0}
+  levels:
+  - cost: 200
+    range: 10.9375
+    fireRate: 4
+    damage: 110.5
+    visualColor: {r: 0.35, g: 0.75, b: 1, a: 1}
+    visualScale: 0.88666666
+    projectileSpeed: 28.125
+    projectileColor: {r: 0.675, g: 0.875, b: 1, a: 1}
+    projectileScale: 0.25
+    hasStatusEffect: 0
+    effectType: 0
+    effectDuration: 0
+    effectStrength: 0
+  lumberCost: 0
+  sellValue: 218
+  wc3Id: hwtw
+  buildTime: 50
+  abilityIds:
+  - Abds
+  - ACct
+  importNotes: 'Not defined or not simulated: stock abilities not simulated: Abds,ACct'

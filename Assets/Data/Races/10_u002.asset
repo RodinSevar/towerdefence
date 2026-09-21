@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0912dfa899d499548bead1a0706877b0, type: 3}
+  m_Name: 10_u002
+  m_EditorClassIdentifier: Assembly-CSharp::RaceData
+  displayName: Space Station
+  constructorName: Meteor
+  description: Space is VERY unusual.  This race is queen of special-effect towers.
+    Best chosen as second race because of its high prices.
+  lumberCost: 1
+  color: {r: 0.2, g: 0.3, b: 0.7, a: 1}
+  towers:
+  - {fileID: 11400000, guid: dfb367773923c684683cd9a1cbc2741b, type: 2}
+  - {fileID: 11400000, guid: e1c5e5c605cb1044fb519dea78021a03, type: 2}
+  - {fileID: 11400000, guid: f2c70d983739a954c8b633cf393f8649, type: 2}
+  - {fileID: 11400000, guid: 6cce6833084edc74894519049f55e584, type: 2}
+  - {fileID: 11400000, guid: 1ee8c53555a30cd419045530eff589b5, type: 2}
+  - {fileID: 11400000, guid: f7bba4c04d1cb0b4d9d5e8c3307e7a3e, type: 2}
+  - {fileID: 11400000, guid: 456aff791d88b4a42a7f3b607f417ffc, type: 2}
+  - {fileID: 11400000, guid: fe63a087efbb9dd46baf54177599da5e, type: 2}

@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77bb193158e8c554eaf19e36fa5061fa, type: 3}
+  m_Name: hC87
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  displayName: Gravity's Pull
+  attackStyle: 0
+  description: The next tower of Gravity's defense has the ability to slow enemies.
+    It also does splash damage in a moderate amount. Gravity's Pull posseses a short
+    range, however.
+  icon: {fileID: 0}
+  levels:
+  - cost: 50
+    range: 6.25
+    fireRate: 1
+    damage: 44.5
+    visualColor: {r: 0.55, g: 0.3, b: 0.85, a: 1}
+    visualScale: 0.74666667
+    projectileSpeed: 18.75
+    projectileColor: {r: 0.775, g: 0.65, b: 0.925, a: 1}
+    projectileScale: 0.25
+    hasStatusEffect: 0
+    effectType: 0
+    effectDuration: 0
+    effectStrength: 0
+  lumberCost: 0
+  sellValue: 38
+  wc3Id: hC87
+  buildTime: 25
+  abilityIds:
+  - Abds
+  - ACsw
+  - ACsw
+  importNotes: 'Not defined or not simulated: damage dice (ua1d), assumed 1; cooldown
+    (ua1c), assumed 1; stock abilities not simulated: Abds,ACsw,ACsw; missile splash
+    damage not simulated'

@@ -201,7 +201,8 @@ public class Tower : MonoBehaviour, ISelectable
     // ISelectable implementation
     public string GetDisplayName()
     {
-        return data != null ? $"{data.displayName} Lvl {currentLevelIndex + 1}" : "Unknown Tower";
+        if (data == null) return "Unknown Tower";
+        return data.levels.Length > 1 ? $"{data.displayName} Lvl {currentLevelIndex + 1}" : data.displayName;
     }
 
     public void SetSelected(bool selected)
@@ -216,14 +217,16 @@ public class Tower : MonoBehaviour, ISelectable
     {
         TowerLevel level = CurrentLevel;
         if (level == null) return "";
-        return $"Damage: {level.damage}\nRange: {level.range}\nFire Rate: {level.fireRate}/s";
+        return $"Damage: {level.damage:0.#}\nRange: {level.range:0.#}\nFire Rate: {level.fireRate:0.##}/s";
     }
 
     public bool IsSellable() => true;
 
-    /// <summary>Half of everything spent on this tower so far.</summary>
+    /// <summary>Sell value from the map data if defined, else half of everything spent on this tower.</summary>
     public int GetRefundAmount()
     {
+        if (data.sellValue >= 0) return data.sellValue;
+
         int totalCost = 0;
         for (int i = 0; i <= currentLevelIndex; i++)
         {

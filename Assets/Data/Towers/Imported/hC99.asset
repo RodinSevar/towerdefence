@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77bb193158e8c554eaf19e36fa5061fa, type: 3}
+  m_Name: hC99
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  displayName: Cold Exploder
+  attackStyle: 0
+  description: The Cold Exploder doesn't do much damage, but it has a huge splash.
+    This splash of cold will slow large amounts of enemies. This tower has a high
+    cooldown period, however. It's a good idea for every ice player to make at least
+    one of these.
+  icon: {fileID: 0}
+  levels:
+  - cost: 270
+    range: 10.9375
+    fireRate: 0.44444445
+    damage: 100.5
+    visualColor: {r: 0.6, g: 0.9, b: 1, a: 1}
+    visualScale: 0.952
+    projectileSpeed: 14.0625
+    projectileColor: {r: 0.8, g: 0.95, b: 1, a: 1}
+    projectileScale: 0.25
+    hasStatusEffect: 0
+    effectType: 0
+    effectDuration: 0
+    effectStrength: 0
+  lumberCost: 0
+  sellValue: 203
+  wc3Id: hC99
+  buildTime: 0
+  abilityIds:
+  - Afrb
+  - Abds
+  importNotes: 'Not defined or not simulated: damage dice (ua1d), assumed 1; range
+    (ua1r), assumed 700; projectile speed (ua1z), assumed 900; stock abilities not
+    simulated: Afrb,Abds; missile splash damage not simulated'

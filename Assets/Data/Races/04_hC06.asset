@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0912dfa899d499548bead1a0706877b0, type: 3}
+  m_Name: 04_hC06
+  m_EditorClassIdentifier: Assembly-CSharp::RaceData
+  displayName: Tech Center
+  constructorName: Scientist
+  description: Build a Tech Center to build towers equipped with human technology.
+    Tech towers have long range and moderate damage, but long cooldowns. Tech Towers
+    do extra damage to heavy armor, and reduced to fortified and light.
+  lumberCost: 1
+  color: {r: 0.75, g: 0.75, b: 0.8, a: 1}
+  towers:
+  - {fileID: 11400000, guid: 4e8dea16e5565c14e9fe6fcacaee7b40, type: 2}
+  - {fileID: 11400000, guid: 46070979674d2104bb0ba5d6182e7ee8, type: 2}
+  - {fileID: 11400000, guid: 8ef2a1d0bc21fbb49aaf03ffccc68134, type: 2}
+  - {fileID: 11400000, guid: d0e35765496dd8142a329abf535bfd3e, type: 2}
+  - {fileID: 11400000, guid: 752b63b5c119d1542b9b65184278175b, type: 2}
+  - {fileID: 11400000, guid: 2e5967ae143a0ba41a9b468fb7bd783d, type: 2}
+  - {fileID: 11400000, guid: 49496c56c31febc44ab9d7b3e0375279, type: 2}

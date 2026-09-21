@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77bb193158e8c554eaf19e36fa5061fa, type: 3}
+  m_Name: hgtw
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  displayName: Crystal Shooter
+  attackStyle: 0
+  description: Basic tower of the crystal defense. The Crystal Shooter has relatively
+    high chaos damage for its cost.
+  icon: {fileID: 0}
+  levels:
+  - cost: 10
+    range: 11.71875
+    fireRate: 1.1111112
+    damage: 11.5
+    visualColor: {r: 0.35, g: 0.75, b: 1, a: 1}
+    visualScale: 0.7093333
+    projectileSpeed: 14.0625
+    projectileColor: {r: 0.675, g: 0.875, b: 1, a: 1}
+    projectileScale: 0.25
+    hasStatusEffect: 0
+    effectType: 0
+    effectDuration: 0
+    effectStrength: 0
+  lumberCost: 0
+  sellValue: 7
+  wc3Id: hgtw
+  buildTime: 8
+  abilityIds:
+  - Abds
+  importNotes: 'Not defined or not simulated: damage dice (ua1d), assumed 1; projectile
+    speed (ua1z), assumed 900; stock abilities not simulated: Abds'

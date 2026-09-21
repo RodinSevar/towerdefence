@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77bb193158e8c554eaf19e36fa5061fa, type: 3}
+  m_Name: nmoo
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  displayName: Ice Cave
+  attackStyle: 0
+  description: This cave is cold...(LOL) super strong unit. Attacks land and air
+    units
+  icon: {fileID: 0}
+  levels:
+  - cost: 1500
+    range: 27.34375
+    fireRate: 1
+    damage: 2010.5
+    visualColor: {r: 0.35, g: 0.75, b: 1, a: 1}
+    visualScale: 1.4
+    projectileSpeed: 14.0625
+    projectileColor: {r: 0.675, g: 0.875, b: 1, a: 1}
+    projectileScale: 0.25
+    hasStatusEffect: 0
+    effectType: 0
+    effectDuration: 0
+    effectStrength: 0
+  lumberCost: 0
+  sellValue: -1
+  wc3Id: nmoo
+  buildTime: 0
+  abilityIds:
+  - ACbk
+  importNotes: 'Not defined or not simulated: cooldown (ua1c), assumed 1; projectile
+    speed (ua1z), assumed 900; stock abilities not simulated: ACbk; missile splash
+    damage not simulated'

@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77bb193158e8c554eaf19e36fa5061fa, type: 3}
+  m_Name: oC37
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  displayName: Blizzard Master
+  attackStyle: 1
+  description: "Ice just improved again. The Blizzard Master is a expensive, but
+    worthwhile investment. 80-90 damage. \n\n<color=#ffcc00>Attacks land and air
+    units.</color>"
+  icon: {fileID: 0}
+  levels:
+  - cost: 100
+    range: 10.9375
+    fireRate: 0.8333333
+    damage: 85
+    visualColor: {r: 0.6, g: 0.9, b: 1, a: 1}
+    visualScale: 0.79333335
+    projectileSpeed: 156.25
+    projectileColor: {r: 0.8, g: 0.95, b: 1, a: 1}
+    projectileScale: 0.25
+    hasStatusEffect: 0
+    effectType: 0
+    effectDuration: 0
+    effectStrength: 0
+  lumberCost: 0
+  sellValue: 75
+  wc3Id: oC37
+  buildTime: 41
+  abilityIds:
+  - Afrb
+  importNotes: 'Not defined or not simulated: damage dice (ua1d), assumed 1; range
+    (ua1r), assumed 700; stock abilities not simulated: Afrb; missile splash damage
+    not simulated'

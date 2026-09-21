@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0912dfa899d499548bead1a0706877b0, type: 3}
+  m_Name: 01_nwgt
+  m_EditorClassIdentifier: Assembly-CSharp::RaceData
+  displayName: Earth Gate
+  constructorName: Gaia's Servant
+  description: Use earth bound structures to fight on your side.  Earth structures
+    have large splash damage.
+  lumberCost: 1
+  color: {r: 0.35, g: 0.75, b: 0.3, a: 1}
+  towers:
+  - {fileID: 11400000, guid: 1cf213dacafd7204c9883925b750abe1, type: 2}
+  - {fileID: 11400000, guid: 1e0968441375fc3449b2044ee27a0c9d, type: 2}
+  - {fileID: 11400000, guid: 2bea740a6c5960841bef02879ee84e42, type: 2}
+  - {fileID: 11400000, guid: 153eaecf643fb1c46a1b385f2a1cda1f, type: 2}
+  - {fileID: 11400000, guid: 9be182b797697674a9d90643eefa6be7, type: 2}
+  - {fileID: 11400000, guid: fc3c05e467db518499b522844be32811, type: 2}

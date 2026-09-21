@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77bb193158e8c554eaf19e36fa5061fa, type: 3}
+  m_Name: o000
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  displayName: Fire Wolf
+  attackStyle: 0
+  description: Good dammage and range, average speed, decent splash. good for its
+    cost
+  icon: {fileID: 0}
+  levels:
+  - cost: 15
+    range: 10.9375
+    fireRate: 0.8333333
+    damage: 13.5
+    visualColor: {r: 0.75, g: 0.1, b: 0.2, a: 1}
+    visualScale: 0.714
+    projectileSpeed: 31.25
+    projectileColor: {r: 0.875, g: 0.55, b: 0.6, a: 1}
+    projectileScale: 0.25
+    hasStatusEffect: 0
+    effectType: 0
+    effectDuration: 0
+    effectStrength: 0
+  lumberCost: 0
+  sellValue: 12
+  wc3Id: o000
+  buildTime: 10
+  abilityIds: []
+  importNotes: 'Not defined or not simulated: damage dice (ua1d), assumed 1; range
+    (ua1r), assumed 700; missile splash damage not simulated'

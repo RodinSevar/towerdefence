@@ -10,6 +10,9 @@ public class HUD : MonoBehaviour
     private TextMeshProUGUI livesText;
 
     [SerializeField]
+    private TextMeshProUGUI lumberText;
+
+    [SerializeField]
     private TextMeshProUGUI waveText;
 
     [SerializeField]
@@ -26,6 +29,7 @@ public class HUD : MonoBehaviour
         // Subscribe to game events
         GameManager.Instance.OnGoldChanged += UpdateGoldDisplay;
         GameManager.Instance.OnLivesChanged += UpdateLivesDisplay;
+        GameManager.Instance.OnLumberChanged += UpdateLumberDisplay;
         GameManager.Instance.OnWaveStarted += UpdateWaveDisplay;
         GameManager.Instance.OnGameOver += ShowGameOverScreen;
         GameManager.Instance.OnGameWon += ShowGameWonScreen;
@@ -33,6 +37,7 @@ public class HUD : MonoBehaviour
         // Initial updates
         UpdateGoldDisplay(GameManager.Instance.GetCurrentGold());
         UpdateLivesDisplay(GameManager.Instance.GetCurrentLives());
+        UpdateLumberDisplay(GameManager.Instance.GetCurrentLumber());
         
         if (restartButton != null)
         {
@@ -50,6 +55,12 @@ public class HUD : MonoBehaviour
     {
         if (livesText != null)
             livesText.text = $"Lives: {lives}";
+    }
+
+    private void UpdateLumberDisplay(int lumber)
+    {
+        if (lumberText != null)
+            lumberText.text = $"Lumber: {lumber}";
     }
 
     private void UpdateWaveDisplay(int wave)
@@ -88,6 +99,7 @@ public class HUD : MonoBehaviour
         {
             GameManager.Instance.OnGoldChanged -= UpdateGoldDisplay;
             GameManager.Instance.OnLivesChanged -= UpdateLivesDisplay;
+            GameManager.Instance.OnLumberChanged -= UpdateLumberDisplay;
             GameManager.Instance.OnWaveStarted -= UpdateWaveDisplay;
             GameManager.Instance.OnGameOver -= ShowGameOverScreen;
             GameManager.Instance.OnGameWon -= ShowGameWonScreen;

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0912dfa899d499548bead1a0706877b0, type: 3}
+  m_Name: 05_hC01
+  m_EditorClassIdentifier: Assembly-CSharp::RaceData
+  displayName: Forge of Fire
+  constructorName: Fire Minion
+  description: Allows you to summon the powers of fire to aid you. Fire towers have
+    moderate damage and splash damage. Fire Towers do extra damage to Heavy Armor,
+    but reduced to Fortified and Light.
+  lumberCost: 1
+  color: {r: 1, g: 0.4, b: 0.1, a: 1}
+  towers:
+  - {fileID: 11400000, guid: 64409991db241b54da2f797260aa41ff, type: 2}
+  - {fileID: 11400000, guid: 8680f46be5cad3546be354220390e66d, type: 2}
+  - {fileID: 11400000, guid: d5f892afb8359b24a8db57b6ed2a6b8d, type: 2}
+  - {fileID: 11400000, guid: c666088b8451d31458dcfc2de72842e6, type: 2}
+  - {fileID: 11400000, guid: 48acc869575fa6b499c9d8a7d9fb6c12, type: 2}
+  - {fileID: 11400000, guid: 5c7b1d4cfb65db54ba782ca393e6ca23, type: 2}
+  - {fileID: 11400000, guid: cc26cdc818e383f4b92b2eece48fe329, type: 2}

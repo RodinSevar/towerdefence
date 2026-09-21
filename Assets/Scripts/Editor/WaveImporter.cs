@@ -17,13 +17,9 @@ using UnityEngine;
 /// </summary>
 public static class WaveImporter
 {
-    private const string MapDir = "mpq_files";
     private const string EnemyDir = "Assets/Data/Enemies/Imported";
     public const string WaveSetPath = "Assets/Data/Waves/WintermaulWaves.asset";
     private const string ScenePath = "Assets/Scenes/SampleScene.unity";
-
-    // One Unity grid cell is 2 WC3 pathing cells of 32 units (see WPMImporter), i.e. 64 WC3 units.
-    private const float WorldUnitsPerCell = 64f;
 
     // The map only stores fields that differ from the base unit; the base unit data lives in the game's own files,
     // which we don't have. These are used when a field is missing, and the gap is recorded in EnemyData.importNotes.
@@ -59,9 +55,9 @@ public static class WaveImporter
         Directory.CreateDirectory(EnemyDir);
         Directory.CreateDirectory(Path.GetDirectoryName(WaveSetPath));
 
-        var units = ParseUnits(Path.Combine(MapDir, "war3map.w3u"));
-        var strings = ParseStrings(Path.Combine(MapDir, "war3map.wts"));
-        var levels = ParseLevels(File.ReadAllText(Path.Combine(MapDir, "war3map.j")));
+        var units = Wc3Data.ParseUnits(Wc3Data.MapFile("war3map.w3u"));
+        var strings = Wc3Data.ParseStrings(Wc3Data.MapFile("war3map.wts"));
+        var levels = ParseLevels(File.ReadAllText(Wc3Data.MapFile("war3map.j")));
 
         var enemyByType = new Dictionary<string, EnemyData>();
         var waveList = new List<WaveSet.Wave>();
@@ -106,20 +102,20 @@ public static class WaveImporter
 
         var notes = new List<string>();
 
-        string name = f.TryGetValue("unam", out var n) ? ResolveString((string)n, strings) : null;
+        string name = f.TryGetValue("unam", out var n) ? Wc3Data.ResolveString((string)n, strings) : null;
         enemy.displayName = string.IsNullOrWhiteSpace(name) ? id : name.Trim();
 
-        enemy.health = (float)GetNumber(f, "uhpm", 0, notes, "hit points (uhpm)");
+        enemy.health = (float)Wc3Data.GetNumber(f, "uhpm", 0, notes, "hit points (uhpm)");
 
-        double speed = GetNumber(f, "umvs", AssumedSpeed, notes, $"speed (umvs), assumed {AssumedSpeed}");
-        enemy.speed = (float)(speed / WorldUnitsPerCell);
+        double speed = Wc3Data.GetNumber(f, "umvs", AssumedSpeed, notes, $"speed (umvs), assumed {AssumedSpeed}");
+        enemy.speed = (float)(speed / Wc3Data.WorldUnitsPerCell);
 
-        enemy.armor = (float)GetNumber(f, "udef", AssumedArmor, notes, $"armor (udef), assumed {AssumedArmor}");
+        enemy.armor = (float)Wc3Data.GetNumber(f, "udef", AssumedArmor, notes, $"armor (udef), assumed {AssumedArmor}");
 
         // Bounty = base + dice * (sides + 1) / 2 (average roll)
-        double bountyBase = GetNumber(f, "ubba", 0, notes, "bounty base (ubba), assumed 0");
-        double dice = GetNumber(f, "ubdi", AssumedBountyDice, notes, $"bounty dice (ubdi), assumed {AssumedBountyDice}");
-        double sides = GetNumber(f, "ubsi", 1, notes, "bounty sides (ubsi), assumed 1");
+        double bountyBase = Wc3Data.GetNumber(f, "ubba", 0, notes, "bounty base (ubba), assumed 0");
+        double dice = Wc3Data.GetNumber(f, "ubdi", AssumedBountyDice, notes, $"bounty dice (ubdi), assumed {AssumedBountyDice}");
+        double sides = Wc3Data.GetNumber(f, "ubsi", 1, notes, "bounty sides (ubsi), assumed 1");
         enemy.goldReward = Mathf.Max(0, Mathf.RoundToInt((float)(bountyBase + dice * (sides + 1) / 2.0)));
 
         enemy.importNotes = notes.Count == 0 ? "" : "Not defined in the map, assumed: " + string.Join("; ", notes);
@@ -127,21 +123,6 @@ public static class WaveImporter
         if (isNew) AssetDatabase.CreateAsset(enemy, path);
         EditorUtility.SetDirty(enemy);
         return enemy;
-    }
-
-    private static double GetNumber(Dictionary<string, object> f, string key, double fallback, List<string> notes, string what)
-    {
-        if (f.TryGetValue(key, out var v)) return Convert.ToDouble(v);
-        notes.Add(what);
-        return fallback;
-    }
-
-    private static string ResolveString(string value, Dictionary<int, string> strings)
-    {
-        if (value != null && value.StartsWith("TRIGSTR_") && int.TryParse(value.Substring(8), out int idx)
-            && strings.TryGetValue(idx, out string s))
-            return s;
-        return value;
     }
 
     // ---------- war3map.j: Set Levels ----------
@@ -173,81 +154,5 @@ public static class WaveImporter
             levels[level] = def;
         }
         return levels;
-    }
-
-    // ---------- war3map.wts ----------
-
-    private static Dictionary<int, string> ParseStrings(string path)
-    {
-        string text = File.ReadAllText(path, Encoding.UTF8).Replace("\r", "").TrimStart('﻿');
-        var strings = new Dictionary<int, string>();
-        foreach (Match m in Regex.Matches(text, @"STRING (\d+)\n(?://[^\n]*\n)*\{\n(.*?)\n\}", RegexOptions.Singleline))
-            strings[int.Parse(m.Groups[1].Value)] = m.Groups[2].Value;
-        return strings;
-    }
-
-    // ---------- war3map.w3u ----------
-
-    /// <summary>
-    /// Reads the object data table. Returns modified fields keyed by unit id (custom id if it has one, else the
-    /// original id that was modified). File layout (version 2): two tables (original-modified, then custom), each a
-    /// count followed by objects: oldId, newId, modCount, then per mod: fieldId, type (0 int, 1/2 real, 3 string),
-    /// value, and a 4-byte end marker.
-    /// </summary>
-    private static Dictionary<string, Dictionary<string, object>> ParseUnits(string path)
-    {
-        var units = new Dictionary<string, Dictionary<string, object>>();
-        using (var r = new BinaryReader(File.OpenRead(path)))
-        {
-            int version = r.ReadInt32();
-            if (version != 2) throw new InvalidOperationException($"Unsupported w3u version {version} (expected 2).");
-
-            for (int table = 0; table < 2; table++)
-            {
-                int count = r.ReadInt32();
-                for (int i = 0; i < count; i++)
-                {
-                    string oldId = ReadId(r);
-                    string newId = ReadId(r);
-                    int modCount = r.ReadInt32();
-                    var fields = new Dictionary<string, object>();
-                    for (int m = 0; m < modCount; m++)
-                    {
-                        string fieldId = ReadId(r);
-                        int type = r.ReadInt32();
-                        object value;
-                        switch (type)
-                        {
-                            case 0: value = r.ReadInt32(); break;
-                            case 1:
-                            case 2: value = r.ReadSingle(); break;
-                            case 3: value = ReadCString(r); break;
-                            default: throw new InvalidOperationException($"Unknown w3u value type {type}");
-                        }
-                        r.ReadInt32(); // end marker
-                        fields[fieldId] = value;
-                    }
-                    units[newId ?? oldId] = fields;
-                }
-            }
-            if (r.BaseStream.Position != r.BaseStream.Length)
-                throw new InvalidOperationException("w3u parse did not consume the whole file; format assumption is wrong.");
-        }
-        return units;
-    }
-
-    private static string ReadId(BinaryReader r)
-    {
-        byte[] b = r.ReadBytes(4);
-        if (b[0] == 0 && b[1] == 0 && b[2] == 0 && b[3] == 0) return null;
-        return Encoding.ASCII.GetString(b);
-    }
-
-    private static string ReadCString(BinaryReader r)
-    {
-        var bytes = new List<byte>();
-        byte b;
-        while ((b = r.ReadByte()) != 0) bytes.Add(b);
-        return Encoding.UTF8.GetString(bytes.ToArray());
     }
 }

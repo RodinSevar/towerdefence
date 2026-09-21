@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77bb193158e8c554eaf19e36fa5061fa, type: 3}
+  m_Name: h006
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  displayName: Gate Keeper
+  attackStyle: 1
+  description: The Gate Keeper is very special.  it has no dammage at all, but permanantely
+    reduces the speed of all enemies around it.  Works on Duke. A must-have.
+  icon: {fileID: 0}
+  levels:
+  - cost: 135
+    range: 10.15625
+    fireRate: 0.30769232
+    damage: 1.5
+    visualColor: {r: 1, g: 1, b: 0.85, a: 1}
+    visualScale: 0.826
+    projectileSpeed: 156.25
+    projectileColor: {r: 1, g: 1, b: 0.925, a: 1}
+    projectileScale: 0.25
+    hasStatusEffect: 0
+    effectType: 0
+    effectDuration: 0
+    effectStrength: 0
+  lumberCost: 0
+  sellValue: 85
+  wc3Id: h006
+  buildTime: 25
+  abilityIds: []
+  importNotes: 'Not defined or not simulated: damage dice (ua1d), assumed 1'

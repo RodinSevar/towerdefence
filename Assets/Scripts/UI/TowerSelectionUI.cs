@@ -4,8 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// The tower build menu (WC3-style command card). Shows one button per entry in
-/// <see cref="TowerManager.BuildableTowers"/>, padded with empty slots up to <see cref="SlotCount"/>.
+/// The tower build menu (WC3-style command card). Shows one button per tower of the active race
+/// (<see cref="TowerManager.BuildableTowers"/>), padded with empty slots up to <see cref="SlotCount"/>,
+/// and rebuilds whenever the active race changes.
 /// </summary>
 public class TowerSelectionUI : MonoBehaviour
 {
@@ -25,7 +26,22 @@ public class TowerSelectionUI : MonoBehaviour
         if (towersContainer == null)
             towersContainer = transform;
 
-        TowerData[] towers = TowerManager.Instance.BuildableTowers ?? new TowerData[0];
+        RaceManager.Instance.OnRacesChanged += Rebuild;
+        Rebuild();
+    }
+
+    private void OnDestroy()
+    {
+        if (RaceManager.Instance != null)
+            RaceManager.Instance.OnRacesChanged -= Rebuild;
+    }
+
+    private void Rebuild()
+    {
+        foreach (Transform child in towersContainer) Destroy(child.gameObject);
+        buttonMap.Clear();
+
+        TowerData[] towers = TowerManager.Instance.BuildableTowers;
         if (towers.Length > SlotCount)
             Debug.LogWarning($"{towers.Length} buildable towers but the menu only has {SlotCount} slots.");
 
@@ -62,8 +78,10 @@ public class TowerSelectionUI : MonoBehaviour
         var textObj = new GameObject("Text", typeof(RectTransform));
         textObj.transform.SetParent(buttonObj.transform, false);
         TextMeshProUGUI text = textObj.AddComponent<TextMeshProUGUI>();
-        text.text = $"{tower.displayName.Replace(" Tower", "")}\n${tower.BaseCost}";
-        text.fontSize = 12;
+        text.text = $"{tower.displayName}\n${tower.BaseCost}";
+        text.enableAutoSizing = true;
+        text.fontSizeMin = 5;
+        text.fontSizeMax = 10;
         text.alignment = TextAlignmentOptions.Center;
         text.color = Color.white;
         text.raycastTarget = false;
@@ -71,8 +89,8 @@ public class TowerSelectionUI : MonoBehaviour
         RectTransform textRect = text.rectTransform;
         textRect.anchorMin = Vector2.zero;
         textRect.anchorMax = Vector2.one;
-        textRect.offsetMin = Vector2.zero;
-        textRect.offsetMax = Vector2.zero;
+        textRect.offsetMin = new Vector2(2, 2);
+        textRect.offsetMax = new Vector2(-2, -2);
 
         button.onClick.AddListener(() => TowerManager.Instance.SelectTower(tower));
         buttonMap[tower] = button;

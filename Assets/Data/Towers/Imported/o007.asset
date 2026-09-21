@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77bb193158e8c554eaf19e36fa5061fa, type: 3}
+  m_Name: o007
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  displayName: Dragon's Lair
+  attackStyle: 1
+  description: Very Strange Tower indeed.  while it can do 10 dammage, it can also
+    do 800 with splash and at enormous range
+  icon: {fileID: 0}
+  levels:
+  - cost: 225
+    range: 46.875
+    fireRate: 0.5
+    damage: 405
+    visualColor: {r: 0.75, g: 0.1, b: 0.2, a: 1}
+    visualScale: 0.90999997
+    projectileSpeed: 156.25
+    projectileColor: {r: 0.875, g: 0.55, b: 0.6, a: 1}
+    projectileScale: 0.25
+    hasStatusEffect: 0
+    effectType: 0
+    effectDuration: 0
+    effectStrength: 0
+  lumberCost: 0
+  sellValue: 165
+  wc3Id: o007
+  buildTime: 0
+  abilityIds: []
+  importNotes: 'Not defined or not simulated: missile splash damage not simulated'

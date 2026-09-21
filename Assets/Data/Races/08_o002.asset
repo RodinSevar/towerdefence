@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0912dfa899d499548bead1a0706877b0, type: 3}
+  m_Name: 08_o002
+  m_EditorClassIdentifier: Assembly-CSharp::RaceData
+  displayName: Demonic Empire
+  constructorName: Demon King
+  description: Trains the Demon King.  Demons have high dammage range and most of
+    the time, good splash.  Only, their speed isnt killer.  Try them!
+  lumberCost: 1
+  color: {r: 0.75, g: 0.1, b: 0.2, a: 1}
+  towers:
+  - {fileID: 11400000, guid: 20007175181b0dc4eaeceb921d0f417a, type: 2}
+  - {fileID: 11400000, guid: a9d5f40b2b8bec340b46eb62d678c66a, type: 2}
+  - {fileID: 11400000, guid: 0f8bc3ef732f4384ea24eed7b19e04e6, type: 2}
+  - {fileID: 11400000, guid: 2231755b69b2bcd48800404eeb46c298, type: 2}
+  - {fileID: 11400000, guid: d38bcc89cd2c16c41a1c82300d442dbe, type: 2}
+  - {fileID: 11400000, guid: 959bf0b54decff94a89bf9a8bbf0872b, type: 2}
+  - {fileID: 11400000, guid: 2d8755c1028b93d48b15d2bc2fc7a044, type: 2}

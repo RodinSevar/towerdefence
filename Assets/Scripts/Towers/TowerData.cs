@@ -37,12 +37,26 @@ public class TowerData : ScriptableObject
 {
     public string displayName = "Tower";
     public TowerAttackStyle attackStyle = TowerAttackStyle.Projectile;
+    [TextArea] public string description;
 
     [Tooltip("Optional icon for the build button")]
     public Sprite icon;
 
     [Tooltip("Level 1 is the first entry; each further entry is an upgrade")]
     public TowerLevel[] levels = { new TowerLevel() };
+
+    [Header("Economy")]
+    public int lumberCost = 0;
+    [Tooltip("Gold refunded when sold. Negative = half of everything spent")]
+    public int sellValue = -1;
+
+    [Header("Import info (set by the WC3 importer)")]
+    public string wc3Id;
+    [Tooltip("Seconds the original tower takes to build (not simulated yet)")]
+    public float buildTime;
+    [Tooltip("Stock WC3 ability ids on the original tower (not simulated yet)")]
+    public string[] abilityIds;
+    [TextArea] public string importNotes;
 
     public int BaseCost => levels != null && levels.Length > 0 ? levels[0].cost : 0;
 }

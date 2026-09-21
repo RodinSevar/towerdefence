@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77bb193158e8c554eaf19e36fa5061fa, type: 3}
+  m_Name: oC24
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  displayName: Icicle Tosser
+  attackStyle: 0
+  description: "Basic Ice Structure. Decent rate of fire, good minimum damage, slows
+    enemies. 6 damage \n\n<color=#ffcc00>Attacks land and air units.</color>"
+  icon: {fileID: 0}
+  levels:
+  - cost: 10
+    range: 10.9375
+    fireRate: 0.9090909
+    damage: 6
+    visualColor: {r: 0.6, g: 0.9, b: 1, a: 1}
+    visualScale: 0.7093333
+    projectileSpeed: 19.53125
+    projectileColor: {r: 0.8, g: 0.95, b: 1, a: 1}
+    projectileScale: 0.25
+    hasStatusEffect: 0
+    effectType: 0
+    effectDuration: 0
+    effectStrength: 0
+  lumberCost: 0
+  sellValue: 7
+  wc3Id: oC24
+  buildTime: 5
+  abilityIds:
+  - Afrb
+  - Abds
+  importNotes: 'Not defined or not simulated: damage dice (ua1d), assumed 1; stock
+    abilities not simulated: Afrb,Abds; missile splash damage not simulated'

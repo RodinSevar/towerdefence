@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0912dfa899d499548bead1a0706877b0, type: 3}
+  m_Name: 02_eC12
+  m_EditorClassIdentifier: Assembly-CSharp::RaceData
+  displayName: Stone Sanctuary
+  constructorName: Stone Summoner
+  description: Conjure up hunks of stone to assist you. Stone Towers have high damage
+    and low range. Stone Towers sometimes do 2x damage, and do extra damage to fortified
+    armor.
+  lumberCost: 1
+  color: {r: 0.6, g: 0.55, b: 0.45, a: 1}
+  towers:
+  - {fileID: 11400000, guid: 60bdb29309ef0f440b8a68d9acdfb572, type: 2}
+  - {fileID: 11400000, guid: 8300fd5a281fb214cac12275389c5034, type: 2}
+  - {fileID: 11400000, guid: b12701dfb12d0574da16ea7c8c2f3717, type: 2}
+  - {fileID: 11400000, guid: df660c308bccf7147b148224027a8512, type: 2}
+  - {fileID: 11400000, guid: 64b51717bbb518f45bdacc6747427363, type: 2}
+  - {fileID: 11400000, guid: 7b19892929c5e294c8173795043e3355, type: 2}
+  - {fileID: 11400000, guid: 4b1fedec22c0eba49960d855a8e4b6df, type: 2}
