@@ -1,9 +1,12 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class GridManager : MonoBehaviour
+public class GridManager : Singleton<GridManager>
 {
-    public static GridManager Instance { get; private set; }
+    // Cell coordinates are centered on the origin (may be negative); arrays are indexed 0..ArraySize-1.
+    public const int ArraySize = 256;
+    private const int IndexOffset = ArraySize / 2;
+    private const float DefaultHeight = 0.5f;
 
     [SerializeField]
     private float cellSize = 1f;
@@ -18,30 +21,30 @@ public class GridManager : MonoBehaviour
     private bool[,] unbuildableCellsArray;
     private float[,] cellHeightsArray;
 
-    private void Awake()
+    protected override void OnSingletonAwake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
         InitializeGrid();
     }
 
     private void InitializeGrid()
     {
-        occupiedCellsArray = new bool[256, 256];
-        unbuildableCellsArray = new bool[256, 256];
-        cellHeightsArray = new float[256, 256];
-        
-        for (int x = 0; x < 256; x++)
-        {
-            for (int y = 0; y < 256; y++)
-            {
-                cellHeightsArray[x, y] = 0.5f;
-            }
-        }
+        occupiedCellsArray = new bool[ArraySize, ArraySize];
+        unbuildableCellsArray = new bool[ArraySize, ArraySize];
+        cellHeightsArray = new float[ArraySize, ArraySize];
+
+        for (int x = 0; x < ArraySize; x++)
+            for (int y = 0; y < ArraySize; y++)
+                cellHeightsArray[x, y] = DefaultHeight;
+    }
+
+    /// <summary>
+    /// Converts a centered cell coordinate to array indices. False if outside the array.
+    /// </summary>
+    private static bool TryGetIndex(Vector2Int cell, out int x, out int y)
+    {
+        x = cell.x + IndexOffset;
+        y = cell.y + IndexOffset;
+        return x >= 0 && x < ArraySize && y >= 0 && y < ArraySize;
     }
 
     /// <summary>
@@ -58,23 +61,13 @@ public class GridManager : MonoBehaviour
 
     public void SetCellHeight(Vector2Int cell, float height)
     {
-        int x = cell.x + 128;
-        int y = cell.y + 128;
-        if (x >= 0 && x < 256 && y >= 0 && y < 256)
-        {
+        if (TryGetIndex(cell, out int x, out int y))
             cellHeightsArray[x, y] = height;
-        }
     }
 
     public float GetCellHeight(Vector2Int cell)
     {
-        int x = cell.x + 128;
-        int y = cell.y + 128;
-        if (x >= 0 && x < 256 && y >= 0 && y < 256)
-        {
-            return cellHeightsArray[x, y];
-        }
-        return 0.5f; // Default ground height if none set
+        return TryGetIndex(cell, out int x, out int y) ? cellHeightsArray[x, y] : DefaultHeight;
     }
 
     public Vector3 GetWorldPosition(Vector2Int cell)
@@ -83,17 +76,13 @@ public class GridManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Converts world position to grid cell coordinates
+    /// Converts world position to grid cell coordinates (grid is centered on the origin)
     /// </summary>
     public Vector2Int WorldToGridCell(Vector3 worldPos)
     {
-        // Get grid center (should be at origin)
-        Vector3 localPos = worldPos;
-        
-        int gridX = Mathf.RoundToInt(localPos.x / cellSize);
-        int gridZ = Mathf.RoundToInt(localPos.z / cellSize);
-        
-        return new Vector2Int(gridX, gridZ);
+        return new Vector2Int(
+            Mathf.RoundToInt(worldPos.x / cellSize),
+            Mathf.RoundToInt(worldPos.z / cellSize));
     }
 
     /// <summary>
@@ -102,22 +91,16 @@ public class GridManager : MonoBehaviour
     public bool IsCellOccupied(Vector2Int cell)
     {
         if (!IsValidCell(cell)) return true;
-        int x = cell.x + 128;
-        int y = cell.y + 128;
-        return occupiedCellsArray[x, y];
+        return !TryGetIndex(cell, out int x, out int y) || occupiedCellsArray[x, y];
     }
 
     /// <summary>
-    /// Marks a cell as occupied (by a tower) - marks center cell and adjacent cells
+    /// Marks a cell as occupied (by a tower)
     /// </summary>
     public void OccupyCell(Vector2Int cell)
     {
-        int x = cell.x + 128;
-        int y = cell.y + 128;
-        if (x >= 0 && x < 256 && y >= 0 && y < 256)
-        {
+        if (TryGetIndex(cell, out int x, out int y))
             occupiedCellsArray[x, y] = true;
-        }
     }
 
     /// <summary>
@@ -125,12 +108,8 @@ public class GridManager : MonoBehaviour
     /// </summary>
     public void FreeCell(Vector2Int cell)
     {
-        int x = cell.x + 128;
-        int y = cell.y + 128;
-        if (x >= 0 && x < 256 && y >= 0 && y < 256)
-        {
+        if (TryGetIndex(cell, out int x, out int y))
             occupiedCellsArray[x, y] = false;
-        }
     }
 
     /// <summary>
@@ -139,11 +118,8 @@ public class GridManager : MonoBehaviour
     public bool CanBuildAt(Vector3 worldPos)
     {
         Vector2Int cell = WorldToGridCell(worldPos);
-        int x = cell.x + 128;
-        int y = cell.y + 128;
-        
-        if (x < 0 || x >= 256 || y < 0 || y >= 256) return false;
-        
+        if (!TryGetIndex(cell, out int x, out int y)) return false;
+
         return !IsCellOccupied(cell) && !unbuildableCellsArray[x, y];
     }
 
@@ -152,16 +128,12 @@ public class GridManager : MonoBehaviour
     /// </summary>
     public void MarkUnbuildable(Vector2Int cell)
     {
-        int x = cell.x + 128;
-        int y = cell.y + 128;
-        if (x >= 0 && x < 256 && y >= 0 && y < 256)
-        {
+        if (TryGetIndex(cell, out int x, out int y))
             unbuildableCellsArray[x, y] = true;
-        }
     }
 
     /// <summary>
-    /// Checks if a grid cell is within bounds
+    /// Checks if a grid cell is within the playable bounds
     /// </summary>
     private bool IsValidCell(Vector2Int cell)
     {

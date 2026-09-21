@@ -87,7 +87,7 @@ public class SelectionUI : MonoBehaviour
                 // Update upgrade button interactability dynamically (in case gold changes)
                 if (upgradeButton != null && currentUnit.CanUpgrade())
                 {
-                    bool canAfford = GameManager.Instance.GetGold() >= currentUnit.GetUpgradeCost();
+                    bool canAfford = GameManager.Instance.GetCurrentGold() >= currentUnit.GetUpgradeCost();
                     upgradeButton.interactable = canAfford;
                 }
             }
@@ -127,7 +127,7 @@ public class SelectionUI : MonoBehaviour
             {
                 int cost = unit.GetUpgradeCost();
                 upgradeButtonText.text = $"Upgrade (-{cost}G)";
-                upgradeButton.interactable = GameManager.Instance.GetGold() >= cost;
+                upgradeButton.interactable = GameManager.Instance.GetCurrentGold() >= cost;
             }
         }
 

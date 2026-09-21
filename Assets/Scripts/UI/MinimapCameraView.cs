@@ -6,7 +6,7 @@ public class MinimapCameraView : MonoBehaviour
     private RectTransform[] lines = new RectTransform[4];
     
     private float gridHalfSize = 98f;
-    private float minimapSize = 100f;
+    private float minimapSize => ((RectTransform)transform).rect.width;
     private float lineThickness = 2f;
 
     private void Start()

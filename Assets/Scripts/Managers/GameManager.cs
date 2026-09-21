@@ -1,10 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
-    public static GameManager Instance { get; private set; }
-
     [Header("Game Settings")]
     public int initialLives = 20;
     public int initialGold = 500;
@@ -21,16 +19,6 @@ public class GameManager : MonoBehaviour
     public System.Action<int> OnWaveStarted;
     public System.Action OnGameOver;
     public System.Action OnGameWon;
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-    }
 
     private void Start()
     {
@@ -58,7 +46,6 @@ public class GameManager : MonoBehaviour
         OnGoldChanged?.Invoke(currentGold);
     }
     
-    public int GetGold() => currentGold;
 
     public bool TrySpendGold(int amount)
     {

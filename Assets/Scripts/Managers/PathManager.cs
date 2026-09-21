@@ -1,21 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class PathManager : MonoBehaviour
+public class PathManager : Singleton<PathManager>
 {
-    public static PathManager Instance { get; private set; }
-
     public System.Action OnMazeChanged;
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-    }
 
     private void Start()
     {

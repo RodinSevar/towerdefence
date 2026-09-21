@@ -1,10 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class WaveManager : MonoBehaviour
+public class WaveManager : Singleton<WaveManager>
 {
-    public static WaveManager Instance { get; private set; }
-
     [System.Serializable]
     public class Wave
     {
@@ -31,16 +29,6 @@ public class WaveManager : MonoBehaviour
     public void UnregisterSpawner(Spawner spawner)
     {
         activeSpawners.Remove(spawner);
-    }
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
     }
 
     private void Start()

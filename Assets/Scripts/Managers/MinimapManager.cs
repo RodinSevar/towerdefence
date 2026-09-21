@@ -2,32 +2,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-public class MinimapManager : MonoBehaviour
+public class MinimapManager : Singleton<MinimapManager>
 {
-    public static MinimapManager Instance { get; private set; }
-
-    private RectTransform minimapContainer;
+    [SerializeField] private RectTransform minimapContainer;
     
     private Dictionary<Transform, RectTransform> unitDots = new Dictionary<Transform, RectTransform>();
     
     // Grid bounds
     private float gridHalfSize = 98f;
-    private float minimapSize = 100f;
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-    }
-
-    public void Initialize(RectTransform container)
-    {
-        minimapContainer = container;
-    }
+    private float minimapSize => minimapContainer != null ? minimapContainer.rect.width : 100f;
 
     public void RegisterUnit(Transform unitTransform, bool isEnemy)
     {

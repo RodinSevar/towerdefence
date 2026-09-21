@@ -2,24 +2,13 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 
-public class PlayerInteraction : MonoBehaviour
+public class PlayerInteraction : Singleton<PlayerInteraction>
 {
-    public static PlayerInteraction Instance { get; private set; }
     
     private ISelectable selectedUnit;
     
     public System.Action<ISelectable> OnUnitSelected;
     public System.Action OnUnitDeselected;
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-    }
 
     private void Update()
     {

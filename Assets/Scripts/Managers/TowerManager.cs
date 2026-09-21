@@ -2,10 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 
-public class TowerManager : MonoBehaviour
+public class TowerManager : Singleton<TowerManager>
 {
-    public static TowerManager Instance { get; private set; }
-
     private List<Tower> activeTowers = new List<Tower>();
     private Tower selectedTowerPrefab = null;
     private bool isPlacingTower = false;
@@ -19,23 +17,16 @@ public class TowerManager : MonoBehaviour
 
     public System.Action<Tower> OnTowerPlaced;
 
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-    }
-
     private void Update()
     {
         if (isPlacingTower)
         {
             UpdatePreview();
 
-            if (Mouse.current.leftButton.isPressed)
+            // Shift+drag keeps placing towers; otherwise one click = one attempt
+            bool clicked = Mouse.current.leftButton.wasPressedThisFrame
+                || (Keyboard.current.shiftKey.isPressed && Mouse.current.leftButton.isPressed);
+            if (clicked)
             {
                 // Ignore clicks over UI
                 if (UnityEngine.EventSystems.EventSystem.current != null && 
@@ -86,16 +77,7 @@ public class TowerManager : MonoBehaviour
         ghostRenderers = previewGhost.GetComponentsInChildren<Renderer>();
         foreach (var rend in ghostRenderers)
         {
-            Material mat = new Material(Shader.Find("Standard"));
-            mat.SetFloat("_Mode", 3); // Transparent
-            mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            mat.SetInt("_ZWrite", 0);
-            mat.DisableKeyword("_ALPHATEST_ON");
-            mat.EnableKeyword("_ALPHABLEND_ON");
-            mat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-            mat.renderQueue = 3000;
-            rend.material = mat;
+            rend.material = CreateGhostMaterial(3000);
         }
         
         previewFloor = GameObject.CreatePrimitive(PrimitiveType.Quad);
@@ -105,18 +87,17 @@ public class TowerManager : MonoBehaviour
         previewFloor.transform.localScale = new Vector3(size, size, 1);
         
         floorRenderer = previewFloor.GetComponent<Renderer>();
-        Material floorMat = new Material(Shader.Find("Standard"));
-        floorMat.SetFloat("_Mode", 3);
-        floorMat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-        floorMat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-        floorMat.SetInt("_ZWrite", 0);
-        floorMat.EnableKeyword("_ALPHABLEND_ON");
-        floorMat.renderQueue = 3001;
-        floorRenderer.material = floorMat;
+        floorRenderer.material = CreateGhostMaterial(3001);
         
         lastHoveredCell = new Vector2Int(-999, -999);
     }
     
+    // Sprites/Default is unlit, alpha-blended, tintable via color, and works in both built-in and URP.
+    private static Material CreateGhostMaterial(int renderQueue)
+    {
+        return new Material(Shader.Find("Sprites/Default")) { renderQueue = renderQueue };
+    }
+
     private void DestroyPreviewObjects()
     {
         if (previewGhost != null) Destroy(previewGhost);
@@ -143,15 +124,8 @@ public class TowerManager : MonoBehaviour
                 if (cell != lastHoveredCell)
                 {
                     lastHoveredCell = cell;
-                    lastHoverIsValid = false;
+                    lastHoverIsValid = CanPlaceAt(cell, snappedPos, selectedTowerPrefab.GetCost(), false, out _);
 
-                    if (GridManager.Instance.CanBuildAt(snappedPos) && GameManager.Instance.GetCurrentGold() >= selectedTowerPrefab.GetComponent<Tower>().GetCost())
-                    {
-                        GridManager.Instance.OccupyCell(cell);
-                        lastHoverIsValid = PathManager.Instance.ValidateFullMaze();
-                        GridManager.Instance.FreeCell(cell);
-                    }
-                    
                     Color ghostColor = lastHoverIsValid ? new Color(0, 1, 0, 0.4f) : new Color(1, 0, 0, 0.4f);
                     Color floorColor = lastHoverIsValid ? new Color(0, 1, 0, 0.8f) : new Color(1, 0, 0, 0.8f);
 
@@ -175,6 +149,27 @@ public class TowerManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Whether a tower costing <paramref name="cost"/> can be placed on <paramref name="cell"/>: cell is buildable,
+    /// the player can afford it, and it would not cut off any spawner. <paramref name="clearPathCache"/> is true
+    /// for a real placement attempt (cache is refreshed around the check), false for hover previews.
+    /// </summary>
+    private bool CanPlaceAt(Vector2Int cell, Vector3 worldPos, int cost, bool clearPathCache, out string failReason)
+    {
+        failReason = null;
+        if (!GridManager.Instance.CanBuildAt(worldPos)) { failReason = "occupied or unbuildable"; return false; }
+        if (GameManager.Instance.GetCurrentGold() < cost) { failReason = "not enough gold"; return false; }
+
+        GridManager.Instance.OccupyCell(cell);
+        if (clearPathCache) PathManager.Instance.ClearCache();
+        bool pathOk = PathManager.Instance.ValidateFullMaze();
+        GridManager.Instance.FreeCell(cell);
+        if (clearPathCache) PathManager.Instance.ClearCache();
+
+        if (!pathOk) failReason = "would block the path for at least one spawner";
+        return pathOk;
+    }
+
     private void TryPlaceTower()
     {
         if (selectedTowerPrefab == null) return;
@@ -189,37 +184,17 @@ public class TowerManager : MonoBehaviour
                 // Snap to grid
                 Vector3 snappedPos = GridManager.Instance.SnapToGrid(hit.point);
                 
-                // Check if building is allowed at this position
-                if (!GridManager.Instance.CanBuildAt(snappedPos))
-                {
-                    Debug.Log($"Tower placement failed: Cannot build at {snappedPos} (Occupied or Unbuildable)");
-                    return; // Can't build here
-                }
-                
-                int cost = selectedTowerPrefab.GetComponent<Tower>().GetCost();
-                if (GameManager.Instance.GetCurrentGold() < cost)
-                {
-                    Debug.Log($"Tower placement failed: Not enough gold (Cost: {cost}, Have: {GameManager.Instance.GetCurrentGold()})");
-                    return; // Not enough gold
-                }
-                
-                // Temporarily occupy to validate maze
                 Vector2Int cell = GridManager.Instance.WorldToGridCell(snappedPos);
-                GridManager.Instance.OccupyCell(cell);
-                
-                PathManager.Instance.ClearCache();
-                if (!PathManager.Instance.ValidateFullMaze())
+                int cost = selectedTowerPrefab.GetCost();
+                if (!CanPlaceAt(cell, snappedPos, cost, true, out string failReason))
                 {
-                    // Revert and deny placement
-                    GridManager.Instance.FreeCell(cell);
-                    PathManager.Instance.ClearCache();
-                    Debug.Log($"Tower placement blocked: Placing at {cell} prevents path completion for at least one spawner.");
+                    Debug.Log($"Tower placement failed at {cell}: {failReason}");
                     return;
                 }
-                PathManager.Instance.ClearCache();
-                
+
                 if (GameManager.Instance.TrySpendGold(cost))
                 {
+                    GridManager.Instance.OccupyCell(cell);
                     Tower newTower = Instantiate(selectedTowerPrefab, snappedPos, Quaternion.identity);
                     newTower.gameObject.SetActive(true);
                     
@@ -232,10 +207,6 @@ public class TowerManager : MonoBehaviour
                     
                     // Notify enemies that the maze has changed
                     PathManager.Instance.NotifyMazeChanged();
-                }
-                else
-                {
-                    GridManager.Instance.FreeCell(cell);
                 }
             }
         }

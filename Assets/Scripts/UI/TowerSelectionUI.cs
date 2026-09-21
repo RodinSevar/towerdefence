@@ -51,7 +51,7 @@ public class TowerSelectionUI : MonoBehaviour
         foreach (Tower tower in towerPrefabs)
         {
             GameObject buttonObj = new GameObject("TowerButton");
-            buttonObj.transform.SetParent(towersContainer);
+            buttonObj.transform.SetParent(towersContainer, false);
 
             Image buttonImage = buttonObj.AddComponent<Image>();
             buttonImage.color = new Color(0.3f, 0.3f, 0.3f);
@@ -68,7 +68,7 @@ public class TowerSelectionUI : MonoBehaviour
             layoutElement.preferredWidth = 130;
 
             GameObject buttonTextObj = new GameObject("Text");
-            buttonTextObj.transform.SetParent(buttonObj.transform);
+            buttonTextObj.transform.SetParent(buttonObj.transform, false);
             TextMeshProUGUI buttonText = buttonTextObj.AddComponent<TextMeshProUGUI>();
             // Remove the word "Tower" so it fits in the small square buttons
             string shortName = tower.GetDisplayName().Replace(" Tower", "");
