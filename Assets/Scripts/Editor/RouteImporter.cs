@@ -197,12 +197,13 @@ public static class RouteImporter
             }
             else
             {
-                // The map creates these creeps but never gives them a group or an order. Send them straight to the exit.
-                groupName = "(no group in the map; direct to exit)";
+                // The map creates these creeps but never gives them a group or an order, so in the original they stand idle
+                // (a gap in the map's logic). The intended behavior is to walk to the exit, so send them straight there.
+                groupName = "(idle in the original map; routed straight to the exit)";
                 string exit = new List<string>(exitRegions)[0];
                 MapRect exitRect = GetRect(rects, exit);
                 steps = new List<RouteStep> { Step(exit, exitRect.Center, exitRect, true) };
-                Debug.LogWarning($"RouteImporter: spawn '{region}' has no group and no orders in the map; routed directly to '{exit}'.");
+                Debug.LogWarning($"RouteImporter: spawn '{region}' has no group and no orders in the map (its creeps idle in the original); routed straight to '{exit}' as intended.");
             }
 
             if (!playerNodes.TryGetValue(player.player, out Transform node))
