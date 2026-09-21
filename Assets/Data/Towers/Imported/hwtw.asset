@@ -17,6 +17,7 @@ MonoBehaviour:
   description: The Crystal Fury is a fast attacking tower with high damage and critical
     strike. One of the deadliest towers of crystal defense.
   icon: {fileID: 0}
+  modelPrefab: {fileID: 7426751538032634015, guid: 54bcf12c6da679340a719e6b332d204e, type: 3}
   levels:
   - cost: 200
     range: 10.9375

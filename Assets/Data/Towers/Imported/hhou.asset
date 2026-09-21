@@ -17,6 +17,7 @@ MonoBehaviour:
   description: The Crystal Slower is one of the best slowing towers in the game.
     It deals splash damage and slows the enemies. It costs quite a bit, however.
   icon: {fileID: 0}
+  modelPrefab: {fileID: 3241103664422411811, guid: b40d1a0e88ea2ef4c94263cbe1ac12a0, type: 3}
   levels:
   - cost: 250
     range: 12.5

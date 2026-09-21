@@ -17,6 +17,7 @@ MonoBehaviour:
   description: Basic tower of the crystal defense. The Crystal Shooter has relatively
     high chaos damage for its cost.
   icon: {fileID: 0}
+  modelPrefab: {fileID: 6215749348245726934, guid: 4fe495c1855df3246b03ec43d196d658, type: 3}
   levels:
   - cost: 10
     range: 11.71875

@@ -17,6 +17,7 @@ MonoBehaviour:
   description: The second tower of crystal defense. Does much higher damage than
     the Shooter, and also deals splash damage.
   icon: {fileID: 0}
+  modelPrefab: {fileID: 3511292154295695548, guid: dac64eb578de34443b70765878345ce8, type: 3}
   levels:
   - cost: 50
     range: 10.9375

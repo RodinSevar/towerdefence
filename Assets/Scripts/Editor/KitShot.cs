@@ -11,7 +11,15 @@ using UnityEngine;
 /// </summary>
 public static class KitShot
 {
-    private const string KitDir = "Assets/ThirdParty/Kenney/RetroFantasy";
+    private static string KitDir => ArgOr("-kitdir", "Assets/ThirdParty/Kenney/RetroFantasy");
+    private static string Tag => ArgOr("-tag", "kit");
+
+    private static string ArgOr(string key, string fallback)
+    {
+        var args = System.Environment.GetCommandLineArgs();
+        int i = System.Array.IndexOf(args, key);
+        return i >= 0 && i + 1 < args.Length ? args[i + 1] : fallback;
+    }
     private const int PerSheet = 20, Columns = 5, Width = 1500, Height = 1000;
 
     public static void Run()
@@ -54,7 +62,7 @@ public static class KitShot
             RenderTexture.active = rt;
             var tex = new Texture2D(Width, Height, TextureFormat.RGB24, false);
             tex.ReadPixels(new Rect(0, 0, Width, Height), 0, 0);
-            File.WriteAllBytes($"Screenshots/kit_{s}.png", tex.EncodeToPNG());
+            File.WriteAllBytes($"Screenshots/{Tag}_{s}.png", tex.EncodeToPNG());
             cam.targetTexture = null; RenderTexture.active = null;
             Object.DestroyImmediate(rt); Object.DestroyImmediate(tex);
             foreach (var g in spawned) Object.DestroyImmediate(g);

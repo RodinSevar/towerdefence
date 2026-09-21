@@ -17,6 +17,7 @@ MonoBehaviour:
   description: The Crystal Buster is like the Blaster. Th Buster, however, has a
     larger range, higher damage, and a greater splash. It's quite expensive, though.
   icon: {fileID: 0}
+  modelPrefab: {fileID: 2508843014746902586, guid: d4bd5f6ca786898458aab0cd6069a24e, type: 3}
   levels:
   - cost: 400
     range: 14.0625

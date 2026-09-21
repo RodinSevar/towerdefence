@@ -17,6 +17,7 @@ MonoBehaviour:
   description: This cave is cold...(LOL) super strong unit. Attacks land and air
     units
   icon: {fileID: 0}
+  modelPrefab: {fileID: 4661615375598006420, guid: eae4cf1dce8e784479a9d5283264c2e6, type: 3}
   levels:
   - cost: 1500
     range: 27.34375

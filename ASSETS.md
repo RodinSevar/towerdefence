@@ -6,7 +6,7 @@ pulled in when needed. All packs below are CC0 (public domain); credit is option
 
 | Pack | Source | Local cache | Committed |
 |---|---|---|---|
-| Kenney Retro Fantasy Kit 2.0 | https://kenney.nl/assets/retro-fantasy-kit | `local_assets/kenney_retro-fantasy-kit` | all pieces (to be pruned to the used ones) |
+| Kenney Retro Fantasy Kit 2.0 | https://kenney.nl/assets/retro-fantasy-kit | `local_assets/kenney_retro-fantasy-kit` | none (used in early prototypes only) |
 | Kenney Castle Kit | https://kenney.nl/assets/castle-kit | `local_assets/kenney_castle-kit` | none yet |
 | Kenney Fantasy Town Kit 2.0 | https://kenney.nl/assets/fantasy-town-kit | `local_assets/kenney_fantasy-town-kit_2.0` | none yet |
 | Kenney Graveyard Kit 5.0 | https://kenney.nl/assets/graveyard-kit | `local_assets/kenney_graveyard-kit_5.0` | none yet |
@@ -15,7 +15,7 @@ pulled in when needed. All packs below are CC0 (public domain); credit is option
 | Kenney Space Kit | https://kenney.nl/assets/space-kit | `local_assets/kenney_space-kit` | none yet |
 | Kenney Space Station Kit | https://kenney.nl/assets/space-station-kit | `local_assets/kenney_space-station-kit` | none yet |
 | Kenney City Kit (Industrial) 2.0 | https://kenney.nl/assets/city-kit-industrial | `local_assets/kenney_city-kit-industrial_2.0` | none yet |
-| Kenney Tower Defense Kit | https://kenney.nl/assets/tower-defense-kit | `local_assets/kenney_tower-defense-kit` | none yet |
+| Kenney Tower Defense Kit | https://kenney.nl/assets/tower-defense-kit | `local_assets/kenney_tower-defense-kit` | 21 tower, weapon and crystal pieces (Crystal Castle towers) |
 | Kenney Pirate Kit | https://kenney.nl/assets/pirate-kit | `local_assets/kenney_pirate-kit` | none yet |
 | Kenney Mini Dungeon | https://kenney.nl/assets/mini-dungeon | `local_assets/kenney_mini-dungeon` | none yet |
 | KayKit Space Base Bits 1.0 (Kay Lousberg) | https://kaylousberg.itch.io | `local_assets/KayKit_Space_Base_Bits_1.0_FREE` | none yet |

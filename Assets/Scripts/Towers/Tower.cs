@@ -19,6 +19,7 @@ public class Tower : MonoBehaviour, ISelectable
     private Vector3 towerPosition;
     private StatusEffect payloadEffect; // shared by every shot of the current level (creeps copy it on hit)
     private Material visualTemplate; // the prefab's original material, colours are derived from it
+    private GameObject modelInstance;
     private Enemy targetEnemy = null;
     private float fireTimer = 0f;
 
@@ -160,11 +161,37 @@ public class Tower : MonoBehaviour, ISelectable
             ? new StatusEffect(level.effectType, level.effectDuration, level.effectStrength) : null;
         if (visual == null || level == null) return;
 
+        if (data.modelPrefab != null) { ApplyModel(); return; }
+
         visual.localScale = Vector3.one * (level.visualScale * GridManager.Instance.FootprintWorldSize); // visuals were authored for one unit
         visual.localPosition = Vector3.zero;
         var visualRenderer = visual.GetComponent<Renderer>();
         if (visualTemplate == null) visualTemplate = visualRenderer.sharedMaterial;
         visualRenderer.sharedMaterial = MaterialCache.Get(visualTemplate, level.visualColor);
+    }
+
+    /// <summary>Shows the tower's own model (built from kit pieces) instead of the default mesh, and fits the pick box and fire point to it.</summary>
+    private void ApplyModel()
+    {
+        if (modelInstance == null)
+        {
+            modelInstance = Instantiate(data.modelPrefab, transform);
+            modelInstance.transform.localPosition = Vector3.zero;
+            modelInstance.name = "Model";
+        }
+        var defaultMesh = visual.GetComponent<Renderer>();
+        if (defaultMesh != null) defaultMesh.enabled = false;
+
+        var renderers = modelInstance.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0) return;
+        Bounds b = renderers[0].bounds;
+        foreach (var r in renderers) b.Encapsulate(r.bounds);
+
+        visual.localScale = Vector3.one;
+        visual.position = b.center;
+        var box = visual.GetComponent<BoxCollider>();
+        if (box != null) { box.center = Vector3.zero; box.size = b.size; }
+        if (firePoint != null) firePoint.position = new Vector3(b.center.x, b.max.y - b.size.y * 0.15f, b.center.z);
     }
 
     public int GetCost() => CurrentLevel != null ? CurrentLevel.cost : 0;

@@ -17,6 +17,7 @@ MonoBehaviour:
   description: The ultimate tower of crystal defense. The Crystal Dissolver has a
     long range, high damage, and fast speed. It is expensive, but it's worth it.
   icon: {fileID: 0}
+  modelPrefab: {fileID: 1709376689099125746, guid: bd7f7297aa10dd347961aa4f6b03d17c, type: 3}
   levels:
   - cost: 650
     range: 10.9375

@@ -42,6 +42,9 @@ public class TowerData : ScriptableObject
     [Tooltip("Optional icon for the build button")]
     public Sprite icon;
 
+    [Tooltip("Optional 3D model (prefab) shown instead of the default tower mesh. Authored at final world scale.")]
+    public GameObject modelPrefab;
+
     [Tooltip("Level 1 is the first entry; each further entry is an upgrade")]
     public TowerLevel[] levels = { new TowerLevel() };
 
