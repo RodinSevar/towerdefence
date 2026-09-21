@@ -4,7 +4,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 
 /// <summary>
-/// Creates the tower/enemy/wave data assets and the Tower/Enemy prefabs, and wires TowerManager and WaveManager
+/// Creates the tower data assets, placeholder waves (only if the WC3 import has not been run) and the Tower/Enemy prefabs, and wires TowerManager and WaveManager
 /// into the scene. Only creates what is missing: existing assets and prefabs are never overwritten, so tweaks made
 /// in the Inspector survive a re-run. Delete an asset to regenerate it.
 /// </summary>
@@ -81,27 +81,8 @@ public static class GameDataBuilder
             };
         });
 
-        // ---- Enemy data (from the old Enemy stat fields) ----
-        EnemyData basic = LoadOrCreate<EnemyData>($"{EnemyDataDir}/Basic.asset", e =>
-        { e.displayName = "Basic Creep"; e.health = 20f; e.speed = 5f; e.goldReward = 10; });
-        EnemyData strong = LoadOrCreate<EnemyData>($"{EnemyDataDir}/Strong.asset", e =>
-        { e.displayName = "Strong Creep"; e.health = 50f; e.speed = 3f; e.goldReward = 25; });
-        LoadOrCreate<EnemyData>($"{EnemyDataDir}/Fast.asset", e =>
-        { e.displayName = "Fast Creep"; e.health = 15f; e.speed = 8f; e.goldReward = 15; });
-
-        // ---- Waves (from the old SetupDefaultWaves) ----
-        WaveSet waves = LoadOrCreate<WaveSet>($"{WaveDataDir}/DefaultWaves.asset", w =>
-        {
-            w.waves = new WaveSet.Wave[5];
-            for (int i = 0; i < 5; i++)
-            {
-                w.waves[i] = new WaveSet.Wave
-                {
-                    enemy = i < 2 ? basic : strong,
-                    enemyCount = 5 + i * 3,
-                };
-            }
-        });
+        // ---- Waves: the imported Wintermaul levels if present, else 5 placeholder waves ----
+        WaveSet waves = AssetDatabase.LoadAssetAtPath<WaveSet>(WaveImporter.WaveSetPath) ?? CreatePlaceholderWaves();
 
         // ---- Prefabs ----
         Tower towerPrefab = LoadOrCreatePrefab<Tower>($"{PrefabDir}/Tower.prefab", BuildTowerPrefab);
@@ -117,6 +98,23 @@ public static class GameDataBuilder
         Wire(waveManager, "waveSet", waves);
 
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+    }
+
+    private static WaveSet CreatePlaceholderWaves()
+    {
+        EnemyData basic = LoadOrCreate<EnemyData>($"{EnemyDataDir}/Basic.asset", e =>
+        { e.displayName = "Basic Creep"; e.health = 20f; e.speed = 5f; e.goldReward = 10; });
+        EnemyData strong = LoadOrCreate<EnemyData>($"{EnemyDataDir}/Strong.asset", e =>
+        { e.displayName = "Strong Creep"; e.health = 50f; e.speed = 3f; e.goldReward = 25; });
+
+        return LoadOrCreate<WaveSet>($"{WaveDataDir}/DefaultWaves.asset", w =>
+        {
+            w.waves = new WaveSet.Wave[5];
+            for (int i = 0; i < 5; i++)
+            {
+                w.waves[i] = new WaveSet.Wave { enemy = i < 2 ? basic : strong, enemyCount = 5 + i * 3 };
+            }
+        });
     }
 
     // ---------- prefab construction ----------
@@ -207,7 +205,7 @@ public static class GameDataBuilder
 
     private static void Wire(Object target, string field, Object value) => WireObject(target, field, value);
 
-    private static void WireObject(Object target, string field, Object value)
+    internal static void WireObject(Object target, string field, Object value)
     {
         var so = new SerializedObject(target);
         SerializedProperty prop = FindOrThrow(so, target, field);

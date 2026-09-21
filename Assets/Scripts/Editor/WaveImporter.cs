@@ -1,0 +1,253 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+
+/// <summary>
+/// Imports the real Wintermaul levels and creep stats from the extracted map files in mpq_files/:
+///   war3map.j   - "Set Levels" trigger: creep type and count per level
+///   war3map.w3u - custom unit definitions: name, hit points, speed, armor, bounty
+///   war3map.wts - string table for the TRIGSTR_ names
+/// Writes EnemyData assets to Assets/Data/Enemies/Imported and a WaveSet to Assets/Data/Waves/WintermaulWaves.asset,
+/// and points the scene's WaveManager at it. Imported assets are regenerated on every run (they are derived data).
+/// </summary>
+public static class WaveImporter
+{
+    private const string MapDir = "mpq_files";
+    private const string EnemyDir = "Assets/Data/Enemies/Imported";
+    public const string WaveSetPath = "Assets/Data/Waves/WintermaulWaves.asset";
+    private const string ScenePath = "Assets/Scenes/SampleScene.unity";
+
+    // One Unity grid cell is 2 WC3 pathing cells of 32 units (see WPMImporter), i.e. 64 WC3 units.
+    private const float WorldUnitsPerCell = 64f;
+
+    // The map only stores fields that differ from the base unit; the base unit data lives in the game's own files,
+    // which we don't have. These are used when a field is missing, and the gap is recorded in EnemyData.importNotes.
+    private const float AssumedSpeed = 300f;   // WC3 units/sec
+    private const float AssumedArmor = 0f;
+    private const int AssumedBountyDice = 1;
+
+    [MenuItem("Tools/Import WC3 Waves and Creeps")]
+    public static void ImportMenu()
+    {
+        Import();
+    }
+
+    /// <summary>Entry point for batch mode: opens the main scene, imports, wires WaveManager, saves.</summary>
+    public static void ImportAndSaveScene()
+    {
+        EditorSceneManager.OpenScene(ScenePath);
+        WaveSet waves = Import();
+
+        var waveManager = UnityEngine.Object.FindFirstObjectByType<WaveManager>();
+        if (waveManager == null)
+            throw new InvalidOperationException("No WaveManager in the scene. Run Tools > Build Game Data first.");
+        GameDataBuilder.WireObject(waveManager, "waveSet", waves);
+
+        EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+        EditorSceneManager.SaveOpenScenes();
+        AssetDatabase.SaveAssets();
+        Debug.Log("WaveImporter: done.");
+    }
+
+    private static WaveSet Import()
+    {
+        Directory.CreateDirectory(EnemyDir);
+        Directory.CreateDirectory(Path.GetDirectoryName(WaveSetPath));
+
+        var units = ParseUnits(Path.Combine(MapDir, "war3map.w3u"));
+        var strings = ParseStrings(Path.Combine(MapDir, "war3map.wts"));
+        var levels = ParseLevels(File.ReadAllText(Path.Combine(MapDir, "war3map.j")));
+
+        var enemyByType = new Dictionary<string, EnemyData>();
+        var waveList = new List<WaveSet.Wave>();
+        int maxLevel = 0;
+        foreach (int level in levels.Keys) maxLevel = Mathf.Max(maxLevel, level);
+
+        for (int level = 1; level <= maxLevel; level++)
+        {
+            if (!levels.TryGetValue(level, out var lv))
+                throw new InvalidOperationException($"Set Levels has no entry for level {level}.");
+
+            if (!enemyByType.TryGetValue(lv.type, out EnemyData enemy))
+            {
+                if (!units.TryGetValue(lv.type, out var fields))
+                    throw new InvalidOperationException($"Level {level} uses unit '{lv.type}' which is not defined in war3map.w3u.");
+                enemy = SaveEnemy(lv.type, fields, strings);
+                enemyByType[lv.type] = enemy;
+            }
+            waveList.Add(new WaveSet.Wave { enemy = enemy, enemyCount = lv.amount });
+        }
+
+        var waveSet = AssetDatabase.LoadAssetAtPath<WaveSet>(WaveSetPath);
+        if (waveSet == null)
+        {
+            waveSet = ScriptableObject.CreateInstance<WaveSet>();
+            AssetDatabase.CreateAsset(waveSet, WaveSetPath);
+        }
+        waveSet.waves = waveList.ToArray();
+        EditorUtility.SetDirty(waveSet);
+        AssetDatabase.SaveAssets();
+
+        Debug.Log($"WaveImporter: imported {waveList.Count} levels using {enemyByType.Count} creep types.");
+        return waveSet;
+    }
+
+    private static EnemyData SaveEnemy(string id, Dictionary<string, object> f, Dictionary<int, string> strings)
+    {
+        string path = $"{EnemyDir}/{id}.asset";
+        var enemy = AssetDatabase.LoadAssetAtPath<EnemyData>(path);
+        bool isNew = enemy == null;
+        if (isNew) enemy = ScriptableObject.CreateInstance<EnemyData>();
+
+        var notes = new List<string>();
+
+        string name = f.TryGetValue("unam", out var n) ? ResolveString((string)n, strings) : null;
+        enemy.displayName = string.IsNullOrWhiteSpace(name) ? id : name.Trim();
+
+        enemy.health = (float)GetNumber(f, "uhpm", 0, notes, "hit points (uhpm)");
+
+        double speed = GetNumber(f, "umvs", AssumedSpeed, notes, $"speed (umvs), assumed {AssumedSpeed}");
+        enemy.speed = (float)(speed / WorldUnitsPerCell);
+
+        enemy.armor = (float)GetNumber(f, "udef", AssumedArmor, notes, $"armor (udef), assumed {AssumedArmor}");
+
+        // Bounty = base + dice * (sides + 1) / 2 (average roll)
+        double bountyBase = GetNumber(f, "ubba", 0, notes, "bounty base (ubba), assumed 0");
+        double dice = GetNumber(f, "ubdi", AssumedBountyDice, notes, $"bounty dice (ubdi), assumed {AssumedBountyDice}");
+        double sides = GetNumber(f, "ubsi", 1, notes, "bounty sides (ubsi), assumed 1");
+        enemy.goldReward = Mathf.Max(0, Mathf.RoundToInt((float)(bountyBase + dice * (sides + 1) / 2.0)));
+
+        enemy.importNotes = notes.Count == 0 ? "" : "Not defined in the map, assumed: " + string.Join("; ", notes);
+
+        if (isNew) AssetDatabase.CreateAsset(enemy, path);
+        EditorUtility.SetDirty(enemy);
+        return enemy;
+    }
+
+    private static double GetNumber(Dictionary<string, object> f, string key, double fallback, List<string> notes, string what)
+    {
+        if (f.TryGetValue(key, out var v)) return Convert.ToDouble(v);
+        notes.Add(what);
+        return fallback;
+    }
+
+    private static string ResolveString(string value, Dictionary<int, string> strings)
+    {
+        if (value != null && value.StartsWith("TRIGSTR_") && int.TryParse(value.Substring(8), out int idx)
+            && strings.TryGetValue(idx, out string s))
+            return s;
+        return value;
+    }
+
+    // ---------- war3map.j: Set Levels ----------
+
+    private struct LevelDef { public string type; public int amount; }
+
+    private static Dictionary<int, LevelDef> ParseLevels(string jass)
+    {
+        jass = jass.Replace("\r", "");
+
+        // Each condition function tests "udg_Level_Number == N"
+        var conditionLevel = new Dictionary<string, int>();
+        foreach (Match m in Regex.Matches(jass,
+            @"function (Trig_Set_Levels_Func\d+) takes nothing returns boolean\s*return \( udg_Level_Number == (\d+) \)"))
+            conditionLevel[m.Groups[1].Value] = int.Parse(m.Groups[2].Value);
+
+        Match body = Regex.Match(jass,
+            @"function Trig_Set_Levels_Actions takes nothing returns nothing(.*?)endfunction", RegexOptions.Singleline);
+        if (!body.Success) throw new InvalidOperationException("Trig_Set_Levels_Actions not found in war3map.j");
+
+        var levels = new Dictionary<int, LevelDef>();
+        foreach (Match m in Regex.Matches(body.Groups[1].Value,
+            @"if \( (Trig_Set_Levels_Func\d+)\(\) \) then\s*set udg_(Monster_Type|Monster_Amount) = (\S+)"))
+        {
+            int level = conditionLevel[m.Groups[1].Value];
+            levels.TryGetValue(level, out LevelDef def);
+            if (m.Groups[2].Value == "Monster_Type") def.type = m.Groups[3].Value.Trim('\'');
+            else def.amount = int.Parse(m.Groups[3].Value);
+            levels[level] = def;
+        }
+        return levels;
+    }
+
+    // ---------- war3map.wts ----------
+
+    private static Dictionary<int, string> ParseStrings(string path)
+    {
+        string text = File.ReadAllText(path, Encoding.UTF8).Replace("\r", "").TrimStart('﻿');
+        var strings = new Dictionary<int, string>();
+        foreach (Match m in Regex.Matches(text, @"STRING (\d+)\n(?://[^\n]*\n)*\{\n(.*?)\n\}", RegexOptions.Singleline))
+            strings[int.Parse(m.Groups[1].Value)] = m.Groups[2].Value;
+        return strings;
+    }
+
+    // ---------- war3map.w3u ----------
+
+    /// <summary>
+    /// Reads the object data table. Returns modified fields keyed by unit id (custom id if it has one, else the
+    /// original id that was modified). File layout (version 2): two tables (original-modified, then custom), each a
+    /// count followed by objects: oldId, newId, modCount, then per mod: fieldId, type (0 int, 1/2 real, 3 string),
+    /// value, and a 4-byte end marker.
+    /// </summary>
+    private static Dictionary<string, Dictionary<string, object>> ParseUnits(string path)
+    {
+        var units = new Dictionary<string, Dictionary<string, object>>();
+        using (var r = new BinaryReader(File.OpenRead(path)))
+        {
+            int version = r.ReadInt32();
+            if (version != 2) throw new InvalidOperationException($"Unsupported w3u version {version} (expected 2).");
+
+            for (int table = 0; table < 2; table++)
+            {
+                int count = r.ReadInt32();
+                for (int i = 0; i < count; i++)
+                {
+                    string oldId = ReadId(r);
+                    string newId = ReadId(r);
+                    int modCount = r.ReadInt32();
+                    var fields = new Dictionary<string, object>();
+                    for (int m = 0; m < modCount; m++)
+                    {
+                        string fieldId = ReadId(r);
+                        int type = r.ReadInt32();
+                        object value;
+                        switch (type)
+                        {
+                            case 0: value = r.ReadInt32(); break;
+                            case 1:
+                            case 2: value = r.ReadSingle(); break;
+                            case 3: value = ReadCString(r); break;
+                            default: throw new InvalidOperationException($"Unknown w3u value type {type}");
+                        }
+                        r.ReadInt32(); // end marker
+                        fields[fieldId] = value;
+                    }
+                    units[newId ?? oldId] = fields;
+                }
+            }
+            if (r.BaseStream.Position != r.BaseStream.Length)
+                throw new InvalidOperationException("w3u parse did not consume the whole file; format assumption is wrong.");
+        }
+        return units;
+    }
+
+    private static string ReadId(BinaryReader r)
+    {
+        byte[] b = r.ReadBytes(4);
+        if (b[0] == 0 && b[1] == 0 && b[2] == 0 && b[3] == 0) return null;
+        return Encoding.ASCII.GetString(b);
+    }
+
+    private static string ReadCString(BinaryReader r)
+    {
+        var bytes = new List<byte>();
+        byte b;
+        while ((b = r.ReadByte()) != 0) bytes.Add(b);
+        return Encoding.UTF8.GetString(bytes.ToArray());
+    }
+}

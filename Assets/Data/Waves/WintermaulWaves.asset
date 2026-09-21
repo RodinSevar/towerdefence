@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b021a46e218b9449b60a2b856fe1548, type: 3}
+  m_Name: WintermaulWaves
+  m_EditorClassIdentifier: Assembly-CSharp::WaveSet
+  waves:
+  - enemy: {fileID: 11400000, guid: ccb5b44bb6472b24daf415abef903f02, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 5550deb2f25e36b4cae8c2fdf62de925, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 53196911129ed1746a013de7f245dbdb, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 501fa86976928c6409082a664772bde7, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 06e061162c4cb89468333d93f11af295, type: 2}
+    enemyCount: 15
+  - enemy: {fileID: 11400000, guid: 0d1eac5983977af45b921f9a4dd9b751, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: f23a9dea25faa4646ba478f846a05bb0, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 2d42aa4a438d41d4793a54d4d803f74a, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 955829d2e86ea5f4ab3a888014e779dd, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 4f42e85be592a98448efa7b5a2e89e5c, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: d305df27c899fe54aae2d10acfd5a482, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: fe5580bcbfd040e4ba481495b0732cd8, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: abf2bd402a830f94391f447a3dd86942, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 106dcd8ad2293d046a0bb975c512071d, type: 2}
+    enemyCount: 15
+  - enemy: {fileID: 11400000, guid: 1c1a26a2bc854884aa430028d1016dd2, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 3581fb119c9d4274694f0a0a6cac77cc, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 8df4022e7f9d75144a97ab7ede339d71, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 189886362de01574f9de4d5d2cd45d9d, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: c296d29f62daee249976388c199f1333, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 6183be63b5307de40ad2ea390a260e8b, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 8fd8c41983f216244aa953850b5004c3, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 7b5c7149d4bd9ab42ba49772cbb1abd9, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 52f07e0f2490f994dbf17ad533e2bb28, type: 2}
+    enemyCount: 15
+  - enemy: {fileID: 11400000, guid: f93d369c4ec833740aadfa54984ea60c, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 2ac4c3b87cd9ad04abbd825e6953f5bd, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: cceb6c1360982f747ad28996f8fe69db, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: d654f336227503548ab125e7590507b9, type: 2}
+    enemyCount: 15
+  - enemy: {fileID: 11400000, guid: 1af7e8a83c3d1114fbfdc33e4d9e331f, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 5bd7b919c8dc6e649b15ff57635fcde2, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: ac02e623ac82f7c44897c644f3bb0a3d, type: 2}
+    enemyCount: 1
+  - enemy: {fileID: 11400000, guid: 2f621f31299759b4da5fcdf470b49cc9, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 46f1c9dfd256e2247954479ae2a01320, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 0038116aadf47c64f9b19b205a8d8eac, type: 2}
+    enemyCount: 50
+  - enemy: {fileID: 11400000, guid: 90a3e4e8f30c7af40bb9e626c511ed10, type: 2}
+    enemyCount: 50
+  - enemy: {fileID: 11400000, guid: e7008d0eb7faf7349b5394d6e65c6551, type: 2}
+    enemyCount: 50
+  - enemy: {fileID: 11400000, guid: 7d606e28047e1a241944d998c3eb4081, type: 2}
+    enemyCount: 60
+  - enemy: {fileID: 11400000, guid: 2d53b730f826845439028d10a800eea4, type: 2}
+    enemyCount: 50
+  - enemy: {fileID: 11400000, guid: af2c2060e205e194fa4fea4bff0ffeb8, type: 2}
+    enemyCount: 40
+  - enemy: {fileID: 11400000, guid: d747bf17c88275745836afc481c64b0e, type: 2}
+    enemyCount: 75
+  - enemy: {fileID: 11400000, guid: deea9946a981d6b4196b6d596da24f7f, type: 2}
+    enemyCount: 40
+  - enemy: {fileID: 11400000, guid: 43c4d991d75f92f48a8e339b1df4e374, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 3eb134a23cce951418b8b00a53315f8c, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: a2bc0e27ca48d1a42a2c3382bd104271, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 99a442833fafab245909d59cd558f1dc, type: 2}
+    enemyCount: 25
+  - enemy: {fileID: 11400000, guid: fe51ae8d4afe8e6488ba7b5bb374de88, type: 2}
+    enemyCount: 100
+  - enemy: {fileID: 11400000, guid: 5fd473b556e3ae6489bd73f3d8a8e1e0, type: 2}
+    enemyCount: 27
+  - enemy: {fileID: 11400000, guid: da3483b8c0d23394fbc0856459071ec9, type: 2}
+    enemyCount: 100
+  - enemy: {fileID: 11400000, guid: 8d4fcd87e21104642bba0cf4992671c1, type: 2}
+    enemyCount: 20
+  - enemy: {fileID: 11400000, guid: 6fc4d43a8c4077b4590dd1a421f597ff, type: 2}
+    enemyCount: 33
+  - enemy: {fileID: 11400000, guid: 6a17c8be9dad7e541a6a3afd9438746f, type: 2}
+    enemyCount: 1

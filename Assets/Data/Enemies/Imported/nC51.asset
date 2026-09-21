@@ -10,10 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: db5463b3e8b64e442b19ec5987626c53, type: 3}
-  m_Name: Strong
+  m_Name: nC51
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  displayName: Strong Creep
-  health: 50
-  speed: 3
-  goldReward: 25
+  displayName: Adult Dragon
+  health: 3000
+  speed: 6.25
+  armor: 20
+  goldReward: 1
   visualScale: 0.8
+  importNotes: 'Not defined in the map, assumed: bounty dice (ubdi), assumed 1'

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db5463b3e8b64e442b19ec5987626c53, type: 3}
+  m_Name: nhrh
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyData
+  displayName: Harpy Storm-hag
+  health: 11000
+  speed: 4.6875
+  armor: 30
+  goldReward: 1
+  visualScale: 0.8
+  importNotes: 'Not defined in the map, assumed: speed (umvs), assumed 300; bounty
+    base (ubba), assumed 0; bounty dice (ubdi), assumed 1; bounty sides (ubsi), assumed
+    1'

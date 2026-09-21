@@ -184,6 +184,8 @@ public class Enemy : MonoBehaviour, ISelectable
     {
         if (!isAlive) return;
 
+        damage *= 1f - data.DamageReduction;
+
         currentHealth -= damage;
 
         if (currentHealth <= 0)
@@ -218,7 +220,8 @@ public class Enemy : MonoBehaviour, ISelectable
     public string GetStatsText()
     {
         return $"Health: {Mathf.CeilToInt(currentHealth)} / {Mathf.CeilToInt(data.health)}\n" +
-               $"Speed: {data.speed}\n" +
+               $"Armor: {data.armor}\n" +
+               $"Speed: {data.speed:0.#}\n" +
                $"Reward: {data.goldReward}G";
     }
 

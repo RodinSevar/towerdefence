@@ -5092,7 +5092,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
   enemyPrefab: {fileID: 1124827398376145153, guid: 806baf9a87abcaf4688651a734caae5f, type: 3}
-  waveSet: {fileID: 11400000, guid: 65436c1e2153a4f44ba42e780f4ea475, type: 2}
+  waveSet: {fileID: 11400000, guid: 0ed12a14bd549834fb9f3ab52ab49530, type: 2}
   activeSpawners: []
 --- !u!4 &1747237988
 Transform:

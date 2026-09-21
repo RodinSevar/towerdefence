@@ -10,10 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: db5463b3e8b64e442b19ec5987626c53, type: 3}
-  m_Name: Fast
+  m_Name: nzom
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  displayName: Fast Creep
-  health: 15
-  speed: 8
-  goldReward: 15
+  displayName: Evan's  Zombies
+  health: 9750
+  speed: 8.15625
+  armor: 40
+  goldReward: 8
   visualScale: 0.8
+  importNotes: 
