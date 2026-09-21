@@ -35,7 +35,7 @@ public class RaceManager : Singleton<RaceManager>
 
     public bool CanUnlock(RaceData race)
     {
-        return race != null && Local != null && !Local.ownedRaces.Contains(race) && Local.lumber >= race.lumberCost;
+        return Simulation.Running && race != null && Local != null && !Local.ownedRaces.Contains(race) && Local.lumber >= race.lumberCost;
     }
 
     public int IndexOf(RaceData race) => Array.IndexOf(races, race);
@@ -63,7 +63,7 @@ public class RaceManager : Singleton<RaceManager>
     /// <summary>Asks to make an owned race the active one.</summary>
     public void SetActive(RaceData race)
     {
-        if (race == null || Local == null || !Local.ownedRaces.Contains(race) || race == Local.activeRace) return;
+        if (!Simulation.Running || race == null || Local == null || !Local.ownedRaces.Contains(race) || race == Local.activeRace) return;
         CommandQueue.Submit(new SetActiveRaceCommand { playerId = PlayerManager.Instance.LocalPlayerId, raceIndex = IndexOf(race) });
     }
 

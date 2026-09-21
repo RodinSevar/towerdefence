@@ -64,8 +64,13 @@ public static class NetCheck
         public NetListener listener;
         public List<Machine> All => new List<Machine> { host, c1, c2 };
 
-        public static Game Start()
+        public static Game Start(int[] slots = null)
         {
+            bool custom = slots != null;
+            slots = slots ?? new[] { 0, 1, 2 };
+            int playerCount = custom ? PlayerSlots.Count : 3;
+            var mask = new bool[playerCount];
+            foreach (int s in slots) mask[s] = true;
             var g = new Game { host = new Machine(), c1 = new Machine(), c2 = new Machine() };
             g.listener = new NetListener(0);
             var clientPeers = new List<NetPeer>();
@@ -80,12 +85,12 @@ public static class NetCheck
                     if (wait.ElapsedMilliseconds > 3000) throw new Exception("accept timed out");
                     Thread.Sleep(2);
                 }
-                accepted.PlayerId = i + 1;
+                accepted.PlayerId = slots[i + 1];
                 hostSide.Add(accepted);
             }
-            g.host.Attach(new LockstepSession(true, 0, 3, hostSide));
-            g.c1.Attach(new LockstepSession(false, 1, 3, new List<NetPeer> { clientPeers[0] }));
-            g.c2.Attach(new LockstepSession(false, 2, 3, new List<NetPeer> { clientPeers[1] }));
+            g.host.Attach(new LockstepSession(true, slots[0], playerCount, hostSide, mask));
+            g.c1.Attach(new LockstepSession(false, slots[1], playerCount, new List<NetPeer> { clientPeers[0] }, mask));
+            g.c2.Attach(new LockstepSession(false, slots[2], playerCount, new List<NetPeer> { clientPeers[1] }, mask));
             foreach (var m in g.All) m.session.Begin();
             return g;
         }
@@ -113,6 +118,7 @@ public static class NetCheck
     {
         int failures = 0;
         failures += Check("commands run identically on every machine", TestIdentical);
+        failures += Check("empty slots do not stall the game", TestEmptySlots);
         failures += Check("wrong checksum is detected", TestDesync);
         failures += Check("dropped player is handed over identically", TestDrop);
         failures += Check("a silent player stalls the others", TestStall);
@@ -162,6 +168,22 @@ public static class NetCheck
             if (g.host.executed.Count < 25) return $"only {g.host.executed.Count} commands executed";
             return Compare(g.host, g.c1, "host vs client 1") ?? Compare(g.host, g.c2, "host vs client 2")
                 ?? (g.host.desynced || g.c1.desynced || g.c2.desynced ? "false desync alarm" : null);
+        }
+        finally { g.Stop(); }
+    }
+
+    private static string TestEmptySlots()
+    {
+        var g = Game.Start(new[] { 2, 5, 7 }); // nine slots, only three taken
+        try
+        {
+            Inject(g.host, 2, 10, 0);
+            Inject(g.c1, 5, 10, 0);
+            Inject(g.c2, 7, 10, 0);
+            g.Run(300, 8000);
+            if (g.host.tick < 300 || g.c1.tick < 300 || g.c2.tick < 300) return $"stalled with empty slots ({g.host.tick}/{g.c1.tick}/{g.c2.tick})";
+            if (g.host.executed.Count < 25) return $"only {g.host.executed.Count} commands executed";
+            return Compare(g.host, g.c1, "host vs client 1") ?? Compare(g.host, g.c2, "host vs client 2");
         }
         finally { g.Stop(); }
     }

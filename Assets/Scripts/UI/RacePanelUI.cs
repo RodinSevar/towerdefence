@@ -60,7 +60,9 @@ public class RacePanelUI : MonoBehaviour
         if (Keyboard.current != null && Keyboard.current.f12Key.wasPressedThisFrame) Toggle();
     }
 
-    private void Toggle()
+    public bool IsOpen => content != null && content.activeSelf;
+
+    public void Toggle()
     {
         content.SetActive(!content.activeSelf);
         Refresh();

@@ -113,12 +113,17 @@ public class GameBoot : MonoBehaviour
         if (FindAnyObjectByType<PlayerManager>() == null)
             new GameObject("PlayerManager").AddComponent<PlayerManager>();
 
+        // Keep the HUD in the middle of very wide screens (the game view still fills the whole window)
+        var canvas = FindAnyObjectByType<Canvas>();
+        if (canvas != null && canvas.GetComponent<UiWidthLimiter>() == null) canvas.gameObject.AddComponent<UiWidthLimiter>();
+
         // LAN menu and lockstep glue (holds the game until a mode is chosen)
         if (FindAnyObjectByType<NetworkGame>() == null)
         {
             var netObj = new GameObject("Network");
             netObj.AddComponent<NetworkGame>();
-            netObj.AddComponent<NetworkLobbyUI>();
+            netObj.AddComponent<LobbyUI>();
+            netObj.AddComponent<PauseMenu>();
         }
 
         // The fixed-rate simulation clock drives all game logic

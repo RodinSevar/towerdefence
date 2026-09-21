@@ -10,12 +10,13 @@ public static class Msg
 {
     public const byte Hello = 1;        // client -> host: [string name]
     public const byte Welcome = 2;      // host -> client: [byte playerId]
-    public const byte Lobby = 3;        // host -> clients: [byte count][string name]*count
-    public const byte Start = 4;        // host -> clients: [byte playerCount]
+    public const byte Lobby = 3;        // host -> clients: [byte yourSlot][9 x (bool taken, string name)]
+    public const byte Start = 4;        // host -> clients: [byte yourSlot][9 x (bool taken, string name)]
     public const byte Batch = 5;        // client -> host: [int turn][commands]
     public const byte Bundle = 6;       // host -> clients: [int turn][commands]
     public const byte Checksum = 7;     // client -> host: [int tick][uint hash]
     public const byte Desync = 8;       // host -> clients: [int tick]
+    public const byte SlotRequest = 9;  // client -> host: [byte slot]
     public const byte Disconnected = 255; // local only: the peer's connection ended
 }
 

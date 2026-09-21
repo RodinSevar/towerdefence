@@ -7,12 +7,15 @@ public class PlayerInteraction : Singleton<PlayerInteraction>
     
     private ISelectable selectedUnit;
     
+    public bool HasSelection => selectedUnit != null;
+
     public System.Action<ISelectable> OnUnitSelected;
     public System.Action OnUnitDeselected;
 
     private void Update()
     {
         if (Mouse.current == null || Keyboard.current == null) return; // no input devices (e.g. headless run)
+        if (GameInput.Blocked) return;
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {

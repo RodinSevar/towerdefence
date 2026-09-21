@@ -43,14 +43,14 @@ public class LockstepSession
     /// <summary>The game cannot go on (for example the host went away).</summary>
     public event Action<string> Ended;
 
-    public LockstepSession(bool isHost, int localId, int playerCount, List<NetPeer> peers)
+    public LockstepSession(bool isHost, int localId, int playerCount, List<NetPeer> peers, bool[] activeMask = null)
     {
         IsHost = isHost;
         LocalId = localId;
         PlayerCount = playerCount;
         this.peers = peers;
         active = new bool[playerCount];
-        for (int i = 0; i < playerCount; i++) active[i] = true;
+        for (int i = 0; i < playerCount; i++) active[i] = activeMask == null || (i < activeMask.Length && activeMask[i]);
     }
 
     public bool IsPlayerActive(int id) => id >= 0 && id < active.Length && active[id];

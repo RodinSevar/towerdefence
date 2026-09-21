@@ -26,12 +26,27 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
+        if (GameInput.Blocked) return; // a menu or the setup screen is up
+
         // Don't move camera if Game Over
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver())
             return;
 
         HandlePanning();
         HandleZooming();
+    }
+
+    /// <summary>Moves the camera so the middle of the view looks at <paramref name="target"/> (x, z), keeping its height and angle.</summary>
+    public void FocusOn(Vector3 target)
+    {
+        var ground = new Plane(Vector3.up, Vector3.zero);
+        var ray = new Ray(transform.position, transform.forward);
+        if (!ground.Raycast(ray, out float enter)) return;
+        Vector3 lookAt = ray.GetPoint(enter);
+        Vector3 pos = transform.position + new Vector3(target.x - lookAt.x, 0f, target.z - lookAt.z);
+        pos.x = Mathf.Clamp(pos.x, panLimitX.x, panLimitX.y);
+        pos.z = Mathf.Clamp(pos.z, panLimitZ.x, panLimitZ.y);
+        transform.position = pos;
     }
 
     private void HandlePanning()

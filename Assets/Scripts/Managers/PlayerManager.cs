@@ -61,15 +61,9 @@ public class PlayerManager : Singleton<PlayerManager>
     [Tooltip("Players in this game (1 offline)")]
     [SerializeField, Range(1, MaxPlayers)] private int playerCount = 1;
 
-    private static readonly Color[] Colors =
-    {
-        new Color(1f, 0.15f, 0.15f), new Color(0.2f, 0.4f, 1f), new Color(0.1f, 0.85f, 0.75f),
-        new Color(0.55f, 0.15f, 0.7f), new Color(1f, 0.95f, 0.2f), new Color(1f, 0.55f, 0.1f),
-        new Color(0.2f, 0.8f, 0.2f), new Color(1f, 0.5f, 0.8f), new Color(0.6f, 0.6f, 0.6f),
-    };
-
     private readonly List<PlayerState> players = new List<PlayerState>();
     private bool initialized;
+    private bool[] slotOccupied; // null = every slot has a player
 
     public int LocalPlayerId { get; private set; }
     public IReadOnlyList<PlayerState> Players { get { EnsureInitialized(); return players; } }
@@ -79,10 +73,11 @@ public class PlayerManager : Singleton<PlayerManager>
     public event Action<PlayerState> OnLocalPlayerChanged;
 
     /// <summary>Sets how many players there are and which one this machine controls (before the game starts).</summary>
-    public void Configure(int count, int localId)
+    public void Configure(int count, int localId, bool[] occupied = null)
     {
         playerCount = Mathf.Clamp(count, 1, MaxPlayers);
         LocalPlayerId = Mathf.Clamp(localId, 0, playerCount - 1);
+        slotOccupied = occupied;
         players.Clear();
         initialized = false;
     }
@@ -102,7 +97,7 @@ public class PlayerManager : Singleton<PlayerManager>
 
         for (int i = 0; i < playerCount; i++)
         {
-            var p = new PlayerState(i, $"Player {i + 1}", Colors[i % Colors.Length])
+            var p = new PlayerState(i, $"Player {i + 1}", PlayerSlots.Colors[i % PlayerSlots.Count])
             {
                 gold = GameManager.Instance.initialGold,
                 lumber = GameManager.Instance.initialLumber,
@@ -112,6 +107,7 @@ public class PlayerManager : Singleton<PlayerManager>
             foreach (var race in RaceManager.Instance.Races)
                 if (race != null && p.ownedRaces.Contains(race)) { p.activeRace = race; break; }
 
+            if (slotOccupied != null && i < slotOccupied.Length && !slotOccupied[i]) p.active = false; // empty slot
             p.Changed += OnPlayerChanged;
             players.Add(p);
         }

@@ -24,6 +24,7 @@ public class TowerManager : Singleton<TowerManager>
     private void Update()
     {
         if (Mouse.current == null || Keyboard.current == null) return; // no input devices (e.g. headless run)
+        if (GameInput.Blocked) return;
 
         if (isPlacingTower)
         {
