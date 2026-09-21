@@ -30,3 +30,6 @@ Thumbs.db
 
 # Lock files
 Packages/packages-lock.json
+
+# Extracted Warcraft III game data (not redistributable)
+/local_gamedata/
