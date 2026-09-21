@@ -19,7 +19,7 @@ public static class ModelShot
         Directory.CreateDirectory(ModelDir);
         Directory.CreateDirectory("Screenshots");
 
-        Mesh tower = Save(LowPolyModels.GuardTower());
+        Mesh tower = SaveMesh(LowPolyModels.GuardTower());
         Material material = LowPolyMaterial();
 
         EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
@@ -50,15 +50,20 @@ public static class ModelShot
         Debug.Log("ModelShot: done.");
     }
 
-    private static Mesh Save(Mesh mesh)
+    public static Mesh SaveMesh(Mesh mesh)
     {
         string path = $"{ModelDir}/{mesh.name}.asset";
-        AssetDatabase.DeleteAsset(path);
-        AssetDatabase.CreateAsset(mesh, path);
-        return AssetDatabase.LoadAssetAtPath<Mesh>(path);
+        var existing = AssetDatabase.LoadAssetAtPath<Mesh>(path);
+        if (existing == null)
+        {
+            AssetDatabase.CreateAsset(mesh, path);
+            return mesh;
+        }
+        EditorUtility.CopySerialized(mesh, existing); // keep the asset (and its GUID) so prefabs stay linked
+        return existing;
     }
 
-    private static Material LowPolyMaterial()
+    public static Material LowPolyMaterial()
     {
         var shader = Shader.Find("Wintermaul/VertexColorLit");
         var material = AssetDatabase.LoadAssetAtPath<Material>(MaterialPath);

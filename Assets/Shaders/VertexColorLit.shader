@@ -1,10 +1,10 @@
 // Lit shader for low-poly models: albedo comes from the mesh's vertex colours (times _BaseColor), so a whole model needs no
-// textures and shares one material. Flat shading comes from the mesh normals.
+// textures and shares one material. Vertex alpha = how much _BaseColor tints that vertex (0 = none, 1 = fully). Flat shading comes from the mesh normals.
 Shader "Wintermaul/VertexColorLit"
 {
     Properties
     {
-        _BaseColor("Tint", Color) = (1, 1, 1, 1)
+        [MainColor] _BaseColor("Tint", Color) = (1, 1, 1, 1)
         _Smoothness("Smoothness", Range(0, 1)) = 0.1
     }
 
@@ -75,7 +75,8 @@ Shader "Wintermaul/VertexColorLit"
                 inputData.shadowMask = half4(1, 1, 1, 1);
 
                 SurfaceData surface = (SurfaceData)0;
-                surface.albedo = i.color.rgb * _BaseColor.rgb;
+                // vertex alpha marks the parts the tint applies to (roof, banners); the rest keeps its own colour
+                surface.albedo = lerp(i.color.rgb, i.color.rgb * _BaseColor.rgb, i.color.a);
                 surface.smoothness = _Smoothness;
                 surface.occlusion = 1;
                 surface.alpha = 1;

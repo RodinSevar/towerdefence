@@ -3,12 +3,12 @@ using UnityEngine;
 /// <summary>The low-poly models, each described in code. See <see cref="LowPolyBuilder"/>.</summary>
 public static class LowPolyModels
 {
-    private static readonly Color Stone = new Color(0.55f, 0.56f, 0.60f);
-    private static readonly Color StoneDark = new Color(0.36f, 0.37f, 0.42f);
-    private static readonly Color StoneLight = new Color(0.68f, 0.69f, 0.73f);
-    private static readonly Color Roof = new Color(0.24f, 0.36f, 0.62f);
-    private static readonly Color Dark = new Color(0.10f, 0.10f, 0.13f);
-    private static readonly Color Gold = new Color(0.85f, 0.70f, 0.25f);
+    private static readonly Color Stone = new Color(0.55f, 0.56f, 0.60f, 0);
+    private static readonly Color StoneDark = new Color(0.36f, 0.37f, 0.42f, 0);
+    private static readonly Color StoneLight = new Color(0.68f, 0.69f, 0.73f, 0);
+    private static readonly Color Roof = new Color(0.85f, 0.85f, 0.90f, 1); // alpha 1: takes the tower level's colour;
+    private static readonly Color Dark = new Color(0.10f, 0.10f, 0.13f, 0);
+    private static readonly Color Gold = new Color(0.85f, 0.70f, 0.25f, 0);
 
     /// <summary>A round stone guard tower with battlements and a pointed roof. About 1 unit wide, 1.6 tall.</summary>
     public static Mesh GuardTower()
