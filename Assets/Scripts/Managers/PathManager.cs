@@ -1,361 +1,422 @@
-using UnityEngine;
 using System.Collections.Generic;
+using System.Diagnostics;
+using UnityEngine;
 
+/// <summary>
+/// Pathing for the creeps: maze validation ("does every spawner still reach every waypoint?") and flow fields
+/// (one distance field per waypoint target, queried per creep).
+///
+/// Everything runs on flat arrays over the grid. A single rule, <see cref="CanStep"/>, defines which moves exist, and both
+/// validation and the distance fields use it, so what validation accepts is exactly what creeps can walk.
+///
+/// The public API (ValidateFullMaze, GetFlowDirection, NotifyMazeChanged, ClearCache, OnMazeChanged) is deliberately
+/// small so the algorithm behind it can be replaced.
+/// </summary>
 public class PathManager : Singleton<PathManager>
 {
     public System.Action OnMazeChanged;
 
-    private void Start()
-    {
-    }
+    /// <summary>Milliseconds per frame spent recomputing flow fields after the maze changed.</summary>
+    [SerializeField] private float regenerationBudgetMs = 2f;
 
-    public class FlowField
-    {
-        public Vector2Int target;
-        public float[,] distanceGrid = new float[200, 200];
-        public Vector2[,] vectorGrid = new Vector2[200, 200];
-        public bool hasVectors = false;
-        public bool needsDistanceUpdate = true;
-    }
+    private const int Size = GridManager.ArraySize;
+    private const int CellCount = Size * Size;
+    private const float MaxStepHeight = 1.2f;
+    private const int InfDistance = int.MaxValue;
+    private const int OrthCost = 10, DiagCost = 14;
 
-    private Dictionary<Vector2Int, FlowField> flowFieldCache = new Dictionary<Vector2Int, FlowField>();
-    private MinHeap openSet = new MinHeap(40000);
+    // The 8 neighbours in the same order the original code scanned them (dx -1..1, then dy -1..1).
+    private static readonly int[] Dx = { -1, -1, -1, 0, 0, 1, 1, 1 };
+    private static readonly int[] Dy = { -1, 0, 1, -1, 1, -1, 0, 1 };
+    private static readonly int[] Offset = new int[8];   // index delta of each direction
+    private static readonly int[] CornerA = new int[8];  // for diagonals: index delta of the two orthogonal corner cells
+    private static readonly int[] CornerB = new int[8];  // (0 for orthogonal moves)
+    private static readonly int[] StepCost = new int[8];
 
-    public void ClearCache()
+    static PathManager()
     {
-        foreach (var ff in flowFieldCache.Values)
+        for (int d = 0; d < 8; d++)
         {
-            ff.needsDistanceUpdate = true;
-            ff.hasVectors = false;
+            Offset[d] = Dy[d] * Size + Dx[d];
+            bool diagonal = Dx[d] != 0 && Dy[d] != 0;
+            CornerA[d] = diagonal ? Dx[d] : 0;
+            CornerB[d] = diagonal ? Dy[d] * Size : 0;
+            StepCost[d] = diagonal ? DiagCost : OrthCost;
         }
     }
 
+    // Static terrain data, built once from the grid heights.
+    private ushort[] stepMask;   // bit d set: stepping from this cell in direction d is allowed by the terrain alone
+    private bool built;
+
+    private class Field
+    {
+        public int target;
+        public int[] dist = new int[CellCount];
+        public bool computed;
+        public bool dirty = true;
+    }
+
+    private readonly Dictionary<int, Field> fields = new Dictionary<int, Field>();
+    private readonly List<Field> dirtyQueue = new List<Field>();
+    private readonly List<int>[] buckets = CreateBuckets();
+    private readonly Stopwatch budgetTimer = new Stopwatch();
+
+    // Search scratch (reused, no per-call allocation)
+    private int[] visitStamp = new int[CellCount];
+    private int stamp;
+    private readonly IntHeap heap = new IntHeap(CellCount);
+    private readonly HashSet<long> checkedSegments = new HashSet<long>();
+
+    private static List<int>[] CreateBuckets()
+    {
+        var b = new List<int>[DiagCost + 1];
+        for (int i = 0; i < b.Length; i++) b[i] = new List<int>(1024);
+        return b;
+    }
+
+    // ------------------------------------------------------------------------------------------------ public API
+
+    /// <summary>Marks every flow field stale. They are recomputed over the next frames (see Update).</summary>
+    public void ClearCache()
+    {
+        foreach (var f in fields.Values) MarkDirty(f);
+    }
+
+    /// <summary>Call after towers are placed or removed.</summary>
     public void NotifyMazeChanged()
     {
         ClearCache();
         OnMazeChanged?.Invoke();
     }
 
+    /// <summary>
+    /// True if, for every spawner, each waypoint can reach the next one with the current tower layout.
+    /// Independent of the flow-field cache, so it is always exact (used by placement preview and placement).
+    /// </summary>
     public bool ValidateFullMaze()
     {
         if (WaveManager.Instance == null) return true;
-        
+        EnsureBuilt();
+
+        var grid = GridManager.Instance;
+        checkedSegments.Clear();
         foreach (var spawner in WaveManager.Instance.activeSpawners)
         {
-            if (spawner.waypoints == null || spawner.waypoints.Length < 2) continue;
-            for (int i = 0; i < spawner.waypoints.Length - 1; i++)
+            var wp = spawner.waypoints;
+            if (wp == null || wp.Length < 2) continue;
+            for (int i = 0; i < wp.Length - 1; i++)
             {
-                Vector2Int startNode = GridManager.Instance.WorldToGridCell(spawner.waypoints[i]);
-                Vector2Int targetNode = GridManager.Instance.WorldToGridCell(spawner.waypoints[i+1]);
-                
-                FlowField ff = GetFlowField(targetNode, false);
-                if (ff == null || ff.distanceGrid[startNode.x + 100, startNode.y + 100] == float.MaxValue)
-                {
-                    Debug.Log($"Maze Validation Failed for Spawner {spawner.gameObject.name}! Start Node {startNode} cannot reach Target Node {targetNode}. Target FlowField valid: {ff != null}");
-                    return false;
-                }
+                int start = GridManager.CellIndex(grid.WorldToGridCell(wp[i]));
+                int target = GridManager.CellIndex(grid.WorldToGridCell(wp[i + 1]));
+                if (start < 0 || target < 0) return false;
+                if (!checkedSegments.Add(((long)start << 32) | (uint)target)) continue; // already verified
+
+                if (!CanReach(start, target)) return false;
             }
         }
         return true;
     }
 
+    /// <summary>
+    /// Direction a creep at <paramref name="currentPos"/> should move to reach <paramref name="targetPos"/>
+    /// (unit vector in x/z, or zero if there is no route).
+    /// </summary>
     public Vector2 GetFlowDirection(Vector3 currentPos, Vector3 targetPos)
     {
-        Vector2Int currentCell = GridManager.Instance.WorldToGridCell(currentPos);
-        Vector2Int targetCell = GridManager.Instance.WorldToGridCell(targetPos);
+        var grid = GridManager.Instance;
+        Vector2Int currentCell = grid.WorldToGridCell(currentPos);
+        Vector2Int targetCell = grid.WorldToGridCell(targetPos);
 
-        // If in the exact destination cell, steer directly towards the transform vector
-        // to prevent getting stuck oscillating over the center.
+        // In the exact destination cell, steer directly at the target position to avoid oscillating over the center.
         if (currentCell == targetCell)
         {
             Vector3 dir = (targetPos - currentPos).normalized;
             return new Vector2(dir.x, dir.z);
         }
 
-        FlowField ff = GetFlowField(targetCell, true);
-        if (ff == null) return Vector2.zero;
+        int cell = GridManager.CellIndex(currentCell);
+        int target = GridManager.CellIndex(targetCell);
+        if (cell < 0 || target < 0) return Vector2.zero;
 
-        int cx = currentCell.x + 100;
-        int cy = currentCell.y + 100;
-        if (cx >= 0 && cx < 200 && cy >= 0 && cy < 200)
-        {
-            return ff.vectorGrid[cx, cy];
-        }
-
-        return Vector2.zero;
+        EnsureBuilt();
+        Field field = GetField(target);
+        return BestDirection(field.dist, cell);
     }
 
-    private FlowField GetFlowField(Vector2Int targetNode, bool generateVectors = true)
+    /// <summary>
+    /// Recomputes every stale flow field now. Normally fields are refreshed a little per frame; call this from tools
+    /// and tests that need the result immediately.
+    /// </summary>
+    public void FlushDirtyFields()
     {
-        if (!flowFieldCache.TryGetValue(targetNode, out FlowField cached))
-        {
-            cached = new FlowField();
-            cached.target = targetNode;
-            flowFieldCache[targetNode] = cached;
-            GenerateDistanceField(cached);
-        }
-        else if (cached.needsDistanceUpdate)
-        {
-            GenerateDistanceField(cached);
-        }
-
-        if (generateVectors && !cached.hasVectors)
-        {
-            GenerateVectorField(cached);
-        }
-
-        return cached;
+        EnsureBuilt();
+        while (dirtyQueue.Count > 0) RecomputeNext();
     }
 
-    private void GenerateDistanceField(FlowField ff)
+    // ------------------------------------------------------------------------------------------------ per-frame refresh
+
+    private void Update()
     {
-        int targetX = ff.target.x + 100;
-        int targetY = ff.target.y + 100;
+        if (dirtyQueue.Count == 0) return;
 
-        if (targetX < 0 || targetX >= 200 || targetY < 0 || targetY >= 200) return;
-
-        for (int x = 0; x < 200; x++)
+        // Recompute stale fields within a time budget (at least one per frame). Until a field is refreshed, creeps keep
+        // using its previous distances, so a placement never causes a single long frame.
+        budgetTimer.Restart();
+        do
         {
-            for (int y = 0; y < 200; y++)
+            RecomputeNext();
+        }
+        while (dirtyQueue.Count > 0 && budgetTimer.Elapsed.TotalMilliseconds < regenerationBudgetMs);
+    }
+
+    private void MarkDirty(Field f)
+    {
+        if (f.dirty) return;
+        f.dirty = true;
+        dirtyQueue.Add(f);
+    }
+
+    private void RecomputeNext()
+    {
+        Field f = dirtyQueue[0];
+        dirtyQueue.RemoveAt(0);
+        ComputeDistances(f);
+    }
+
+    private Field GetField(int target)
+    {
+        if (!fields.TryGetValue(target, out Field f))
+        {
+            f = new Field { target = target };
+            fields[target] = f;
+            ComputeDistances(f); // first request for this target: compute now, creeps need a field to follow
+        }
+        return f;
+    }
+
+    // ------------------------------------------------------------------------------------------------ terrain and moves
+
+    private void EnsureBuilt()
+    {
+        if (built) return;
+        var grid = GridManager.Instance;
+        float[] heights = grid.HeightGrid;
+        stepMask = new ushort[CellCount];
+
+        int half = 0;
+        // Only cells inside the playable area take part; find the extent from the grid itself.
+        for (int y = 0; y < Size; y++)
+        {
+            for (int x = 0; x < Size; x++)
             {
-                ff.distanceGrid[x, y] = float.MaxValue;
+                var cell = new Vector2Int(x - GridManager.IndexOffset, y - GridManager.IndexOffset);
+                if (!grid.IsPlayable(cell)) continue;
+                int c = y * Size + x;
+                ushort mask = 0;
+                for (int d = 0; d < 8; d++)
+                {
+                    var n = new Vector2Int(cell.x + Dx[d], cell.y + Dy[d]);
+                    if (!grid.IsPlayable(n)) continue;
+                    int ni = c + Offset[d];
+                    if (Mathf.Abs(heights[c] - heights[ni]) > MaxStepHeight) continue;
+
+                    if (Dx[d] != 0 && Dy[d] != 0)
+                    {
+                        // Diagonal: both orthogonal corner cells must also be reachable on the flat (no corner cutting)
+                        var a = new Vector2Int(cell.x + Dx[d], cell.y);
+                        var b = new Vector2Int(cell.x, cell.y + Dy[d]);
+                        if (!grid.IsPlayable(a) || !grid.IsPlayable(b)) continue;
+                        if (Mathf.Abs(heights[c] - heights[c + CornerA[d]]) > MaxStepHeight) continue;
+                        if (Mathf.Abs(heights[c] - heights[c + CornerB[d]]) > MaxStepHeight) continue;
+                    }
+                    mask |= (ushort)(1 << d);
+                }
+                stepMask[c] = mask;
+                half++;
             }
         }
-
-        openSet.Clear();
-        openSet.Add(ff.target, 0f);
-        ff.distanceGrid[targetX, targetY] = 0f;
-        ff.needsDistanceUpdate = false;
-        ff.hasVectors = false;
-
-        // DIJKSTRA - Generate Distance Field
-        while (openSet.Count > 0)
-        {
-            Vector2Int current = openSet.RemoveFirst();
-            int cx = current.x + 100;
-            int cy = current.y + 100;
-            float currentDist = ff.distanceGrid[cx, cy];
-
-            for (int dx = -1; dx <= 1; dx++)
-            {
-                for (int dy = -1; dy <= 1; dy++)
-                {
-                    if (dx == 0 && dy == 0) continue;
-
-                    Vector2Int neighbor = new Vector2Int(current.x + dx, current.y + dy);
-                    if (!IsValidNeighbor(neighbor, current)) continue; // NOTE: reversed! Checking if neighbor can walk to current!
-                    
-                    // Prevent corner cutting
-                    if (Mathf.Abs(dx) == 1 && Mathf.Abs(dy) == 1)
-                    {
-                        if (!IsValidNeighbor(new Vector2Int(neighbor.x, current.y), current) || 
-                            !IsValidNeighbor(new Vector2Int(current.x, neighbor.y), current))
-                        {
-                            continue;
-                        }
-                    }
-
-                    int nx = neighbor.x + 100;
-                    int ny = neighbor.y + 100;
-
-                    if (nx < 0 || nx >= 200 || ny < 0 || ny >= 200) continue;
-
-                    float distToNeighbor = (dx == 0 || dy == 0) ? 10f : 14f;
-                    float newDist = currentDist + distToNeighbor;
-
-                    if (newDist < ff.distanceGrid[nx, ny])
-                    {
-                        ff.distanceGrid[nx, ny] = newDist;
-                        openSet.Add(neighbor, newDist);
-                    }
-                }
-            }
-        }
+        built = true;
     }
 
-    private void GenerateVectorField(FlowField ff)
+    /// <summary>
+    /// The one movement rule. A creep in cell <paramref name="c"/> may step in direction <paramref name="d"/> if the terrain
+    /// allows it (heights, playable area), the destination is free, and for diagonal steps both corner cells are free.
+    /// </summary>
+    private bool CanStep(bool[] occupied, int c, int d)
     {
-        int targetX = ff.target.x + 100;
-        int targetY = ff.target.y + 100;
-
-        // GENERATE VECTOR FIELD
-        for (int x = 0; x < 200; x++)
-        {
-            for (int y = 0; y < 200; y++)
-            {
-                if (ff.distanceGrid[x, y] == float.MaxValue)
-                {
-                    ff.vectorGrid[x, y] = Vector2.zero;
-                    continue; // Unreachable
-                }
-                if (x == targetX && y == targetY)
-                {
-                    ff.vectorGrid[x, y] = Vector2.zero;
-                    continue; // Target has no vector
-                }
-
-                Vector2Int current = new Vector2Int(x - 100, y - 100);
-                float bestDist = ff.distanceGrid[x, y];
-                Vector2 bestDir = Vector2.zero;
-
-                for (int dx = -1; dx <= 1; dx++)
-                {
-                    for (int dy = -1; dy <= 1; dy++)
-                    {
-                        if (dx == 0 && dy == 0) continue;
-                        
-                        Vector2Int neighbor = new Vector2Int(current.x + dx, current.y + dy);
-                        if (!IsValidNeighbor(current, neighbor)) continue;
-                        
-                        // Prevent corner cutting for vectors too
-                        if (Mathf.Abs(dx) == 1 && Mathf.Abs(dy) == 1)
-                        {
-                            if (!IsValidNeighbor(current, new Vector2Int(neighbor.x, current.y)) || 
-                                !IsValidNeighbor(current, new Vector2Int(current.x, neighbor.y)))
-                            {
-                                continue;
-                            }
-                        }
-
-                        int nx = neighbor.x + 100;
-                        int ny = neighbor.y + 100;
-
-                        if (nx < 0 || nx >= 200 || ny < 0 || ny >= 200) continue;
-
-                        if (ff.distanceGrid[nx, ny] < bestDist)
-                        {
-                            bestDist = ff.distanceGrid[nx, ny];
-                            bestDir = new Vector2(dx, dy).normalized;
-                        }
-                    }
-                }
-                ff.vectorGrid[x, y] = bestDir;
-            }
-        }
-        
-        ff.hasVectors = true;
-    }
-
-    private bool IsValidNeighbor(Vector2Int from, Vector2Int to)
-    {
-        if (GridManager.Instance.IsCellOccupied(to)) return false;
-        
-        float heightFrom = GridManager.Instance.GetCellHeight(from);
-        float heightTo = GridManager.Instance.GetCellHeight(to);
-        
-        if (Mathf.Abs(heightFrom - heightTo) > 1.2f) return false;
-        
+        if ((stepMask[c] & (1 << d)) == 0) return false;
+        if (occupied[c + Offset[d]]) return false;
+        if (CornerA[d] != 0 && (occupied[c + CornerA[d]] || occupied[c + CornerB[d]])) return false;
         return true;
     }
 
-    private struct HeapNode
+    // ------------------------------------------------------------------------------------------------ reachability
+
+    /// <summary>Greedy best-first search: is there any walkable route from start to target? Fast in open ground.</summary>
+    private bool CanReach(int start, int target)
     {
-        public Vector2Int pos;
-        public float fScore;
-        public HeapNode(Vector2Int pos, float fScore)
+        if (start == target) return true;
+        bool[] occupied = GridManager.Instance.OccupancyGrid;
+
+        stamp++;
+        heap.Clear();
+        visitStamp[start] = stamp;
+        heap.Push(Heuristic(start, target), start);
+
+        while (heap.Count > 0)
         {
-            this.pos = pos;
-            this.fScore = fScore;
+            int u = heap.PopMin();
+            for (int d = 0; d < 8; d++)
+            {
+                if (!CanStep(occupied, u, d)) continue;
+                int v = u + Offset[d];
+                if (visitStamp[v] == stamp) continue;
+                if (v == target) return true;
+                visitStamp[v] = stamp;
+                heap.Push(Heuristic(v, target), v);
+            }
+        }
+        return false;
+    }
+
+    private static int Heuristic(int a, int b)
+    {
+        int dx = (a & (Size - 1)) - (b & (Size - 1));
+        int dy = (a >> 8) - (b >> 8);
+        if (dx < 0) dx = -dx;
+        if (dy < 0) dy = -dy;
+        return dx > dy ? OrthCost * dx + (DiagCost - OrthCost) * dy : OrthCost * dy + (DiagCost - OrthCost) * dx;
+    }
+
+    // ------------------------------------------------------------------------------------------------ flow fields
+
+    /// <summary>
+    /// Distance to the field's target for every cell, by a bucket queue (costs are only 10 and 14). Distances are
+    /// computed backwards from the target: a cell is settled from a neighbour it can step to.
+    /// </summary>
+    private void ComputeDistances(Field f)
+    {
+        f.dirty = false;
+        f.computed = true;
+        if (dirtyQueue.Count > 0) dirtyQueue.Remove(f); // in case it was requested while queued
+
+        int[] dist = f.dist;
+        for (int i = 0; i < dist.Length; i++) dist[i] = InfDistance;
+
+        int target = f.target;
+        bool[] occupied = GridManager.Instance.OccupancyGrid;
+        dist[target] = 0;
+
+        foreach (var b in buckets) b.Clear();
+        buckets[0].Add(target);
+        int pending = 1;
+
+        for (int d0 = 0; pending > 0; d0++)
+        {
+            List<int> bucket = buckets[d0 % buckets.Length];
+            for (int k = 0; k < bucket.Count; k++)
+            {
+                int u = bucket[k];
+                pending--;
+                if (dist[u] != d0) continue; // superseded by a shorter route
+
+                for (int d = 0; d < 8; d++)
+                {
+                    int n = u - Offset[d]; // cell that steps to u in direction d
+                    if ((uint)n >= CellCount) continue;
+                    if (!CanStep(occupied, n, d)) continue;
+
+                    int nd = d0 + StepCost[d];
+                    if (nd < dist[n])
+                    {
+                        dist[n] = nd;
+                        buckets[nd % buckets.Length].Add(n);
+                        pending++;
+                    }
+                }
+            }
+            bucket.Clear();
         }
     }
 
-    private class MinHeap
+    /// <summary>The step from <paramref name="c"/> toward the lowest-distance reachable neighbour.</summary>
+    private Vector2 BestDirection(int[] dist, int c)
     {
-        private HeapNode[] elements;
+        int best = dist[c];
+        if (best == InfDistance || best == 0) return Vector2.zero; // unreachable, or at the target
+        bool[] occupied = GridManager.Instance.OccupancyGrid;
+
+        int bestDir = -1;
+        for (int d = 0; d < 8; d++)
+        {
+            if (!CanStep(occupied, c, d)) continue;
+            int nd = dist[c + Offset[d]];
+            if (nd < best)
+            {
+                best = nd;
+                bestDir = d;
+            }
+        }
+        return bestDir < 0 ? Vector2.zero : new Vector2(Dx[bestDir], Dy[bestDir]).normalized;
+    }
+
+    // ------------------------------------------------------------------------------------------------ int min-heap
+
+    /// <summary>Minimal binary min-heap of (key, value) int pairs, allocation-free after construction.</summary>
+    private class IntHeap
+    {
+        private readonly int[] keys;
+        private readonly int[] values;
         private int count;
 
-        public MinHeap(int maxElements)
+        public IntHeap(int capacity)
         {
-            elements = new HeapNode[maxElements];
-            count = 0;
+            keys = new int[capacity];
+            values = new int[capacity];
         }
 
         public int Count => count;
+        public void Clear() { count = 0; }
 
-        public void Clear()
+        public void Push(int key, int value)
         {
-            count = 0;
+            if (count >= keys.Length) return;
+            int i = count++;
+            while (i > 0)
+            {
+                int parent = (i - 1) >> 1;
+                if (keys[parent] <= key) break;
+                keys[i] = keys[parent];
+                values[i] = values[parent];
+                i = parent;
+            }
+            keys[i] = key;
+            values[i] = value;
         }
 
-        public void Add(Vector2Int item, float fScore)
+        public int PopMin()
         {
-            if (count >= elements.Length) return;
-            HeapNode node = new HeapNode(item, fScore);
-            elements[count] = node;
-            SortUp(count);
-            count++;
-        }
-
-        public Vector2Int RemoveFirst()
-        {
-            HeapNode firstItem = elements[0];
+            int result = values[0];
             count--;
-            elements[0] = elements[count];
-            SortDown(0);
-            return firstItem.pos;
-        }
-
-        private void SortDown(int index)
-        {
-            while (true)
+            if (count > 0)
             {
-                int childIndexLeft = index * 2 + 1;
-                int childIndexRight = index * 2 + 2;
-                int swapIndex = 0;
-
-                if (childIndexLeft < count)
+                int key = keys[count], value = values[count];
+                int i = 0;
+                while (true)
                 {
-                    swapIndex = childIndexLeft;
-
-                    if (childIndexRight < count)
-                    {
-                        if (elements[childIndexRight].fScore < elements[childIndexLeft].fScore)
-                        {
-                            swapIndex = childIndexRight;
-                        }
-                    }
-
-                    if (elements[swapIndex].fScore < elements[index].fScore)
-                    {
-                        Swap(index, swapIndex);
-                        index = swapIndex;
-                    }
-                    else
-                    {
-                        return;
-                    }
+                    int child = 2 * i + 1;
+                    if (child >= count) break;
+                    if (child + 1 < count && keys[child + 1] < keys[child]) child++;
+                    if (keys[child] >= key) break;
+                    keys[i] = keys[child];
+                    values[i] = values[child];
+                    i = child;
                 }
-                else
-                {
-                    return;
-                }
+                keys[i] = key;
+                values[i] = value;
             }
-        }
-
-        private void SortUp(int index)
-        {
-            int parentIndex = (index - 1) / 2;
-
-            while (true)
-            {
-                if (elements[index].fScore < elements[parentIndex].fScore)
-                {
-                    Swap(index, parentIndex);
-                    index = parentIndex;
-                    parentIndex = (index - 1) / 2;
-                }
-                else
-                {
-                    break;
-                }
-            }
-        }
-
-        private void Swap(int indexA, int indexB)
-        {
-            HeapNode temp = elements[indexA];
-            elements[indexA] = elements[indexB];
-            elements[indexB] = temp;
+            return result;
         }
     }
 }

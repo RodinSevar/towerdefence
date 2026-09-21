@@ -88,6 +88,7 @@ public static class PerfBench
         {
             case 0: Setup(); break;
             case 10: TerrainCheck(); break;
+            case 11: PathEquivalence(); break;
             case 1: PathCosts(); break;
             case 2: SinglePlacement(); break;
             case 3: FillTowers(); break;
@@ -113,6 +114,7 @@ public static class PerfBench
     /// <summary>Asks the path system for a direction on every spawner segment, as the creeps do each frame.</summary>
     private static void RegenAll()
     {
+        PathManager.Instance.FlushDirtyFields(); // fields are normally refreshed a little per frame; force it to measure total work
         foreach (var spawner in WaveManager.Instance.activeSpawners)
         {
             var wp = spawner.waypoints;
@@ -150,6 +152,104 @@ public static class PerfBench
             else undecided++;
         }
         Debug.Log($"BENCH terrainWalls triangles={walls} facingOutward={outward} facingIntoGround={inward} undecided={undecided}");
+        step = 11;
+    }
+
+    // ---- equivalence with the original reachability rules (kept here only as a test reference) ----
+
+    private static bool LegacyValid(Vector2Int from, Vector2Int to)
+    {
+        var g = GridManager.Instance;
+        if (g.IsCellOccupied(to)) return false;
+        return Mathf.Abs(g.GetCellHeight(from) - g.GetCellHeight(to)) <= 1.2f;
+    }
+
+    private static HashSet<Vector2Int> LegacyReachedFrom(Vector2Int target)
+    {
+        var seen = new HashSet<Vector2Int> { target };
+        var q = new Queue<Vector2Int>();
+        q.Enqueue(target);
+        while (q.Count > 0)
+        {
+            var cur = q.Dequeue();
+            for (int dx = -1; dx <= 1; dx++)
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                if (dx == 0 && dy == 0) continue;
+                var nb = new Vector2Int(cur.x + dx, cur.y + dy);
+                if (!LegacyValid(nb, cur)) continue;
+                if (dx != 0 && dy != 0 && (!LegacyValid(new Vector2Int(nb.x, cur.y), cur) || !LegacyValid(new Vector2Int(cur.x, nb.y), cur))) continue;
+                if (nb.x < -100 || nb.x >= 100 || nb.y < -100 || nb.y >= 100) continue;
+                if (seen.Add(nb)) q.Enqueue(nb);
+            }
+        }
+        return seen;
+    }
+
+    private static bool LegacyValidate()
+    {
+        var g = GridManager.Instance;
+        var cache = new Dictionary<Vector2Int, HashSet<Vector2Int>>();
+        foreach (var s in WaveManager.Instance.activeSpawners)
+        {
+            var wp = s.waypoints;
+            for (int i = 0; wp != null && i < wp.Length - 1; i++)
+            {
+                var start = g.WorldToGridCell(wp[i]);
+                var target = g.WorldToGridCell(wp[i + 1]);
+                if (!cache.TryGetValue(target, out var reached)) cache[target] = reached = LegacyReachedFrom(target);
+                if (!reached.Contains(start)) return false;
+            }
+        }
+        return true;
+    }
+
+    private static void PathEquivalence()
+    {
+        var g = GridManager.Instance;
+        var changed = new List<Vector2Int>();
+        int agree = 0, newStricter = 0, newLooser = 0, trials = 0;
+
+        void Compare(string label)
+        {
+            bool fresh = PathManager.Instance.ValidateFullMaze();
+            bool legacy = LegacyValidate();
+            trials++;
+            if (fresh == legacy) agree++;
+            else if (!fresh) { newStricter++; Debug.Log($"BENCH pathEquivalence stricter than legacy (expected only for corner squeezes): {label}"); }
+            else { newLooser++; Debug.Log($"BENCH pathEquivalence MISMATCH (new accepts, legacy rejects): {label}"); }
+        }
+
+        // 1) random towers near the paths
+        for (int i = 0; i < 40; i++)
+        {
+            var cell = g.WorldToGridCell(RandomNearPath());
+            if (g.IsCellOccupied(cell) || !g.CanBuildAt(g.GetWorldPosition(cell))) continue;
+            g.OccupyCell(cell);
+            Compare($"random tower at {cell}");
+            if (PathManager.Instance.ValidateFullMaze()) changed.Add(cell); else g.FreeCell(cell);
+        }
+
+        // 2) targeted layouts around a waypoint: full enclosure, one free side, one free diagonal (corner squeeze)
+        var sp = WaveManager.Instance.activeSpawners[0];
+        Vector2Int T = g.WorldToGridCell(sp.waypoints[sp.waypoints.Length - 1]);
+        var ring = new List<Vector2Int>();
+        for (int dx = -1; dx <= 1; dx++) for (int dy = -1; dy <= 1; dy++) if (dx != 0 || dy != 0) ring.Add(new Vector2Int(T.x + dx, T.y + dy));
+
+        void WithRing(System.Predicate<Vector2Int> occupy, string label)
+        {
+            var placed = new List<Vector2Int>();
+            foreach (var c in ring)
+                if (occupy(c) && !g.IsCellOccupied(c)) { g.OccupyCell(c); placed.Add(c); }
+            Compare(label);
+            foreach (var c in placed) g.FreeCell(c);
+        }
+        WithRing(c => true, "target fully enclosed");
+        WithRing(c => c != new Vector2Int(T.x - 1, T.y), "target with one free orthogonal side");
+        WithRing(c => c != new Vector2Int(T.x + 1, T.y + 1), "target with only a free diagonal (corner squeeze)");
+
+        foreach (var c in changed) g.FreeCell(c); // restore the layout
+        Debug.Log($"BENCH pathEquivalence trials={trials} agree={agree} newStricterThanLegacy={newStricter} newLooserThanLegacy={newLooser}");
         step = 1;
     }
 

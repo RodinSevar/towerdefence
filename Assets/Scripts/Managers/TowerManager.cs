@@ -132,7 +132,7 @@ public class TowerManager : Singleton<TowerManager>
                 if (cell != lastHoveredCell)
                 {
                     lastHoveredCell = cell;
-                    lastHoverIsValid = CanPlaceAt(cell, snappedPos, selectedTower, false, out _);
+                    lastHoverIsValid = CanPlaceAt(cell, snappedPos, selectedTower, out _);
 
                     Color ghostColor = lastHoverIsValid ? new Color(0, 1, 0, 0.4f) : new Color(1, 0, 0, 0.4f);
                     Color floorColor = lastHoverIsValid ? new Color(0, 1, 0, 0.8f) : new Color(1, 0, 0, 0.8f);
@@ -159,10 +159,9 @@ public class TowerManager : Singleton<TowerManager>
 
     /// <summary>
     /// Whether <paramref name="tower"/> can be placed on <paramref name="cell"/>: cell is buildable,
-    /// the player can afford it, and it would not cut off any spawner. <paramref name="clearPathCache"/> is true
-    /// for a real placement attempt (cache is refreshed around the check), false for hover previews.
+    /// the player can afford it, and it would not cut off any spawner.
     /// </summary>
-    private bool CanPlaceAt(Vector2Int cell, Vector3 worldPos, TowerData tower, bool clearPathCache, out string failReason)
+    private bool CanPlaceAt(Vector2Int cell, Vector3 worldPos, TowerData tower, out string failReason)
     {
         failReason = null;
         if (!GridManager.Instance.CanBuildAt(worldPos)) { failReason = "occupied or unbuildable"; return false; }
@@ -170,10 +169,8 @@ public class TowerManager : Singleton<TowerManager>
         if (GameManager.Instance.GetCurrentLumber() < tower.lumberCost) { failReason = "not enough lumber"; return false; }
 
         GridManager.Instance.OccupyCell(cell);
-        if (clearPathCache) PathManager.Instance.ClearCache();
         bool pathOk = PathManager.Instance.ValidateFullMaze();
         GridManager.Instance.FreeCell(cell);
-        if (clearPathCache) PathManager.Instance.ClearCache();
 
         if (!pathOk) failReason = "would block the path for at least one spawner";
         return pathOk;
@@ -187,7 +184,7 @@ public class TowerManager : Singleton<TowerManager>
     {
         Vector3 snappedPos = GridManager.Instance.SnapToGrid(worldPos);
         Vector2Int cell = GridManager.Instance.WorldToGridCell(snappedPos);
-        if (!CanPlaceAt(cell, snappedPos, tower, true, out string failReason))
+        if (!CanPlaceAt(cell, snappedPos, tower, out string failReason))
         {
             Debug.Log($"Tower placement failed at {cell}: {failReason}");
             return false;

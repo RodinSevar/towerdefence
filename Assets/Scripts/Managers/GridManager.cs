@@ -5,7 +5,7 @@ public class GridManager : Singleton<GridManager>
 {
     // Cell coordinates are centered on the origin (may be negative); arrays are indexed 0..ArraySize-1.
     public const int ArraySize = 256;
-    private const int IndexOffset = ArraySize / 2;
+    public const int IndexOffset = ArraySize / 2;
     private const float DefaultHeight = 0.5f;
 
     [SerializeField]
@@ -17,9 +17,17 @@ public class GridManager : Singleton<GridManager>
     [SerializeField]
     private int gridHeight = 196;
 
-    private bool[,] occupiedCellsArray;
-    private bool[,] unbuildableCellsArray;
-    private float[,] cellHeightsArray;
+    // Flat storage, index = (y + IndexOffset) * ArraySize + (x + IndexOffset). Exposed read-only-by-convention
+    // (see OccupancyGrid / HeightGrid) so the pathfinder can scan them without a method call per cell.
+    private bool[] occupiedCells;
+    private bool[] unbuildableCells;
+    private float[] cellHeights;
+
+    /// <summary>Tower/cliff occupancy, indexed by <see cref="CellIndex"/>. Do not write; use OccupyCell/FreeCell.</summary>
+    public bool[] OccupancyGrid => occupiedCells;
+
+    /// <summary>Cell surface heights, indexed by <see cref="CellIndex"/>. Do not write; use SetCellHeight.</summary>
+    public float[] HeightGrid => cellHeights;
 
     protected override void OnSingletonAwake()
     {
@@ -28,23 +36,35 @@ public class GridManager : Singleton<GridManager>
 
     private void InitializeGrid()
     {
-        occupiedCellsArray = new bool[ArraySize, ArraySize];
-        unbuildableCellsArray = new bool[ArraySize, ArraySize];
-        cellHeightsArray = new float[ArraySize, ArraySize];
+        int count = ArraySize * ArraySize;
+        occupiedCells = new bool[count];
+        unbuildableCells = new bool[count];
+        cellHeights = new float[count];
 
-        for (int x = 0; x < ArraySize; x++)
-            for (int y = 0; y < ArraySize; y++)
-                cellHeightsArray[x, y] = DefaultHeight;
+        for (int i = 0; i < count; i++)
+            cellHeights[i] = DefaultHeight;
     }
 
-    /// <summary>
-    /// Converts a centered cell coordinate to array indices. False if outside the array.
-    /// </summary>
-    private static bool TryGetIndex(Vector2Int cell, out int x, out int y)
+    /// <summary>Array index for a centered cell coordinate, or -1 if it lies outside the array.</summary>
+    public static int CellIndex(Vector2Int cell)
     {
-        x = cell.x + IndexOffset;
-        y = cell.y + IndexOffset;
-        return x >= 0 && x < ArraySize && y >= 0 && y < ArraySize;
+        int x = cell.x + IndexOffset;
+        int y = cell.y + IndexOffset;
+        if (x < 0 || x >= ArraySize || y < 0 || y >= ArraySize) return -1;
+        return y * ArraySize + x;
+    }
+
+    public static Vector2Int IndexToCell(int index)
+    {
+        return new Vector2Int(index % ArraySize - IndexOffset, index / ArraySize - IndexOffset);
+    }
+
+    /// <summary>True if the cell is inside the playable area (the grid is centered on the origin).</summary>
+    public bool IsPlayable(Vector2Int cell)
+    {
+        int halfWidth = gridWidth / 2;
+        int halfHeight = gridHeight / 2;
+        return cell.x >= -halfWidth && cell.x <= halfWidth && cell.y >= -halfHeight && cell.y <= halfHeight;
     }
 
     /// <summary>
@@ -61,13 +81,14 @@ public class GridManager : Singleton<GridManager>
 
     public void SetCellHeight(Vector2Int cell, float height)
     {
-        if (TryGetIndex(cell, out int x, out int y))
-            cellHeightsArray[x, y] = height;
+        int i = CellIndex(cell);
+        if (i >= 0) cellHeights[i] = height;
     }
 
     public float GetCellHeight(Vector2Int cell)
     {
-        return TryGetIndex(cell, out int x, out int y) ? cellHeightsArray[x, y] : DefaultHeight;
+        int i = CellIndex(cell);
+        return i >= 0 ? cellHeights[i] : DefaultHeight;
     }
 
     public Vector3 GetWorldPosition(Vector2Int cell)
@@ -90,8 +111,9 @@ public class GridManager : Singleton<GridManager>
     /// </summary>
     public bool IsCellOccupied(Vector2Int cell)
     {
-        if (!IsValidCell(cell)) return true;
-        return !TryGetIndex(cell, out int x, out int y) || occupiedCellsArray[x, y];
+        if (!IsPlayable(cell)) return true;
+        int i = CellIndex(cell);
+        return i < 0 || occupiedCells[i];
     }
 
     /// <summary>
@@ -99,8 +121,8 @@ public class GridManager : Singleton<GridManager>
     /// </summary>
     public void OccupyCell(Vector2Int cell)
     {
-        if (TryGetIndex(cell, out int x, out int y))
-            occupiedCellsArray[x, y] = true;
+        int i = CellIndex(cell);
+        if (i >= 0) occupiedCells[i] = true;
     }
 
     /// <summary>
@@ -108,8 +130,8 @@ public class GridManager : Singleton<GridManager>
     /// </summary>
     public void FreeCell(Vector2Int cell)
     {
-        if (TryGetIndex(cell, out int x, out int y))
-            occupiedCellsArray[x, y] = false;
+        int i = CellIndex(cell);
+        if (i >= 0) occupiedCells[i] = false;
     }
 
     /// <summary>
@@ -118,9 +140,10 @@ public class GridManager : Singleton<GridManager>
     public bool CanBuildAt(Vector3 worldPos)
     {
         Vector2Int cell = WorldToGridCell(worldPos);
-        if (!TryGetIndex(cell, out int x, out int y)) return false;
+        int i = CellIndex(cell);
+        if (i < 0) return false;
 
-        return !IsCellOccupied(cell) && !unbuildableCellsArray[x, y];
+        return !IsCellOccupied(cell) && !unbuildableCells[i];
     }
 
     /// <summary>
@@ -128,18 +151,8 @@ public class GridManager : Singleton<GridManager>
     /// </summary>
     public void MarkUnbuildable(Vector2Int cell)
     {
-        if (TryGetIndex(cell, out int x, out int y))
-            unbuildableCellsArray[x, y] = true;
-    }
-
-    /// <summary>
-    /// Checks if a grid cell is within the playable bounds
-    /// </summary>
-    private bool IsValidCell(Vector2Int cell)
-    {
-        int halfWidth = gridWidth / 2;
-        int halfHeight = gridHeight / 2;
-        return cell.x >= -halfWidth && cell.x <= halfWidth && cell.y >= -halfHeight && cell.y <= halfHeight;
+        int i = CellIndex(cell);
+        if (i >= 0) unbuildableCells[i] = true;
     }
 
     public float GetCellSize() => cellSize;
