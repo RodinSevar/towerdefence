@@ -17,7 +17,6 @@ public static class TerrainImporter
     private const int BaseLayer = 2;               // the map's default level
     private const float WaterOffset = -89.6f;      // water height = (raw - 0x2000) / 4 - 89.6 (Warcraft III convention)
 
-    [MenuItem("Tools/Import WC3 Terrain")]
     public static void ImportMenu()
     {
         Import();

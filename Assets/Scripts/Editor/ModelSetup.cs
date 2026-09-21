@@ -6,7 +6,6 @@ public static class ModelSetup
 {
     private const string TowerPrefab = "Assets/Prefabs/Tower.prefab";
 
-    [MenuItem("Tools/Apply Low-Poly Models")]
     public static void Apply()
     {
         Mesh tower = ModelShot.SaveMesh(LowPolyModels.GuardTower());

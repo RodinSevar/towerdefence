@@ -17,7 +17,6 @@ public static class GameDataBuilder
     private const string PrefabDir = "Assets/Prefabs";
     private const string RaceDir = "Assets/Data/Races";
 
-    [MenuItem("Tools/Build Game Data")]
     public static void BuildInOpenScene()
     {
         Build();
@@ -222,7 +221,6 @@ public static class GameDataBuilder
     }
 
     /// <summary>Deletes and regenerates the Tower and Enemy prefabs (use after changing how they are built).</summary>
-    [MenuItem("Tools/Rebuild Prefabs")]
     public static void RebuildPrefabsMenu()
     {
         AssetDatabase.DeleteAsset($"{PrefabDir}/Tower.prefab");

@@ -57,7 +57,6 @@ public static class RouteImporter
         { "Left_Move_2",          ("Bottom Middle (Gray)", Color.gray) },
     };
 
-    [MenuItem("Tools/Import WC3 Routes")]
     public static void ImportMenu()
     {
         Import();
