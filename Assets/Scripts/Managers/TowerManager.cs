@@ -166,8 +166,9 @@ public class TowerManager : Singleton<TowerManager>
     }
 
     /// <summary>
-    /// Colours each square of the footprint by whether it can be built on, so the player sees which square blocks the
-    /// placement. If every square is fine but the placement is still refused (cost, or it would block the maze), all turn red.
+    /// Colours each square of the footprint by whether the ground under it can be built on, ignoring cost and the maze rule,
+    /// so the player sees the terrain as if they could afford the tower. (The tower model still tints red when the build
+    /// would be refused for any reason.)
     /// </summary>
     private void ColorFootprint(Vector2Int origin, Color good, Color bad)
     {
@@ -175,12 +176,10 @@ public class TowerManager : Singleton<TowerManager>
         for (int i = 0; i < floorSquares.Length; i++)
         {
             var block = new Vector2Int(origin.x + (i % perSide) * 2, origin.y + (i / perSide) * 2);
-            bool ok = lastHoverIsValid || (GridManager.Instance.CanBuildBlock(block, 2) && !AllSquaresBuildable(origin));
+            bool ok = GridManager.Instance.CanBuildBlock(block, 2);
             if (floorSquares[i] != null) floorSquares[i].material.color = ok ? good : bad;
         }
     }
-
-    private static bool AllSquaresBuildable(Vector2Int origin) => GridManager.Instance.CanBuildFootprint(origin);
 
     /// <summary>
     /// Whether <paramref name="tower"/> can be placed on <paramref name="cell"/>: cell is buildable,
