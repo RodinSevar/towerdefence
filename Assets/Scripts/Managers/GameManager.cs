@@ -23,6 +23,7 @@ public class GameManager : Singleton<GameManager>
     private int currentLumber;
     private int currentWave = 0;
     private bool isGameOver = false;
+    private float waveCountdown = -1f; // seconds until the next wave starts; negative = no wave scheduled
     private readonly HashSet<Enemy> activeEnemies = new HashSet<Enemy>();
 
     public System.Action<int> OnGoldChanged;
@@ -48,8 +49,24 @@ public class GameManager : Singleton<GameManager>
         OnLivesChanged?.Invoke(currentLives);
 
         // Start the first wave after a delay
-        Invoke(nameof(StartNextWave), firstWaveDelay);
+        waveCountdown = firstWaveDelay;
     }
+
+    /// <summary>One simulation tick (called by <see cref="Simulation"/>): counts down to the next wave.</summary>
+    public void SimTick(float dt)
+    {
+        if (isGameOver || waveCountdown < 0f) return;
+        waveCountdown -= dt;
+        if (waveCountdown > 0f) return;
+        waveCountdown = -1f;
+        StartNextWave();
+    }
+
+    /// <summary>Seconds until the next wave starts, or a negative number if none is scheduled.</summary>
+    public float WaveCountdown => waveCountdown;
+
+    /// <summary>Cancels the scheduled wave (tests that start waves themselves).</summary>
+    public void CancelWaveTimer() => waveCountdown = -1f;
 
     public void StartNextWave()
     {
@@ -128,9 +145,7 @@ public class GameManager : Singleton<GameManager>
 
         if (currentWave < WaveManager.Instance.GetTotalWaves())
         {
-            // Cancel any pending invokes and schedule next wave
-            CancelInvoke(nameof(StartNextWave));
-            Invoke(nameof(StartNextWave), waveDelay);
+            waveCountdown = waveDelay;
         }
         else
         {

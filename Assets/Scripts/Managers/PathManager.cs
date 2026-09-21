@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 
 /// <summary>
@@ -16,8 +15,8 @@ public class PathManager : Singleton<PathManager>
 {
     public System.Action OnMazeChanged;
 
-    /// <summary>Milliseconds per frame spent recomputing flow fields after the maze changed.</summary>
-    [SerializeField] private float regenerationBudgetMs = 2f;
+    /// <summary>Flow fields recomputed per simulation tick after the maze changed (a count, not a time budget, so every machine refreshes the same fields on the same tick).</summary>
+    [SerializeField] private int fieldsPerTick = 1;
 
     private const int Size = GridManager.ArraySize;
     private const int SizeShift = 9; // log2(Size)
@@ -61,7 +60,6 @@ public class PathManager : Singleton<PathManager>
     private readonly Dictionary<int, Field> fields = new Dictionary<int, Field>();
     private readonly List<Field> dirtyQueue = new List<Field>();
     private readonly List<int>[] buckets = CreateBuckets();
-    private readonly Stopwatch budgetTimer = new Stopwatch();
 
     // Search scratch (reused, no per-call allocation)
     private int[] visitStamp = new int[CellCount];
@@ -157,18 +155,11 @@ public class PathManager : Singleton<PathManager>
 
     // ------------------------------------------------------------------------------------------------ per-frame refresh
 
-    private void Update()
+    /// <summary>One simulation tick (called by <see cref="Simulation"/>): refreshes a few stale fields.</summary>
+    public void SimTick()
     {
-        if (dirtyQueue.Count == 0) return;
-
-        // Recompute stale fields within a time budget (at least one per frame). Until a field is refreshed, creeps keep
-        // using its previous distances, so a placement never causes a single long frame.
-        budgetTimer.Restart();
-        do
-        {
-            RecomputeNext();
-        }
-        while (dirtyQueue.Count > 0 && budgetTimer.Elapsed.TotalMilliseconds < regenerationBudgetMs);
+        // Until a field is refreshed, creeps keep using its previous distances, so a placement never causes a single long frame.
+        for (int i = 0; i < fieldsPerTick && dirtyQueue.Count > 0; i++) RecomputeNext();
     }
 
     private void MarkDirty(Field f)

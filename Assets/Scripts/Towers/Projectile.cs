@@ -8,6 +8,7 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     private static readonly Stack<Projectile> pool = new Stack<Projectile>();
+    private static readonly List<Projectile> flying = new List<Projectile>(); // in flight (deterministic order: swap-removal on hit)
 
     private Enemy target;
     private float speed;
@@ -15,6 +16,7 @@ public class Projectile : MonoBehaviour
     private StatusEffect payloadEffect;
     private Transform tr;
     private Renderer rend;
+    private int flyingIndex;
 
     public static void Spawn(Vector3 position, float scale, Color color, Enemy targetEnemy, float travelSpeed,
         float hitDamage, StatusEffect effect)
@@ -31,6 +33,8 @@ public class Projectile : MonoBehaviour
         p.damage = hitDamage;
         p.payloadEffect = effect;
         p.gameObject.SetActive(true);
+        p.flyingIndex = flying.Count;
+        flying.Add(p);
     }
 
     private static Projectile Create()
@@ -44,7 +48,25 @@ public class Projectile : MonoBehaviour
         return p;
     }
 
-    private void Update()
+    /// <summary>Moves every projectile one tick (called by <see cref="Simulation"/>).</summary>
+    public static void SimTickAll(float dt)
+    {
+        for (int i = flying.Count - 1; i >= 0; i--)
+        {
+            Projectile p = flying[i];
+            if (p == null) { RemoveFlying(i); continue; } // destroyed by a scene reload
+            p.Step(dt);
+        }
+    }
+
+    private static void RemoveFlying(int i)
+    {
+        int last = flying.Count - 1;
+        if (i != last) { flying[i] = flying[last]; if (flying[i] != null) flying[i].flyingIndex = i; }
+        flying.RemoveAt(last);
+    }
+
+    private void Step(float dt)
     {
         // If the target dies while the shot is in flight, recycle it
         if (target == null || !target.IsAlive)
@@ -55,15 +77,15 @@ public class Projectile : MonoBehaviour
 
         Vector3 targetPos = target.AimPoint;
         Vector3 toTarget = targetPos - tr.position;
-        float distanceThisFrame = speed * Time.deltaTime;
+        float distanceThisTick = speed * dt;
 
-        if (toTarget.sqrMagnitude <= distanceThisFrame * distanceThisFrame)
+        if (toTarget.sqrMagnitude <= distanceThisTick * distanceThisTick)
         {
             HitTarget();
             return;
         }
 
-        tr.position += toTarget.normalized * distanceThisFrame;
+        tr.position += toTarget.normalized * distanceThisTick;
     }
 
     private void HitTarget()
@@ -78,6 +100,7 @@ public class Projectile : MonoBehaviour
 
     private void Release()
     {
+        RemoveFlying(flyingIndex);
         target = null;
         payloadEffect = null;
         gameObject.SetActive(false);

@@ -49,6 +49,12 @@ public class TowerManager : Singleton<TowerManager>
         }
     }
 
+    /// <summary>One simulation tick: every tower acts, in the order they were built.</summary>
+    public void SimTick(float dt)
+    {
+        for (int i = 0; i < activeTowers.Count; i++) activeTowers[i].SimTick(dt);
+    }
+
     public void RegisterTower(Tower tower)
     {
         activeTowers.Add(tower);

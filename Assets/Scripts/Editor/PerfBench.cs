@@ -105,7 +105,7 @@ public static class PerfBench
 
     private static void Setup()
     {
-        GameManager.Instance.CancelInvoke();          // no automatic wave
+        GameManager.Instance.CancelWaveTimer();          // no automatic wave
         GameManager.Instance.AddGold(10000000);
         // creeps leaking must not end the game (GameOver freezes game time); give the bench effectively unlimited lives
         typeof(GameManager).GetField("currentLives", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
@@ -184,7 +184,7 @@ public static class PerfBench
             routeLivesStart = GameManager.Instance.GetCurrentLives();
             Time.timeScale = 20f;
             WaveManager.Instance.StartWave(1);
-            routeStartTime = Time.time;
+            routeStartTime = (float)Simulation.Time;
             routeSpawned = true;
             routeFrame = 0;
             return;
@@ -201,7 +201,7 @@ public static class PerfBench
             if (e.StepIndex > best) routeMaxStep[e.Origin] = e.StepIndex;
         }
 
-        double gameTime = Time.time - routeStartTime;
+        double gameTime = Simulation.Time - routeStartTime;
         routeMaxQueue = Mathf.Max(routeMaxQueue, EnemyManager.Instance.PathQueueLength);
         foreach (var e in alive)
             if (!routeFirstMove.ContainsKey(e) && (e.Position - routeSpawnPos[e]).sqrMagnitude > 0.0025f)
@@ -227,7 +227,7 @@ public static class PerfBench
         foreach (var e in alive) Debug.Log($"BENCH routeStuck spawner='{e.Origin.name}' step={e.StepIndex} at={e.Position}");
 
         Time.timeScale = 1f;
-        GameManager.Instance.CancelInvoke(); // the cleared wave schedules the next one; the bench drives waves itself
+        GameManager.Instance.CancelWaveTimer(); // the cleared wave schedules the next one; the bench drives waves itself
         step = 1;
     }
 
@@ -469,13 +469,13 @@ public static class PerfBench
     {
         if (behaviorStart < 0)
         {
-            behaviorStart = Time.timeAsDouble;
+            behaviorStart = Simulation.Time;
             aliveAtStart = EnemyManager.Instance.Count;
             livesAtStart = GameManager.Instance.GetCurrentLives();
             goldAtStart = GameManager.Instance.GetCurrentGold();
             return;
         }
-        if (Time.timeAsDouble - behaviorStart < BehaviorSeconds) return;
+        if (Simulation.Time - behaviorStart < BehaviorSeconds) return;
 
         int alive = EnemyManager.Instance.Count;
         int leaked = livesAtStart - GameManager.Instance.GetCurrentLives();

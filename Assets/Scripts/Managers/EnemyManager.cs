@@ -93,11 +93,11 @@ public class EnemyManager : Singleton<EnemyManager>
         hasHoles = true;
     }
 
-    private void Update()
+    /// <summary>One simulation tick (called by <see cref="Simulation"/>).</summary>
+    public void SimTick(float dt)
     {
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver()) return;
 
-        float dt = Time.deltaTime;
         ServePathRequests(dt);
         // Creeps can die while ticking (reaching the end); their slots just become null. Creeps spawned meanwhile are
         // appended and start ticking next frame.

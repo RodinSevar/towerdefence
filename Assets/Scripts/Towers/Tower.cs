@@ -62,14 +62,15 @@ public class Tower : MonoBehaviour, ISelectable
         }
     }
 
-    private void Update()
+    /// <summary>One simulation tick (called by <see cref="TowerManager.SimTick"/>).</summary>
+    public void SimTick(float dt)
     {
         if (GameManager.Instance == null || CurrentLevel == null) return;
         if (GameManager.Instance.IsGameOver()) return;
 
         if (laserLine != null && laserLine.enabled)
         {
-            laserDisplayTimer -= Time.deltaTime;
+            laserDisplayTimer -= dt;
             if (laserDisplayTimer <= 0)
             {
                 laserLine.enabled = false;
@@ -82,7 +83,7 @@ public class Tower : MonoBehaviour, ISelectable
             }
         }
 
-        fireTimer += Time.deltaTime;
+        fireTimer += dt;
 
         FindTarget();
 

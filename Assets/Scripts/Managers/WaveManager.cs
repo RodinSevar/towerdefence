@@ -7,7 +7,7 @@ public class WaveManager : Singleton<WaveManager>
     [SerializeField] private WaveSet waveSet;
 
     [Tooltip("Creeps instantiated per frame. The map spawns a level at once; spreading it over a few frames avoids a hitch.")]
-    [SerializeField] private int spawnsPerFrame = 200;
+    [SerializeField] private int spawnsPerTick = 200;
 
     private WaveSet.Wave[] waves => waveSet != null ? waveSet.waves : System.Array.Empty<WaveSet.Wave>();
 
@@ -67,11 +67,12 @@ public class WaveManager : Singleton<WaveManager>
         return true;
     }
 
-    private void Update()
+    /// <summary>One simulation tick (called by <see cref="Simulation"/>).</summary>
+    public void SimTick()
     {
         if (!isSpawning) return;
 
-        for (int budget = spawnsPerFrame; budget > 0 && isSpawning; budget--)
+        for (int budget = spawnsPerTick; budget > 0 && isSpawning; budget--)
         {
             if (spawnerIndex >= activeSpawners.Count)
             {

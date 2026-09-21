@@ -1,0 +1,58 @@
+using UnityEngine;
+
+/// <summary>
+/// Runs the game logic at a fixed rate, independent of the frame rate: every tick has the same length, and systems run in one
+/// fixed order. Two machines that start from the same state and apply the same inputs on the same ticks therefore end up in
+/// the same state, which lockstep multiplayer relies on. Rendering-only work (camera, UI, minimap) stays in Update.
+///
+/// Anything that changes game state (movement, targeting, damage, timers, spawning, path refresh) must run from a tick, use
+/// <see cref="TickDt"/> instead of Time.deltaTime, and avoid wall-clock time, Unity's Random and unordered iteration.
+/// </summary>
+public class Simulation : Singleton<Simulation>
+{
+    public const int TicksPerSecond = 60;
+    public const float TickDt = 1f / TicksPerSecond;
+
+    /// <summary>Ticks executed since the game started.</summary>
+    public static int CurrentTick { get; private set; }
+
+    /// <summary>Simulated seconds since the game started.</summary>
+    public static double Time => CurrentTick * (double)TickDt;
+
+    [Tooltip("Ticks run per rendered frame at most; if the game falls further behind it slows down instead of freezing")]
+    [SerializeField] private int maxTicksPerFrame = 30;
+
+    private float accumulator;
+
+    protected override void OnSingletonAwake()
+    {
+        CurrentTick = 0;
+    }
+
+    private void Update()
+    {
+        // UnityEngine.Time.deltaTime is 0 while the game is paused (timeScale 0) and scaled by game speed.
+        accumulator += UnityEngine.Time.deltaTime;
+        int ran = 0;
+        while (accumulator >= TickDt && ran < maxTicksPerFrame)
+        {
+            Step();
+            accumulator -= TickDt;
+            ran++;
+        }
+        if (accumulator > TickDt) accumulator = TickDt; // the rest of a backlog is dropped
+    }
+
+    private static void Step()
+    {
+        CurrentTick++;
+
+        // Fixed order. Later systems see the results of earlier ones within the same tick.
+        if (PathManager.Instance != null) PathManager.Instance.SimTick();
+        if (WaveManager.Instance != null) WaveManager.Instance.SimTick();
+        if (EnemyManager.Instance != null) EnemyManager.Instance.SimTick(TickDt);
+        if (TowerManager.Instance != null) TowerManager.Instance.SimTick(TickDt);
+        Projectile.SimTickAll(TickDt);
+        if (GameManager.Instance != null) GameManager.Instance.SimTick(TickDt);
+    }
+}
