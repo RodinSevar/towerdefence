@@ -248,6 +248,19 @@ public class GridManager : Singleton<GridManager>
 
     public Vector3 SnapToFootprint(Vector3 worldPos) => FootprintCenter(FootprintOrigin(worldPos));
 
+    /// <summary>Whether the <paramref name="size"/> x <paramref name="size"/> block of cells at <paramref name="origin"/> is free and buildable.</summary>
+    public bool CanBuildBlock(Vector2Int origin, int size)
+    {
+        for (int dz = 0; dz < size; dz++)
+            for (int dx = 0; dx < size; dx++)
+            {
+                var c = new Vector2Int(origin.x + dx, origin.y + dz);
+                int i = CellIndex(c);
+                if (i < 0 || IsCellOccupied(c) || unbuildableCells[i]) return false;
+            }
+        return true;
+    }
+
     public bool CanBuildFootprint(Vector2Int origin)
     {
         for (int dz = 0; dz < Footprint; dz++)

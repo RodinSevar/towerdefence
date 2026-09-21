@@ -13,7 +13,7 @@ public class TowerManager : Singleton<TowerManager>
     private GameObject previewGhost;
     private GameObject previewFloor;
     private Renderer[] ghostRenderers;
-    private Renderer floorRenderer;
+    private Renderer[] floorSquares;    // the four 1x1 squares of the footprint, each coloured by its own buildability
     private Vector2Int lastHoveredCell = new Vector2Int(-999, -999);
     private bool lastHoverIsValid = false;
 
@@ -88,14 +88,21 @@ public class TowerManager : Singleton<TowerManager>
             rend.material = CreateGhostMaterial(3000);
         }
         
-        previewFloor = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        Destroy(previewFloor.GetComponent<Collider>());
-        previewFloor.transform.rotation = Quaternion.Euler(90, 0, 0);
-        float size = GridManager.Instance.FootprintWorldSize;
-        previewFloor.transform.localScale = new Vector3(size, size, 1);
-        
-        floorRenderer = previewFloor.GetComponent<Renderer>();
-        floorRenderer.material = CreateGhostMaterial(3001);
+        previewFloor = new GameObject("PlacementFootprint");
+        int squaresPerSide = GridManager.Footprint / 2;
+        float square = GridManager.Instance.FootprintWorldSize / squaresPerSide;
+        floorSquares = new Renderer[squaresPerSide * squaresPerSide];
+        for (int i = 0; i < floorSquares.Length; i++)
+        {
+            var q = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            Destroy(q.GetComponent<Collider>());
+            q.transform.SetParent(previewFloor.transform, false);
+            q.transform.localRotation = Quaternion.Euler(90, 0, 0);
+            q.transform.localScale = new Vector3(square * 0.96f, square * 0.96f, 1);
+            q.transform.localPosition = new Vector3(((i % squaresPerSide) - (squaresPerSide - 1) / 2f) * square, 0, ((i / squaresPerSide) - (squaresPerSide - 1) / 2f) * square);
+            floorSquares[i] = q.GetComponent<Renderer>();
+            floorSquares[i].material = CreateGhostMaterial(3001);
+        }
         
         lastHoveredCell = new Vector2Int(-999, -999);
     }
@@ -135,13 +142,14 @@ public class TowerManager : Singleton<TowerManager>
                     lastHoverIsValid = CanPlaceAt(cell, snappedPos, selectedTower, out _);
 
                     Color ghostColor = lastHoverIsValid ? new Color(0, 1, 0, 0.4f) : new Color(1, 0, 0, 0.4f);
-                    Color floorColor = lastHoverIsValid ? new Color(0, 1, 0, 0.8f) : new Color(1, 0, 0, 0.8f);
+                    var good = new Color(0, 1, 0, 0.8f);
+                    var bad = new Color(1, 0, 0, 0.8f);
 
                     foreach (var rend in ghostRenderers)
                     {
                         if (rend != null) rend.material.color = ghostColor;
                     }
-                    if (floorRenderer != null) floorRenderer.material.color = floorColor;
+                    ColorFootprint(cell, good, bad);
                 }
             }
             else
@@ -156,6 +164,23 @@ public class TowerManager : Singleton<TowerManager>
             previewFloor.SetActive(false);
         }
     }
+
+    /// <summary>
+    /// Colours each square of the footprint by whether it can be built on, so the player sees which square blocks the
+    /// placement. If every square is fine but the placement is still refused (cost, or it would block the maze), all turn red.
+    /// </summary>
+    private void ColorFootprint(Vector2Int origin, Color good, Color bad)
+    {
+        int perSide = GridManager.Footprint / 2;
+        for (int i = 0; i < floorSquares.Length; i++)
+        {
+            var block = new Vector2Int(origin.x + (i % perSide) * 2, origin.y + (i / perSide) * 2);
+            bool ok = lastHoverIsValid || (GridManager.Instance.CanBuildBlock(block, 2) && !AllSquaresBuildable(origin));
+            if (floorSquares[i] != null) floorSquares[i].material.color = ok ? good : bad;
+        }
+    }
+
+    private static bool AllSquaresBuildable(Vector2Int origin) => GridManager.Instance.CanBuildFootprint(origin);
 
     /// <summary>
     /// Whether <paramref name="tower"/> can be placed on <paramref name="cell"/>: cell is buildable,
