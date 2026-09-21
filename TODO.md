@@ -9,6 +9,7 @@
 - [x] Remove `GameManager.GetGold()` duplicate (use `GetCurrentGold()`)
 
 ## Next (in order)
+- [ ] **ON HOLD: the imported-data unknowns** (see README, "Imported map data: known unknowns"). Base unit and ability data will be extracted from the Warcraft III game files later. Until then do not simulate tower abilities, splash, attack/defense types or tune the assumed defaults; when the game data is available, replace the assumptions in `WaveImporter`/`TowerImporter` and re-run them.
 - [x] `Singleton<T>` base class for the 7 manager singletons
 - [x] UI now lives in the scene (built once by `Tools > Build UI`, `Assets/Scripts/Editor/UIBuilder.cs`); fields wired via `SerializedObject`, reflection and `GameBoot.SetupUI` removed. Edit the Canvas in the scene directly from now on.
 - [x] Towers and enemies are prefabs (`Assets/Prefabs`) driven by `TowerData` / `EnemyData` / `WaveSet` assets in `Assets/Data`. `Tools > Build Game Data` creates missing assets/prefabs and wires the managers. Also fixed double tower registration and the sell-refund mismatch.
